@@ -1,0 +1,53 @@
+project:
+  output-dir: docs
+  type: website
+  render:
+    - index.qmd
+    - conservacao/index.qmd
+    - expedicoes/index.qmd
+    - team/index.qmd
+  resources:
+    - figures/**
+    - js/**
+    - css/**
+
+website:
+  title: "Tsiino Hiwiida"
+  page-navigation: true
+  reader-mode: true  
+  favicon: "figures/tsiino_hex_sticker.png"
+
+  navbar:
+    search: true
+    background: light
+    collapse-below: lg
+    type: light
+    logo: "figures/tsiino_hex_sticker.png"
+    href: index.qmd
+    left:
+      - text: "Sobre"
+        href: index.qmd
+      - text: "Expedições"
+        href: expedicoes/index.qmd
+      - text: "Conservação"
+        href: conservacao/index.qmd
+      - text: "Equipe"
+        href: team/index.qmd
+        
+format:
+  html:
+    toc: true
+    embed-resources: true
+    code-copy: true
+    code-overflow: wrap
+    code-tools: true
+    css:
+      - styles.css
+      - css/language-toggle.css
+    eval: true
+    theme: [spacelab, theme.scss]
+    include-in-header: gtm-head.html
+    include-before-body: gtm-body.html
+    include-after-body:
+      - tsiino-footer.html
+      - _includes/language-scripts.html

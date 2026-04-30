@@ -1,0 +1,55 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+/.quarto/
+*.Rproj
+_freeze
+
+### tsiino Quarto/RStudio ###
+
+# Historico e sessao do R
+.Rhistory
+.RData
+.Ruserdata
+
+# Configuracoes locais do RStudio
+.Rproj.user/
+
+# Ambiente local com possiveis tokens/senhas
+.Renviron
+.env
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs e temporarios
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# Cache comum
+.cache/
+__pycache__/
+
+# Quarto/R Markdown cache
+*_cache/
+*_files/
+
+# Saidas temporarias do Quarto
+.quarto/
+
+# Builds de pacote R, caso existam
+.Rcheck/
+*.tar.gz
+*.Rout
+
+# NAO ignorar docs/ se voce usa GitHub Pages por /docs
+# NAO ignorar _freeze/ se voce usa freeze no Quarto
+
+# Dados locais grandes ou sensiveis: descomente manualmente se necessario
+# _input_data/
+# figures/

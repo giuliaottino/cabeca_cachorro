@@ -1,0 +1,79 @@
+<footer class="tsiino-site-footer" aria-label="Rodapé do site Tsiino Hiiwiida">
+  <div class="tsiino-footer-inner">
+
+    <div class="tsiino-footer-logos">
+      <a class="tsiino-footer-home" href="index.html" aria-label="Página inicial do Tsiino Hiiwiida">
+        <img class="tsiino-footer-logo tsiino-footer-logo-project" data-src="figures/tsiino_hex_sticker.png" alt="Tsiino Hiiwiida">
+      </a>
+
+      <a href="https://www.amazoniamaisdez.org.br/" target="_blank" rel="noopener" aria-label="Iniciativa Amazônia+10">
+        <img class="tsiino-footer-logo tsiino-footer-logo-amazonia" data-src="figures/amazoniamais10.png" alt="Iniciativa Amazônia+10">
+      </a>
+
+      <a href="https://confap.org.br/" target="_blank" rel="noopener" aria-label="CONFAP">
+        <img class="tsiino-footer-logo tsiino-footer-logo-confap" data-src="figures/logo_confap.png" alt="CONFAP">
+      </a>
+
+      <a href="https://www.gov.br/cnpq/pt-br" target="_blank" rel="noopener" aria-label="CNPq">
+        <img class="tsiino-footer-logo tsiino-footer-logo-cnpq" data-src="figures/logo_cnpq.png" alt="CNPq">
+      </a>
+      
+      <a href="https://www.gov.br/pt-br/" target="_blank" rel="noopener" aria-label="Governo Federal">
+        <img class="tsiino-footer-logo tsiino-footer-logo-governo" data-src="figures/logo_governo.png" alt="Governo Federal">
+      </a>
+    </div>
+
+    <div class="tsiino-footer-contact">
+      <div class="tsiino-footer-title">Contato</div>
+      <a href="mailto:tsiinohiiwiida@gmail.com">tsiinohiiwiida@gmail.com</a>
+    </div>
+
+    <div class="tsiino-footer-dev">
+      <div class="tsiino-footer-title">Website desenvolvido por</div>
+
+      <div class="tsiino-footer-dev-links">
+        <a href="https://github.com/giuliaottino" target="_blank" rel="noopener" aria-label="GitHub de G.C. Ottino">
+          <i class="bi bi-github" aria-hidden="true"></i>
+          <span>G.C. Ottino</span>
+        </a>
+
+        <a href="https://github.com/domingoscardoso" target="_blank" rel="noopener" aria-label="GitHub de D. Cardoso / dboslab">
+          <i class="bi bi-github" aria-hidden="true"></i>
+          <span>D.B.O.S Cardoso</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const footer = document.querySelector(".tsiino-site-footer");
+
+  // Move o footer para fora do container do Quarto,
+  if (footer && footer.parentElement !== document.body) {
+    document.body.appendChild(footer);
+  }
+
+  const path = window.location.pathname;
+  const pathParts = path.split("/").filter(Boolean);
+  const currentFile = pathParts[pathParts.length - 1] || "";
+  const isHtmlFile = currentFile.endsWith(".html");
+
+  const depth = isHtmlFile ? pathParts.length - 1 : pathParts.length;
+  const prefix = depth > 0 ? "../".repeat(depth) : "";
+
+  document.querySelectorAll(".tsiino-site-footer img[data-src]").forEach(function (img) {
+    img.src = prefix + img.dataset.src;
+
+    img.addEventListener("error", function () {
+      img.classList.add("tsiino-footer-logo-missing");
+    });
+  });
+
+  document.querySelectorAll(".tsiino-footer-home").forEach(function (link) {
+    link.href = prefix + "index.html";
+  });
+});
+</script>

@@ -1,0 +1,52 @@
+<script>
+(function () {
+  "use strict";
+
+  if (window.__TSIINO_I18N_SCRIPT_LOADER__) {
+    return;
+  }
+  window.__TSIINO_I18N_SCRIPT_LOADER__ = true;
+
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var script = document.createElement("script");
+      script.src = src;
+      script.async = false;
+      script.onload = function () { resolve(src); };
+      script.onerror = function () {
+        script.remove();
+        reject(new Error("Could not load " + src));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  async function loadFirstAvailable(file) {
+    var prefixes = ["./", "../", "../../", "../../../", "/"];
+    var lastError = null;
+
+    for (var i = 0; i < prefixes.length; i++) {
+      var src = prefixes[i] + file + "?v=20260428";
+      try {
+        await loadScript(src);
+        return src;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    throw lastError;
+  }
+
+  async function loadI18n() {
+    try {
+      await loadFirstAvailable("js/translations.js");
+      await loadFirstAvailable("js/language.js");
+    } catch (error) {
+      console.warn("Não foi possível carregar os scripts de tradução.", error);
+    }
+  }
+
+  loadI18n();
+})();
+</script>

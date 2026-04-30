@@ -1,0 +1,5604 @@
+---
+title: "Tsiino Hiiwiida"
+subtitle: "Dimensões da biodiversidade de plantas e fungos no Alto Rio Negro"
+format:
+  html:
+    toc: false
+    page-layout: full
+execute:
+  echo: false
+  eval: true
+  freeze: auto
+  cache: false
+  warning: false
+  message: false
+resources:
+  - figures/
+  - _input_data/
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+find_up <- function(rel_path, start = getwd(), max_levels = 8) {
+  d <- normalizePath(start, winslash = "/", mustWork = FALSE)
+  for (i in 0:max_levels) {
+    cand <- file.path(d, rel_path)
+    if (file.exists(cand)) return(cand)
+    parent <- dirname(d)
+    if (identical(parent, d)) break
+    d <- parent
+  }
+  NA_character_
+}
+
+read_optional_csv <- function(rel_path) {
+  path <- find_up(rel_path)
+  if (is.na(path)) return(data.frame())
+  tryCatch(
+    read.csv(
+      path,
+      stringsAsFactors = FALSE,
+      check.names = FALSE,
+      fileEncoding = "UTF-8-BOM",
+      na.strings = c("", "NA", "NaN")
+    ),
+    error = function(e) data.frame()
+  )
+}
+
+col_or <- function(data, candidates, default = "") {
+  if (nrow(data) == 0) return(character())
+  hit <- intersect(candidates, names(data))
+  if (length(hit) == 0) return(rep(default, nrow(data)))
+  x <- as.character(data[[hit[1]]])
+  x[is.na(x)] <- default
+  x
+}
+
+nz <- function(x) !is.na(x) & nzchar(trimws(as.character(x)))
+
+safe <- function(x) {
+  x <- as.character(x)
+  x[is.na(x) | trimws(x) == ""] <- "—"
+  htmltools::htmlEscape(x)
+}
+```
+
+```{=html}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+<style>
+  :root{
+    --red: #A93632;
+    --red-dark: #6E1F1D;
+    --green: #626A38;
+    --green-dark: #2E3B24;
+    --green-soft: #D7DDC5;
+    --ochre: #D99A27;
+    --cream: #F6F1E8;
+    --paper: #FFFDF7;
+    --ink: #171717;
+    --muted: #675F55;
+    --line: rgba(98,106,56,0.24);
+  }
+
+  *{
+    box-sizing: border-box;
+  }
+
+  html{
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body{
+    overflow-x: hidden;
+    background:
+      linear-gradient(rgba(246,241,232,0.88), rgba(246,241,232,0.88)),
+      url("figures/tsiino_bg.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center top;
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: var(--ink);
+  }
+
+  main.content,
+  #quarto-content,
+  main{
+    width: 100%;
+    background: transparent;
+  }
+
+  main.content{
+    padding-top: 0;
+    padding-bottom: 3.5rem;
+  }
+
+  .quarto-title-block{
+    display: none !important;
+  }
+
+  .navbar{
+    box-shadow: 0 2px 18px rgba(0,0,0,0.10);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .navbar .navbar-brand,
+  .navbar .nav-link{
+    font-family: 'Montserrat', Arial, sans-serif;
+  }
+
+  .navbar .nav-link.active-section{
+    color: var(--red) !important;
+    font-weight: 800;
+    border-bottom: 2px solid var(--red);
+  }
+  
+/* NAVBAR FLUTUANTE NA HOME */
+
+/* Remove qualquer espaço reservado pelo Quarto acima do conteúdo */
+html,
+body{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+body.nav-fixed{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+#quarto-content,
+main,
+main.content{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Header transparente, sem faixa própria */
+#quarto-header{
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 10000 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Navbar sobre o vídeo, sem caixa cinza e sem linha */
+#quarto-header .navbar{
+  position: relative !important;
+  top: 0 !important;
+  margin-top: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  min-height: 76px;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Degradê sutil por cima do vídeo, sem virar faixa sólida */
+#quarto-header::before{
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 120px;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.42) 0%,
+    rgba(0,0,0,0.18) 58%,
+    rgba(0,0,0,0) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Esconde o nome textual da navbar na home; a marca já aparece na hero */
+#quarto-header .navbar-brand{
+  display: none !important;
+}
+
+/* Links e ícones brancos */
+#quarto-header .navbar .nav-link,
+#quarto-header .navbar .nav-link:visited{
+  color: #fff !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.72);
+}
+
+#quarto-header .navbar .nav-link.active,
+#quarto-header .navbar .nav-link:hover{
+  color: var(--ochre) !important;
+}
+
+#quarto-header .navbar svg,
+#quarto-header .navbar i,
+#quarto-header .navbar .bi,
+#quarto-header .quarto-navbar-tools a,
+#quarto-header .quarto-navbar-tools button,
+#quarto-header .aa-DetachedSearchButton,
+#quarto-header .aa-DetachedSearchButtonIcon,
+#quarto-header .quarto-color-scheme-toggle{
+  color: #fff !important;
+  fill: #fff !important;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.55));
+}
+
+  /* HERO inspirado na lógica visual Oxford:
+     vídeo visível + degradê + texto sobreposto, sem card gigante */
+.hero-strip{
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background-image: none;
+  background-size: cover;
+  background-position: center center;
+  isolation: isolate;
+  box-shadow: none;
+}
+.hero-video{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: -4;
+}
+
+  .hero-overlay{
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.46) 42%, rgba(0,0,0,0.10) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.25) 48%, rgba(0,0,0,0.72) 100%);
+  }
+
+.hero-logo-badge{
+  position: absolute;
+  top: clamp(5.2rem, 9vw, 7rem);
+  left: clamp(1.5rem, 3.5vw, 2.5rem);
+  width: clamp(92px, 8vw, 132px);
+  min-height: auto;
+  display: block;
+  padding: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  z-index: 5;
+}
+
+.hero-logo-badge img{
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.35));
+}
+  .hero-logo-badge.logo-missing::after{
+    content: "Tsiino Hiiwiida";
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--green-dark);
+    text-align: center;
+  }
+
+.hero-title-panel{
+  position: absolute;
+  left: clamp(2rem, 5vw, 5rem);
+  top: clamp(14.5rem, 32vh, 18rem);
+  bottom: auto;
+  width: min(940px, calc(100% - 4rem));
+  color: #fff;
+  padding-top: 0;
+  z-index: 4;
+}
+
+  .hero-kicker{
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.68rem, 1vw, 0.82rem);
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ochre);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.65);
+  }
+
+.hero-title-panel h1{
+  margin: 0;
+  color: #fff;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.9;
+  font-weight: 900;
+  letter-spacing: -0.07em;
+  text-shadow: 0 3px 26px rgba(0,0,0,0.75);
+}
+
+  .hero-subtitle{
+    margin: 1rem 0 0 0 !important;
+    color: #F6F1E8 !important;
+    font-family: 'Space Mono', monospace !important;
+    font-size: clamp(0.78rem, 1.45vw, 1.05rem) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.45 !important;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.70);
+  }
+
+  .hero-description{
+    margin: 0.9rem 0 0 0 !important;
+    color: rgba(255,255,255,0.92) !important;
+    font-size: clamp(1rem, 1.6vw, 1.25rem) !important;
+    line-height: 1.58 !important;
+    max-width: 760px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.68);
+  }
+
+  .hero-actions{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+  }
+
+  .btn-main,
+  .btn-ghost{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.68rem 1.05rem;
+    border-radius: 999px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none !important;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .btn-main{
+    background: var(--red);
+    color: #fff !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.28);
+  }
+
+  .btn-ghost{
+    background: rgba(246,241,232,0.90);
+    color: var(--green-dark) !important;
+    border: 1px solid rgba(255,255,255,0.72);
+  }
+
+  .btn-main:hover,
+  .btn-ghost:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.24);
+  }
+
+  .hero-video-toggle{
+    position: absolute;
+    right: clamp(1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.78);
+    background: rgba(0,0,0,0.28);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+  }
+
+  /* SEÇÕES */
+  .content-card{
+    width: min(1120px, calc(100vw - 2rem));
+    margin: 2.6rem auto 0 auto;
+    padding: clamp(1.35rem, 3vw, 2.35rem);
+    background: rgba(255,253,247,0.96);
+    box-shadow: 0 15px 34px rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 2;
+    border-top: 5px solid var(--green);
+  }
+
+  .section-title{
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-title::before{
+    content: "";
+    display: block;
+    height: 1px;
+    background: var(--ink);
+  }
+
+  .section-title h2{
+    margin: 0;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid rgba(98,106,56,0.18);
+    font-size: clamp(1.2rem, 2.6vw, 1.85rem);
+    font-weight: 800;
+    color: var(--red);
+    letter-spacing: 0.01em;
+  }
+
+  .content-card p{
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.72;
+    color: var(--ink);
+    margin: 0 0 1rem 0;
+  }
+
+  .lead{
+    font-family: 'Source Serif 4', Georgia, serif !important;
+    font-size: clamp(1.08rem, 2vw, 1.26rem) !important;
+    line-height: 1.72 !important;
+    color: #191711 !important;
+    border-left: 4px solid var(--ochre);
+    padding-left: 1rem;
+    margin-bottom: 1.3rem !important;
+  }
+
+.two-col{
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+  gap: 1.6rem;
+  align-items: start;
+}
+
+.project-side{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Caixas Plantas/Fungos no final do resumo */
+.taxa-summary-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.35rem;
+}
+
+.taxa-card{
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  padding: 1.05rem 1rem;
+  min-height: 138px;
+  color: var(--cream);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(46,59,36,0.93),
+      rgba(98,106,56,0.82)
+    ),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(246,241,232,0.22);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.14);
+}
+
+.taxa-card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(217,154,39,0.24), transparent 32%),
+    linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.18));
+  pointer-events: none;
+}
+
+.taxa-card-content{
+  position: relative;
+  z-index: 2;
+}
+
+.taxa-card h3{
+  margin: 0 0 0.55rem 0;
+  color: var(--ochre);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.taxa-card p{
+  margin: 0 !important;
+  color: rgba(255,253,247,0.93) !important;
+  font-size: 0.86rem !important;
+  line-height: 1.55 !important;
+}
+
+/* Mapa territorial no card lateral */
+.project-map-card{
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(246,241,232,0.86);
+  border: 1px solid rgba(98,106,56,0.25);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+}
+
+.project-map-header{
+  padding: 0.85rem 1rem 0.65rem 1rem;
+  background:
+    linear-gradient(rgba(46,59,36,0.88), rgba(46,59,36,0.88)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  background-position: center;
+  color: var(--cream);
+}
+
+.project-map-header h3{
+  margin: 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+
+.project-map-header p{
+  margin: 0.35rem 0 0 0 !important;
+  color: rgba(255,253,247,0.88) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.45 !important;
+}
+
+#project-sgc-map{
+  width: 100%;
+  height: 285px;
+  background: var(--green-soft);
+}
+
+.project-map-caption{
+  padding: 0.65rem 0.85rem;
+  font-size: 0.74rem !important;
+  line-height: 1.45 !important;
+  color: var(--muted) !important;
+  font-style: italic;
+  background: rgba(246,241,232,0.92);
+}
+
+/* Foto vertical abaixo do mapa */
+.project-vertical-photo{
+  margin: 0;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--green-soft);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+  border: 1px solid rgba(98,106,56,0.22);
+}
+
+.project-vertical-photo img{
+  display: block;
+  width: 100%;
+  height: clamp(360px, 42vw, 520px);
+  object-fit: cover;
+  object-position: center center;
+}
+
+.project-vertical-photo figcaption{
+  padding: 0.72rem 0.9rem;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--muted);
+  font-style: italic;
+  background: rgba(246,241,232,0.88);
+}
+
+/* ===== Ajuste editorial da seção O projeto ===== */
+
+#o-projeto.content-card {
+  width: min(1180px, calc(100vw - 2rem));
+}
+
+#o-projeto .project-layout {
+  grid-template-columns: minmax(0, 1.02fr) minmax(390px, 0.98fr);
+  gap: clamp(1.8rem, 3.2vw, 2.8rem);
+  align-items: stretch;
+}
+
+#o-projeto .project-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#o-projeto .project-side {
+  height: 100%;
+}
+
+#o-projeto .project-map-card {
+  border-radius: 22px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.10);
+}
+
+#o-projeto #project-sgc-map {
+  height: 245px;
+}
+
+#o-projeto .project-map-caption {
+  display: none;
+}
+
+#o-projeto .project-feature-photo {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #1f2818;
+  box-shadow: 0 18px 38px rgba(0,0,0,0.18);
+  border: 1px solid rgba(98,106,56,0.22);
+}
+
+#o-projeto .project-feature-photo img {
+  display: block;
+  width: 100%;
+  height: clamp(560px, 56vw, 760px);
+  object-fit: cover;
+  object-position: center top;
+  filter: saturate(0.96) contrast(1.04);
+}
+
+#o-projeto .project-feature-photo figcaption {
+  padding: 0.85rem 1rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted);
+  font-style: italic;
+  background: rgba(246,241,232,0.92);
+}
+
+#o-projeto .photo-chip {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.42rem 0.75rem;
+  background: rgba(46,59,36,0.82);
+  color: var(--ochre);
+  border: 1px solid rgba(246,241,232,0.25);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+#o-projeto .taxa-summary-grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1.35rem;
+  margin-top: auto;
+  flex: 1;
+  display: grid;
+}
+
+#o-projeto .taxa-card {
+  min-height: 200px;
+  padding: 2rem 2.15rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.13);
+}
+
+#o-projeto .taxa-card h3 {
+  font-size: 1.22rem;
+  margin-bottom: 1rem;
+  letter-spacing: 0.16em;
+}
+
+#o-projeto .taxa-card p {
+  font-size: 1.28rem !important;
+  line-height: 1.72 !important;
+}
+
+@media (max-width: 980px){
+  .two-col{
+    grid-template-columns: 1fr;
+  }
+
+  .taxa-summary-grid{
+    grid-template-columns: 1fr;
+  }
+
+  #project-sgc-map{
+    height: 320px;
+  }
+
+  #o-projeto .project-layout {
+    grid-template-columns: 1fr;
+  }
+
+  #o-projeto .project-feature-photo img {
+    height: auto;
+    object-fit: contain;
+  }
+}
+  .info-grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .info-grid-three{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .info-box{
+    min-width: 0;
+    background: rgba(246,241,232,0.72);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.1rem 1.15rem;
+  }
+
+  .info-box h3,
+  .people-block h3{
+    font-family: 'Space Mono', monospace;
+    color: var(--green-dark);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    margin: 0 0 0.7rem 0;
+  }
+
+  .info-box ul,
+  .people-list{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .info-box li,
+  .people-list li{
+    position: relative;
+    padding-left: 1.25rem;
+    margin: 0.52rem 0;
+    line-height: 1.55;
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+
+  .info-box li::before,
+  .people-list li::before{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.58rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ochre);
+  }
+
+  .tags{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1rem 0 0.2rem 0;
+  }
+
+  .tag{
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1.5px solid rgba(98,106,56,0.28);
+    background: rgba(246,241,232,0.82);
+    color: var(--green-dark);
+    padding: 0.32rem 0.72rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tag:nth-child(2n){
+    color: var(--red);
+    border-color: rgba(169,54,50,0.30);
+  }
+
+  .tag:nth-child(3n){
+    color: #7A5A18;
+    border-color: rgba(217,154,39,0.42);
+  }
+  
+  .map-card{
+    background: rgba(98,106,56,0.09);
+    border: 1px solid rgba(98,106,56,0.25);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .map-card img{
+    display: block;
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    background: var(--green-soft);
+  }
+
+  .map-caption{
+    padding: 0.8rem 1rem;
+    font-size: 0.82rem !important;
+    color: var(--muted) !important;
+    font-style: italic;
+  }
+
+  .expedition-preview-grid{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .expedition-preview-card{
+    background: rgba(246,241,232,0.78);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem;
+  }
+
+  .expedition-date{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  .expedition-preview-card h3{
+    margin: 0.35rem 0 0.45rem 0;
+    font-size: 1.05rem;
+    color: var(--green-dark);
+    font-weight: 800;
+  }
+
+  .expedition-preview-card p{
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin-bottom: 0;
+  }
+
+  .media-layout{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+  }
+
+  .media-panel{
+    min-width: 0;
+    background: rgba(246,241,232,0.78);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 1rem;
+  }
+
+  .media-panel-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .media-panel h3{
+    margin: 0;
+    color: var(--green-dark);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .media-panel-label{
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 0.28rem 0.6rem;
+    background: var(--red);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .media-carousel{
+    display: flex;
+    gap: 0.9rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0.2rem 0.1rem 0.8rem 0.1rem;
+  }
+
+  .media-item{
+    flex: 0 0 min(310px, 85%);
+    scroll-snap-align: start;
+    background: var(--paper);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(98,106,56,0.18);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  }
+
+  .media-thumb{
+    width: 100%;
+    height: 160px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(217,154,39,0.28), transparent 30%),
+      linear-gradient(135deg, rgba(98,106,56,0.28), rgba(169,54,50,0.18));
+    display: grid;
+    place-items: center;
+    color: var(--green-dark);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+
+  .media-thumb img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .media-body{
+    padding: 0.9rem;
+  }
+
+  .media-date{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.64rem;
+    color: var(--red);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+
+  .media-body h4{
+    margin: 0.35rem 0 0.45rem 0;
+    color: var(--ink);
+    font-size: 0.98rem;
+    line-height: 1.32;
+    font-weight: 800;
+  }
+
+  .media-body p{
+    font-size: 0.82rem;
+    line-height: 1.48;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .media-link{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--red) !important;
+    text-decoration: none !important;
+  }
+
+  .empty-media{
+    padding: 1rem;
+    background: rgba(255,253,247,0.74);
+    border: 1px dashed rgba(169,54,50,0.32);
+    border-radius: 14px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .people-block{
+    margin-top: 1.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px dashed rgba(98,106,56,0.35);
+  }
+
+  .resource-line{
+    font-size: 1.08rem !important;
+    font-weight: 700;
+    color: var(--green-dark) !important;
+  }
+
+  .contact-grid{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .contact-card{
+    background: rgba(246,241,232,0.78);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem;
+  }
+
+  .contact-card h3{
+    margin: 0 0 0.45rem 0;
+    color: var(--green-dark);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .contact-card a{
+    color: var(--red);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .photo-credit{
+    margin-top: 1.2rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    font-size: 0.76rem !important;
+    font-style: italic;
+    color: var(--muted) !important;
+  }
+
+/* CARROSSEL DE OBJETIVOS */
+
+.objectives-section{
+  width: min(1120px, calc(100vw - 2rem));
+  margin: 2.6rem auto 0 auto;
+  padding: 0;
+  background: rgba(255,253,247,0.96);
+  box-shadow: 0 15px 34px rgba(0,0,0,0.12);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  border-top: 5px solid var(--green);
+}
+
+.objectives-carousel{
+  position: relative;
+  min-height: 560px;
+}
+
+.objective-slide{
+  display: none;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.82fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+  min-height: 560px;
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+.objective-slide.active{
+  display: grid;
+}
+
+.objective-text{
+  max-width: 620px;
+}
+
+.objective-kicker{
+  font-family: 'Space Mono', monospace;
+  color: var(--ochre);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+.objective-text h2{
+  margin: 0 0 1rem 0;
+  color: var(--red);
+  font-size: clamp(2rem, 4.2vw, 3.25rem);
+  line-height: 1.12;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+
+.objective-text p{
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  line-height: 1.65;
+}
+
+.objective-image-wrap{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.objective-image{
+  position: relative;
+  width: min(430px, 36vw);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(98,106,56,0.18), rgba(169,54,50,0.10)),
+    var(--cream);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.14);
+}
+
+.objective-photo-slide{
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.objective-photo-slide.active{
+  opacity: 1;
+  transform: scale(1);
+}
+
+.objective-photo-slide img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Setas internas do carrossel de fotos — discretas dentro da imagem circular */
+
+.objective-photo-arrow {
+  width: 32px;
+  height: 32px;
+  background: rgba(23,23,23,0.34);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.35);
+  font-size: 1.2rem;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.objective-photo-arrow:hover {
+  background: rgba(169,54,50,0.86);
+}
+
+.objective-photo-prev{
+  left: 0.85rem;
+}
+
+.objective-photo-next{
+  right: 0.85rem;
+}
+
+.objective-photo-dots{
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.35rem;
+  z-index: 9;
+}
+
+.objective-photo-dot{
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(255,255,255,0.55);
+  cursor: pointer;
+}
+
+.objective-photo-dot.active{
+  width: 20px;
+  background: #fff;
+}
+
+/* Navegação principal do carrossel de objetivos — controle inferior */
+
+.objective-nav {
+  position: absolute;
+  left: 50%;
+  bottom: 0.78rem;
+  transform: translateX(-50%);
+  width: min(250px, calc(100% - 2rem));
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 14;
+}
+
+.objective-arrow {
+  position: static;
+  transform: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(98,106,56,0.22);
+  background: rgba(255,253,247,0.86);
+  color: var(--green-dark);
+  font-size: 1.45rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.objective-arrow:hover {
+  background: var(--red);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.16);
+}
+
+.objective-prev,
+.objective-next {
+  left: auto;
+  right: auto;
+}
+
+.objective-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 1.42rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  z-index: 15;
+  pointer-events: auto;
+}
+
+.objective-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(98,106,56,0.32);
+  cursor: pointer;
+  transition: width 0.18s ease, background 0.18s ease;
+}
+
+.objective-dot.active {
+  width: 26px;
+  background: var(--red);
+}
+
+@media (max-width: 980px){
+  .two-col,
+  .media-layout,
+  .contact-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .expedition-preview-grid,
+  .info-grid-three{
+    grid-template-columns: 1fr;
+  }
+
+  .quick-facts{
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .objective-slide{
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 2rem 1.2rem 4rem 1.2rem;
+  }
+
+  .objective-image{
+    width: min(330px, 78vw);
+  }
+
+  .objective-prev{
+    left: 0.75rem;
+  }
+
+  .objective-next{
+    right: 0.75rem;
+  }
+}
+
+  @media (max-width: 820px){
+.hero-strip{
+  width: 100vw;
+  min-height: 100vh;
+  margin-top: 0;
+}
+
+.hero-title-panel{
+  left: 1rem;
+  top: 9.5rem;
+  bottom: auto;
+  width: calc(100% - 2rem);
+  padding-top: 0;
+}
+
+    .hero-logo-badge{
+      left: 0.75rem;
+      width: 76px;
+      min-height: 76px;
+    }
+
+    .hero-video-toggle{
+      width: 48px;
+      height: 48px;
+      right: 1rem;
+      bottom: 1rem;
+    }
+
+    .content-card{
+      width: calc(100vw - 1rem);
+      padding: 1.35rem 1rem;
+    }
+
+    .section-title{
+      grid-template-columns: 56px 1fr;
+    }
+
+    .info-grid{
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px){
+    .quick-facts{
+      grid-template-columns: 1fr;
+    }
+
+    .hero-logo-badge{
+      display: none;
+    }
+
+    .hero-actions{
+      gap: 0.45rem;
+    }
+
+    .btn-main,
+    .btn-ghost{
+      width: 100%;
+    }
+    
+    .objective-text h2{
+  font-size: clamp(1.75rem, 10vw, 2.45rem);
+}
+
+.objective-text p{
+  font-size: 1rem;
+}
+
+.objective-arrow{
+  width: 40px;
+  height: 40px;
+  font-size: 1.65rem;
+}
+    
+  }
+  
+ /* Ajustes para tela intermediária: notebook meia tela / tablet horizontal */
+@media (max-width: 991.98px) {
+  .hero-logo-badge {
+    top: 4.9rem;
+    left: 0.75rem;
+    width: 78px;
+  }
+
+  .hero-title-panel {
+    top: 11.4rem;
+    left: 0.75rem;
+    width: calc(100% - 1.5rem);
+  }
+
+  /* Menu colapsado mais legível sobre o vídeo */
+  #quarto-header .navbar-collapse.show,
+  #quarto-header .navbar-collapse.collapsing {
+    margin-top: 0.6rem;
+    padding: 0.85rem 1rem;
+    width: min(280px, calc(100vw - 2rem));
+    background: rgba(23, 23, 23, 0.72) !important;
+    border: 1px solid rgba(246, 241, 232, 0.22);
+    border-radius: 18px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  #quarto-header .navbar-collapse.show .nav-link,
+  #quarto-header .navbar-collapse.collapsing .nav-link {
+    color: #F6F1E8 !important;
+    font-weight: 600;
+    padding: 0.45rem 0.25rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  }
+
+  #quarto-header .navbar-collapse.show .nav-link:hover,
+  #quarto-header .navbar-collapse.show .nav-link.active-section {
+    color: var(--ochre) !important;
+  }
+}
+
+/* ===== Pesquisadores responsáveis ===== */
+
+.researchers-section {
+  width: min(1180px, calc(100vw - 2rem));
+  overflow: hidden;
+}
+
+.researchers-layout {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(1.4rem, 2.4vw, 2.2rem);
+  align-items: start;
+}
+
+.researchers-copy {
+  min-width: 0;
+  padding-top: 0.8rem;
+}
+
+.researchers-kicker {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  padding: 0.32rem 0.72rem;
+  border-radius: 999px;
+  background: rgba(98, 106, 56, 0.12);
+  color: var(--green-dark);
+  border: 1px solid rgba(98, 106, 56, 0.22);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.researchers-lead {
+  margin-bottom: 1rem !important;
+  font-size: clamp(1.05rem, 1.45vw, 1.22rem) !important;
+}
+
+.researchers-copy p:not(.lead) {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  max-width: 520px;
+}
+
+.researchers-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+  max-width: 520px;
+}
+
+.researchers-summary div {
+  padding: 0.85rem;
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(98,106,56,0.14), rgba(217,154,39,0.08)),
+    rgba(255,253,247,0.72);
+  border: 1px solid rgba(98,106,56,0.18);
+}
+
+.researchers-number {
+  display: block;
+  color: var(--red);
+  font-size: 1.18rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.researchers-label {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--green-dark);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.researchers-actions {
+  margin-top: 1.35rem !important;
+}
+
+/* painel dos pesquisadores */
+.researchers-panel {
+  min-width: 0;
+  width: 100%;
+  padding: clamp(0.95rem, 1.6vw, 1.25rem);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(217,154,39,0.13), transparent 30%),
+    linear-gradient(180deg, rgba(255,253,247,0.92), rgba(246,241,232,0.76));
+  border: 1px solid rgba(98,106,56,0.22);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.09);
+}
+
+.researchers-panel-header {
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(98,106,56,0.18);
+}
+
+.researchers-panel-header h3 {
+  margin: 0;
+  color: var(--green-dark);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.researchers-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.researcher-card {
+  min-width: 0;
+  padding: 0.9rem 0.95rem;
+  border-radius: 17px;
+  background: rgba(255,253,247,0.96);
+  border: 1px solid rgba(98,106,56,0.16);
+  box-shadow: 0 7px 16px rgba(0,0,0,0.055);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.researcher-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(169,54,50,0.28);
+  box-shadow: 0 11px 22px rgba(0,0,0,0.10);
+}
+
+.agency-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.55rem;
+  padding: 0.22rem 0.52rem;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--cream);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.researcher-card h4 {
+  margin: 0 0 0.38rem 0;
+  color: var(--ink);
+  font-size: clamp(0.9rem, 1vw, 0.98rem);
+  line-height: 1.24;
+  font-weight: 850;
+}
+
+.researcher-card p {
+  margin: 0 !important;
+  color: var(--muted) !important;
+  font-size: 0.78rem !important;
+  line-height: 1.42 !important;
+}
+
+@media (max-width: 1150px) {
+  .researchers-layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 1.4rem;
+  }
+
+  .researchers-list {
+    gap: 0.65rem;
+  }
+}
+
+/* tablet e celular: empilha */
+@media (max-width: 900px) {
+  .researchers-section {
+    width: calc(100vw - 1rem);
+  }
+
+  .researchers-layout {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .researchers-copy p:not(.lead),
+  .researchers-summary {
+    max-width: 100%;
+  }
+}
+
+/* celular estreito: cards em uma coluna */
+@media (max-width: 620px) {
+  .researchers-list {
+    grid-template-columns: 1fr;
+  }
+
+  .researchers-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .researchers-panel {
+    padding: 0.85rem;
+    border-radius: 18px;
+  }
+}
+
+/* ===== Redesenho editorial da página inicial / about ===== */
+
+.reveal-ready {
+  opacity: 0;
+  transform: translateY(44px);
+  transition:
+    opacity 0.72s ease,
+    transform 0.72s cubic-bezier(.2,.7,.2,1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-ready.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.full-bleed-feature.reveal-ready {
+  opacity: 0;
+  transform: translateX(-50%) translateY(44px);
+}
+
+.full-bleed-feature.reveal-ready.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready,
+  .full-bleed-feature.reveal-ready {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .full-bleed-feature.reveal-ready,
+  .full-bleed-feature.reveal-ready.is-visible {
+    transform: translateX(-50%) !important;
+  }
+}
+
+.about-section {
+  width: min(1260px, calc(100vw - 2rem));
+  padding: clamp(1.4rem, 3.4vw, 3rem);
+}
+
+.about-intro-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  gap: clamp(1.6rem, 4vw, 3.4rem);
+  align-items: start;
+}
+
+.about-eyebrow,
+.method-eyebrow,
+.feature-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-bottom: 0.85rem;
+  padding: 0.34rem 0.76rem;
+  border-radius: 999px;
+  background: rgba(98,106,56,0.12);
+  color: var(--green-dark);
+  border: 1px solid rgba(98,106,56,0.22);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-display-title {
+  margin: 0 0 1.1rem 0;
+  color: var(--green-dark);
+  font-size: clamp(2.15rem, 5.2vw, 5.15rem);
+  line-height: 0.92;
+  font-weight: 900;
+  letter-spacing: -0.075em;
+  max-width: 820px;
+}
+
+.about-copy-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.2vw, 1.8rem);
+  margin-top: 1.25rem;
+}
+
+.about-copy-columns p {
+  margin-bottom: 0 !important;
+  color: var(--muted) !important;
+}
+
+.about-pullquote {
+  margin-top: 1.5rem;
+  padding: clamp(1.15rem, 2.2vw, 1.55rem);
+  border-left: 5px solid var(--ochre);
+  background:
+    linear-gradient(135deg, rgba(217,154,39,0.10), rgba(98,106,56,0.08)),
+    rgba(246,241,232,0.74);
+  color: var(--green-dark);
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+  line-height: 1.38;
+  font-weight: 700;
+}
+
+.about-map-stack {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.about-map-stack .project-map-card {
+  border-radius: 24px;
+}
+
+.about-map-stack #project-sgc-map {
+  height: clamp(290px, 32vw, 390px);
+}
+
+.about-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.about-stat {
+  min-height: 126px;
+  padding: 1rem;
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(46,59,36,0.92), rgba(98,106,56,0.86)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  color: var(--cream);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.about-stat strong {
+  display: block;
+  color: var(--ochre);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 0.9;
+  font-weight: 900;
+  letter-spacing: -0.07em;
+}
+
+.about-stat span {
+  display: block;
+  margin-top: 0.55rem;
+  color: rgba(255,253,247,0.92);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.38;
+}
+
+.about-photo-quote {
+  position: relative;
+  margin: 1rem 0 0 0;
+  border-radius: 24px;
+  overflow: hidden;
+  min-height: 360px;
+  background: var(--green-dark);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.16);
+}
+
+.about-photo-quote img {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.96) contrast(1.04);
+  display: block;
+}
+
+.about-photo-quote figcaption {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+  background: rgba(23,23,23,0.58);
+  color: rgba(255,253,247,0.92);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.full-bleed-feature {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  margin: 3.4rem 0 0 0;
+  padding: clamp(2.8rem, 5vw, 5rem) 0 0 0;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(246,241,232,0.90), rgba(246,241,232,0.72)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.feature-title-wrap {
+  width: min(1260px, calc(100vw - 2rem));
+  margin: 0 auto clamp(1.4rem, 3vw, 2.1rem) auto;
+}
+
+.feature-title {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  background: var(--green);
+  color: #fff;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(1.45rem, 3vw, 2.6rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+.feature-title::before {
+  content: "";
+  width: 18px;
+  height: 46px;
+  margin-right: 0.65rem;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,0.95) 0 3px,
+      transparent 3px 6px
+    );
+  border-left: 3px solid rgba(255,255,255,0.95);
+}
+
+.feature-band {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  min-height: clamp(420px, 42vw, 600px);
+}
+
+.feature-photo,
+.feature-panel {
+  min-width: 0;
+  min-height: clamp(420px, 42vw, 600px);
+}
+
+.feature-photo {
+  position: relative;
+  overflow: hidden;
+  background: var(--green-dark);
+}
+
+.feature-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 1.2s ease;
+}
+
+.feature-photo:hover img {
+  transform: scale(1.05);
+}
+
+.feature-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.2rem, 2.6vw, 2.2rem);
+  color: #fff;
+  overflow: hidden;
+}
+
+.feature-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 80% 15%, rgba(255,255,255,0.13), transparent 26%),
+    linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.12));
+  pointer-events: none;
+}
+
+.feature-panel > * {
+  position: relative;
+  z-index: 2;
+}
+
+.feature-panel-green {
+  background: #7D963B;
+}
+
+.feature-panel-deep {
+  background: #3F7A38;
+}
+
+.feature-panel-ochre {
+  background: #A9771E;
+}
+
+.feature-panel h3 {
+  margin: 0 0 auto 0;
+  width: fit-content;
+  padding: 0.5rem 0.78rem;
+  background: #201916;
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.feature-panel p {
+  margin: auto 0 0 0 !important;
+  color: #fff !important;
+  font-size: clamp(1.15rem, 2vw, 1.55rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.method-section {
+  width: min(1260px, calc(100vw - 2rem));
+}
+
+.method-intro-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(1.4rem, 3vw, 2.5rem);
+  align-items: start;
+}
+
+.method-intro-grid .lead {
+  margin-bottom: 0 !important;
+}
+
+.method-river {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 1.6rem;
+  border-radius: 26px;
+  overflow: hidden;
+  background: var(--green-dark);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.12);
+}
+
+.method-step {
+  position: relative;
+  min-height: 275px;
+  padding: clamp(1.2rem, 2vw, 1.65rem);
+  background:
+    linear-gradient(180deg, rgba(255,253,247,0.92), rgba(246,241,232,0.84));
+  border-right: 1px solid rgba(98,106,56,0.20);
+}
+
+.method-step:nth-child(even) {
+  background:
+    linear-gradient(180deg, rgba(215,221,197,0.76), rgba(246,241,232,0.84));
+}
+
+.method-step:last-child {
+  border-right: 0;
+}
+
+.method-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  margin-bottom: 1.1rem;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.method-step h3 {
+  margin: 0 0 0.75rem 0;
+  color: var(--green-dark);
+  font-size: clamp(1.1rem, 1.5vw, 1.32rem);
+  line-height: 1.16;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.method-step p {
+  margin: 0 !important;
+  color: var(--muted) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.58 !important;
+}
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.impact-card {
+  min-height: 188px;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(98,106,56,0.20);
+  background: rgba(255,253,247,0.84);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.impact-card h3 {
+  margin: 0;
+  color: var(--red);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.impact-card p {
+  margin: 1rem 0 0 0 !important;
+  color: var(--green-dark) !important;
+  font-size: clamp(1rem, 1.4vw, 1.16rem) !important;
+  line-height: 1.32 !important;
+  font-weight: 800;
+}
+
+.objectives-section {
+  width: min(1280px, calc(100vw - 1rem));
+}
+
+.objective-text h2 {
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+
+.objective-text p {
+  max-width: 680px;
+}
+
+.objective-kicker {
+  color: #8B641A;
+}
+
+@media (max-width: 1180px) {
+  .feature-band {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .feature-photo,
+  .feature-panel {
+    min-height: 360px;
+  }
+
+  .impact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .about-section,
+  .method-section {
+    width: calc(100vw - 1rem);
+  }
+
+  .about-intro-grid,
+  .method-intro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-copy-columns,
+  .method-river {
+    grid-template-columns: 1fr;
+  }
+
+  .method-step {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgba(98,106,56,0.18);
+  }
+
+  .method-step:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .feature-band {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-photo,
+  .feature-panel {
+    min-height: 310px;
+  }
+
+  .feature-panel p {
+    font-size: 1.35rem !important;
+  }
+
+  .about-stat-grid,
+  .impact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-display-title {
+    font-size: clamp(2.2rem, 13vw, 3.8rem);
+  }
+}
+
+
+/* ===== Refinamentos de layout solicitados: cards mais legíveis e paleta unificada ===== */
+
+.about-section,
+.method-section,
+#expedicoes-recentes,
+#divulgacao,
+.researchers-section {
+  width: min(1260px, calc(100vw - 2rem));
+}
+
+.about-intro-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.64fr);
+  gap: clamp(1.6rem, 3vw, 2.8rem);
+}
+
+.about-map-stack {
+  gap: 0.85rem;
+}
+
+.about-map-stack .project-map-card {
+  min-width: 0;
+}
+
+.about-map-stack #project-sgc-map,
+.about-map-stack #project-sgc-map * {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.about-stat-grid {
+  gap: 0.72rem;
+}
+
+.about-stat {
+  min-height: 140px;
+  padding: 0.95rem 0.9rem;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.about-stat strong {
+  font-size: clamp(2.05rem, 3.15vw, 2.9rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+}
+
+.about-stat span {
+  margin-top: 0.55rem;
+  font-size: clamp(0.53rem, 0.62vw, 0.64rem);
+  line-height: 1.23;
+  letter-spacing: 0.072em;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+
+/* Seção em largura cheia: mantém a dinâmica fluida, mas volta para a paleta da identidade */
+.full-bleed-feature {
+  background:
+    linear-gradient(180deg, rgba(246,241,232,0.94), rgba(246,241,232,0.78)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  background-position: center;
+  padding-top: clamp(2.3rem, 4vw, 4rem);
+}
+
+.feature-title-wrap {
+  margin-bottom: clamp(1.15rem, 2.2vw, 1.7rem);
+}
+
+.feature-title {
+  background: var(--green-dark);
+  color: var(--cream);
+  border: 1px solid rgba(217,154,39,0.35);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+}
+
+.feature-title::before {
+  border-left-color: var(--ochre);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(246,241,232,0.96) 0 3px,
+      transparent 3px 6px
+    );
+}
+
+.feature-band {
+  min-height: clamp(360px, 35vw, 520px);
+  border-top: 1px solid rgba(46,59,36,0.18);
+  border-bottom: 1px solid rgba(46,59,36,0.18);
+}
+
+.feature-photo,
+.feature-panel {
+  min-height: clamp(360px, 35vw, 520px);
+}
+
+.feature-photo {
+  background:
+    linear-gradient(135deg, rgba(46,59,36,0.96), rgba(98,106,56,0.78)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.feature-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(46,59,36,0.10), rgba(46,59,36,0.24));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.feature-photo img {
+  position: relative;
+  z-index: 1;
+  filter: saturate(0.92) contrast(1.06);
+}
+
+.feature-photo.image-missing {
+  display: flex;
+  align-items: flex-end;
+  padding: 1.15rem;
+}
+
+.feature-photo.image-missing::before {
+  content: attr(data-label);
+  position: relative;
+  z-index: 3;
+  color: rgba(255,253,247,0.92);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.feature-panel {
+  justify-content: space-between;
+  padding: clamp(1.15rem, 2.2vw, 1.9rem);
+}
+
+.feature-panel-green {
+  background: linear-gradient(135deg, var(--green), #4f5b33);
+}
+
+.feature-panel-deep {
+  background: linear-gradient(135deg, var(--green-dark), #41502f);
+}
+
+.feature-panel-ochre {
+  background: linear-gradient(135deg, #8b641a, var(--red-dark));
+}
+
+.feature-panel h3 {
+  margin: 0;
+  padding: 0.48rem 0.72rem;
+  background: var(--red-dark);
+  color: var(--cream);
+  border-left: 5px solid var(--ochre);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+.feature-panel p {
+  margin: 0 !important;
+  color: var(--cream) !important;
+  font-size: clamp(1.02rem, 1.55vw, 1.36rem) !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.035em;
+  max-width: 17rem;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Demais seções na mesma linguagem visual */
+.method-river {
+  border: 1px solid rgba(98,106,56,0.20);
+}
+
+.method-step {
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+.method-step p {
+  font-size: 0.88rem !important;
+}
+
+.impact-card,
+.expedition-preview-card,
+.media-panel,
+.researcher-card {
+  background:
+    linear-gradient(180deg, rgba(255,253,247,0.94), rgba(246,241,232,0.78));
+  border: 1px solid rgba(98,106,56,0.18);
+}
+
+.empty-media {
+  background:
+    linear-gradient(135deg, rgba(215,221,197,0.36), rgba(255,253,247,0.78));
+  border: 1px dashed rgba(98,106,56,0.42);
+  color: var(--green-dark);
+  border-radius: 16px;
+}
+
+@media (max-width: 1180px) {
+  .about-intro-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 0.68fr);
+  }
+
+  .about-display-title {
+    font-size: clamp(2.15rem, 4.7vw, 4.4rem);
+  }
+}
+
+@media (max-width: 980px) {
+  .about-intro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .about-stat {
+    min-height: 118px;
+  }
+}
+
+@media (max-width: 760px) {
+  .feature-band {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-photo,
+  .feature-panel {
+    min-height: 300px;
+  }
+
+  .feature-panel p {
+    max-width: 100%;
+    font-size: 1.26rem !important;
+  }
+
+  .about-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .about-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===== Expansão da foto lateral da seção O projeto ===== */
+#o-projeto.about-section {
+  width: min(1280px, calc(100vw - 1.25rem));
+}
+
+#o-projeto .about-intro-grid {
+  grid-template-columns: minmax(0, 0.96fr) minmax(500px, 0.78fr);
+  gap: clamp(1.8rem, 3.2vw, 3rem);
+  align-items: start;
+}
+
+#o-projeto .about-map-stack {
+  gap: 1rem;
+}
+
+#o-projeto .about-map-stack .project-map-card {
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+#o-projeto .about-photo-expanded {
+  margin-top: 0;
+  min-height: clamp(560px, 58vw, 760px);
+  border-radius: 30px;
+  isolation: isolate;
+}
+
+#o-projeto .about-photo-expanded::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(23,23,23,0.18) 0%, rgba(23,23,23,0.02) 42%, rgba(23,23,23,0.74) 100%),
+    linear-gradient(90deg, rgba(46,59,36,0.28), rgba(46,59,36,0));
+  pointer-events: none;
+}
+
+#o-projeto .about-photo-expanded img {
+  min-height: clamp(560px, 58vw, 760px);
+  height: clamp(560px, 58vw, 760px);
+  object-position: center top;
+  transform: scale(1.015);
+}
+
+#o-projeto .about-photo-expanded figcaption {
+  z-index: 4;
+  left: 1.05rem;
+  right: 1.05rem;
+  bottom: 1.05rem;
+  width: auto;
+  background: rgba(23,23,23,0.62);
+  border: 1px solid rgba(255,253,247,0.16);
+}
+
+#o-projeto .about-stat-overlay {
+  position: absolute;
+  z-index: 5;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+#o-projeto .about-stat-overlay .about-stat {
+  min-height: 112px;
+  padding: 0.7rem 0.68rem;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(46,59,36,0.88), rgba(98,106,56,0.78)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  border: 1px solid rgba(255,253,247,0.18);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+#o-projeto .about-stat-overlay .about-stat strong {
+  font-size: clamp(1.55rem, 2.35vw, 2.45rem);
+}
+
+#o-projeto .about-stat-overlay .about-stat span {
+  font-size: clamp(0.48rem, 0.52vw, 0.58rem);
+  line-height: 1.22;
+  letter-spacing: 0.055em;
+}
+
+@media (max-width: 1180px) {
+  #o-projeto .about-intro-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(460px, 0.78fr);
+  }
+
+  #o-projeto .about-stat-overlay {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #o-projeto .about-stat-overlay .about-stat {
+    min-height: 104px;
+  }
+}
+
+@media (max-width: 980px) {
+  #o-projeto .about-intro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(480px, 80vw, 620px);
+    height: clamp(480px, 80vw, 620px);
+  }
+}
+
+@media (max-width: 640px) {
+  #o-projeto .about-stat-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    z-index: 6;
+    margin: -0.75rem 0.85rem 0.85rem 0.85rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #o-projeto .about-photo-expanded {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #o-projeto .about-photo-expanded::before {
+    bottom: 0;
+  }
+
+  #o-projeto .about-photo-expanded img {
+    min-height: 390px;
+    height: 390px;
+  }
+
+  #o-projeto .about-photo-expanded figcaption {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: 0.85rem;
+  }
+}
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  /* Destaque automático da navbar */
+  const sections = document.querySelectorAll("section[id]");
+  const navLinks = document.querySelectorAll(".navbar a[href*='#']");
+
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+
+          navLinks.forEach(link => {
+            link.classList.remove("active-section");
+            const href = link.getAttribute("href");
+            if (href && href.endsWith("#" + id)) {
+              link.classList.add("active-section");
+            }
+          });
+        }
+      });
+    },
+    {
+      root: null,
+      rootMargin: "-35% 0px -55% 0px",
+      threshold: 0
+    }
+  );
+
+  sections.forEach(section => {
+    if (section.id) observer.observe(section);
+  });
+
+  /* Botão play/pause do vídeo da hero */
+  const video = document.querySelector(".hero-video");
+  const toggle = document.querySelector(".hero-video-toggle");
+
+  if (video && toggle) {
+    toggle.addEventListener("click", function () {
+      if (video.paused) {
+        video.play();
+        toggle.textContent = "Ⅱ";
+        toggle.setAttribute("aria-label", "Pausar vídeo");
+      } else {
+        video.pause();
+        toggle.textContent = "▶";
+        toggle.setAttribute("aria-label", "Reproduzir vídeo");
+      }
+    });
+  }
+
+  /* Carrossel principal dos objetivos */
+  const objectiveSlides = document.querySelectorAll(".objective-slide");
+  const objectiveDots = document.querySelectorAll(".objective-dot");
+  const objectivePrev = document.querySelector(".objective-prev");
+  const objectiveNext = document.querySelector(".objective-next");
+
+  let objectiveIndex = 0;
+  let objectiveTimer = null;
+
+  function showObjectiveSlide(index) {
+    if (!objectiveSlides.length) return;
+
+    objectiveIndex = (index + objectiveSlides.length) % objectiveSlides.length;
+
+    objectiveSlides.forEach((slide, i) => {
+      slide.classList.toggle("active", i === objectiveIndex);
+    });
+
+    objectiveDots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === objectiveIndex);
+    });
+
+    resetObjectivePhotoCarousel(objectiveSlides[objectiveIndex]);
+  }
+
+  function restartObjectiveTimer() {
+    if (objectiveTimer) clearInterval(objectiveTimer);
+
+    objectiveTimer = setInterval(function () {
+      showObjectiveSlide(objectiveIndex + 1);
+    }, 9000);
+  }
+
+  if (objectiveSlides.length) {
+    showObjectiveSlide(0);
+    restartObjectiveTimer();
+
+    if (objectivePrev) {
+      objectivePrev.addEventListener("click", function () {
+        showObjectiveSlide(objectiveIndex - 1);
+        restartObjectiveTimer();
+      });
+    }
+
+    if (objectiveNext) {
+      objectiveNext.addEventListener("click", function () {
+        showObjectiveSlide(objectiveIndex + 1);
+        restartObjectiveTimer();
+      });
+    }
+
+    objectiveDots.forEach((dot, i) => {
+      dot.addEventListener("click", function () {
+        showObjectiveSlide(i);
+        restartObjectiveTimer();
+      });
+    });
+  }
+
+  /* Carrossel interno de fotos de cada objetivo */
+  function resetObjectivePhotoCarousel(slide) {
+    if (!slide) return;
+
+    const photos = slide.querySelectorAll(".objective-photo-slide");
+    const photoDots = slide.querySelectorAll(".objective-photo-dot");
+
+    photos.forEach((photo, i) => {
+      photo.classList.toggle("active", i === 0);
+    });
+
+    photoDots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === 0);
+    });
+
+    slide.dataset.photoIndex = "0";
+  }
+
+  function showObjectivePhoto(slide, index) {
+    const photos = slide.querySelectorAll(".objective-photo-slide");
+    const photoDots = slide.querySelectorAll(".objective-photo-dot");
+
+    if (!photos.length) return;
+
+    const nextIndex = (index + photos.length) % photos.length;
+    slide.dataset.photoIndex = String(nextIndex);
+
+    photos.forEach((photo, i) => {
+      photo.classList.toggle("active", i === nextIndex);
+    });
+
+    photoDots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === nextIndex);
+    });
+  }
+
+  document.querySelectorAll(".objective-slide").forEach(slide => {
+    const photoPrev = slide.querySelector(".objective-photo-prev");
+    const photoNext = slide.querySelector(".objective-photo-next");
+    const photoDots = slide.querySelectorAll(".objective-photo-dot");
+
+    slide.dataset.photoIndex = "0";
+
+    if (photoPrev) {
+      photoPrev.addEventListener("click", function (event) {
+        event.stopPropagation();
+        const current = Number(slide.dataset.photoIndex || 0);
+        showObjectivePhoto(slide, current - 1);
+      });
+    }
+
+    if (photoNext) {
+      photoNext.addEventListener("click", function (event) {
+        event.stopPropagation();
+        const current = Number(slide.dataset.photoIndex || 0);
+        showObjectivePhoto(slide, current + 1);
+      });
+    }
+
+    photoDots.forEach((dot, i) => {
+      dot.addEventListener("click", function (event) {
+        event.stopPropagation();
+        showObjectivePhoto(slide, i);
+      });
+    });
+  });
+
+  setInterval(function () {
+    const activeSlide = document.querySelector(".objective-slide.active");
+    if (!activeSlide) return;
+
+    const current = Number(activeSlide.dataset.photoIndex || 0);
+    showObjectivePhoto(activeSlide, current + 1);
+  }, 3500);
+  /* Mapa do município de São Gabriel da Cachoeira na seção O projeto */
+  const projectMapEl = document.getElementById("project-sgc-map");
+
+  if (projectMapEl && typeof L !== "undefined") {
+    const projectMap = L.map("project-sgc-map", {
+      zoomControl: false,
+      scrollWheelZoom: false,
+      dragging: true,
+      attributionControl: false
+    });
+
+L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom: 18
+  }
+).addTo(projectMap);
+
+    fetch("_input_data/limites/sao_gabriel_da_cachoeira.geojson")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("GeoJSON não encontrado");
+        }
+        return response.json();
+      })
+      .then(geojson => {
+        const sgcLayer = L.geoJSON(geojson, {
+          style: {
+            color: "#A93632",
+            weight: 3,
+            opacity: 1,
+            fillColor: "#626A38",
+            fillOpacity: 0.18
+          }
+        }).addTo(projectMap);
+
+        projectMap.fitBounds(sgcLayer.getBounds(), {
+          padding: [18, 18]
+        });
+
+        L.control.zoom({
+          position: "bottomright"
+        }).addTo(projectMap);
+      })
+      .catch(error => {
+        projectMapEl.innerHTML =
+          '<div style="padding:1rem;font-family:Montserrat,Arial,sans-serif;font-size:0.85rem;color:#2E3B24;">Não foi possível carregar o limite municipal. Confira se o arquivo <strong>_input_data/limites/sao_gabriel_da_cachoeira.geojson</strong> existe.</div>';
+      });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const revealTargets = document.querySelectorAll(
+    ".content-card, .objectives-section, .full-bleed-feature"
+  );
+
+  revealTargets.forEach((el, index) => {
+    el.classList.add("reveal-ready");
+    el.style.setProperty("--reveal-delay", `${Math.min(index, 6) * 55}ms`);
+  });
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    revealTargets.forEach(el => el.classList.add("is-visible"));
+    return;
+  }
+
+  const revealObserver = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.12,
+      rootMargin: "0px 0px -8% 0px"
+    }
+  );
+
+  revealTargets.forEach(el => revealObserver.observe(el));
+});
+
+</script>
+```
+
+```{=html}
+<section class="hero-strip" aria-label="Abertura do projeto Tsiino Hiiwiida">
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+
+    aria-hidden="true"
+  >
+    <source src="figures/video/tsiino_hero.mp4" type="video/mp4">
+  </video>
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-logo-badge" aria-label="Logo Tsiino Hiiwiida">
+    <img
+      src="figures/logo_tsiino.png"
+      alt="Logo Tsiino Hiiwiida"
+      onerror="this.style.display='none'; this.parentElement.classList.add('logo-missing');"
+    >
+  </div>
+
+  <div class="hero-title-panel">
+    <div class="hero-kicker">Chamada Expedições · Iniciativa Amazônia+10 · Brasil + Reino Unido</div>
+    <h1>Tsiino Hiiwiida</h1>
+    <p class="hero-subtitle">Dimensões da biodiversidade de plantas e fungos no Alto Rio Negro</p>
+    <p class="hero-description">Uma rede científica e territorial para documentar plantas, fungos, coleções, DNA, memória e comunicação pública na Cabeça do Cachorro, Alto Rio Negro.</p>
+  </div>
+
+  <button class="hero-video-toggle" type="button" aria-label="Pausar vídeo">Ⅱ</button>
+</section>
+```
+
+```{=html}
+<section id="o-projeto" class="content-card about-section">
+  <div class="section-title">
+    <h2>O projeto</h2>
+  </div>
+
+  <div class="about-intro-grid about-hero-grid">
+    <div class="about-copy about-copy-editorial">
+      <div class="about-eyebrow">Síntese do projeto</div>
+
+      <h3 class="about-display-title">
+        <span>Revelar múltiplas dimensões da</span>
+        <span>biodiversidade</span>
+        <span>no Alto Rio Negro.</span>
+      </h3>
+
+      <p class="lead">
+        <strong>Tsiino Hiiwiida</strong>, nome Baniwa da região conhecida como Cabeça do Cachorro, é uma das últimas grandes fronteiras de conhecimento sobre a biodiversidade amazônica.
+      </p>
+
+      <div class="about-copy-columns">
+        <p>
+          O projeto parte de um território excepcional com campinaranas, florestas de terra-firme, igapós, serras e formações aluviais na fronteira entre Brasil, Colômbia e Venezuela. A heterogeneidade ambiental e a longa história geológica da Bacia Amazônica fazem da região um grande cenário para entender evolução, distribuição e endemismos.
+        </p>
+
+        <p>
+          O objetivo do projeto Tsiino Hiiwiida é acelerar a documentação de plantas e fungos, preencher lacunas taxonômicas, biogeográficas e evolutivas, e formar novas redes de pesquisa com participação local no município de São Gabriel da Cachoeira, Amazonas, Brasil.
+        </p>
+      </div>
+
+      <div class="about-pullquote">
+        Da coleta em rios e serras ao catálogo público: o projeto transforma registros de expedições de campo,identificação taxonômica, coleções científicas, sistemática molecular, metagenômica, biomonitoramento e comunicação pública. em acervos de herbário e amostras de DNA em conhecimento sobre a flora e a funga da Cabeça do Cachorro.
+      </div>
+    </div>
+
+    <aside class="about-visual-module" aria-label="Resumo territorial e institucional">
+      <figure class="about-photo-quote about-photo-expanded">
+        <img src="figures/projeto_rio_bela_adormecida.png" alt="Vista aérea do Alto Rio Negro com a formação da Bela Adormecida ao fundo">
+
+        <div class="about-stat-grid about-stat-overlay" aria-label="Números-chave do projeto">
+          <div class="about-stat">
+            <strong>36</strong>
+            <span>meses de duração</span>
+          </div>
+
+          <div class="about-stat">
+            <strong>6</strong>
+            <span>campanhas de campo</span>
+          </div>
+
+          <div class="about-stat">
+            <strong>30</strong>
+            <span>instituições Brasil + Reino Unido</span>
+          </div>
+
+          <div class="about-stat">
+            <strong>4</strong>
+            <span>rios de amostragem</span>
+          </div>
+        </div>
+
+        <figcaption>Alto Rio Negro · território, ciência e colaboração</figcaption>
+      </figure>
+
+      <div class="project-map-card about-map-compact">
+        <div class="project-map-header">
+          <h3>São Gabriel da Cachoeira</h3>
+          <p>Município de atuação do projeto na região da Cabeça do Cachorro, Alto Rio Negro.</p>
+        </div>
+
+        <div id="project-sgc-map" aria-label="Mapa do município de São Gabriel da Cachoeira"></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+```
+
+```{=html}
+<section id="frentes-integradas" class="full-bleed-feature" aria-label="Três eixos da proposta de pesquisa">
+  <div class="feature-title-wrap">
+    <div class="feature-eyebrow">Leitura visual da proposta</div>
+    <div class="feature-title">Três eixos da proposta</div>
+  </div>
+
+  <div class="feature-band">
+    <article class="feature-photo" data-label="Equipe em atividade de levantamento de flora e funga em campo">
+      <img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Equipe em atividade de levantamento de flora e funga em campo" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+    </article>
+
+    <article class="feature-panel feature-panel-green">
+      <h3>Eixo 1</h3>
+      <p class="axis-title">Habitats e espécies</p>
+      <p class="axis-detail">Compreender campinaranas, florestas de terra-firme, igapós, serras e formações aluviais como mosaicos vivos da flora e da funga do Alto Rio Negro.</p>
+    </article>
+
+    <article class="feature-photo" data-label="Registro científico e taxonômico de plantas e fungos">
+      <img src="figures/objetivos/taxonomia_molecular_01.jpg" alt="Registro científico e taxonômico de plantas e fungos" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+    </article>
+
+    <article class="feature-panel feature-panel-deep">
+      <h3>Eixo 2</h3>
+      <p class="axis-title">Biodiversidade, sustento e bioeconomia</p>
+      <p class="axis-detail">Investigar PANC, segurança alimentar, nutrientes, metais pesados e usos potenciais de espécies vegetais em diálogo com conhecimentos e demandas locais.</p>
+    </article>
+
+    <article class="feature-photo" data-label="Atividade de campo com colaboração local">
+      <img src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Atividade de campo com colaboração local" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+    </article>
+
+    <article class="feature-panel feature-panel-ochre">
+      <h3>Eixo 3</h3>
+      <p class="axis-title">Campo e tecnologias emergentes</p>
+      <p class="axis-detail">Integrar vouchers, coleções, DNA, metabarcoding, biomonitoramento, bancos de dados e comunicação pública para transformar coletas em conhecimento acessível.</p>
+    </article>
+  </div>
+</section>
+```
+
+```{=html}
+<section id="metodo-integrado" class="content-card method-section">
+  <div class="section-title">
+    <h2>Como o projeto atua</h2>
+  </div>
+
+  <div class="method-intro-grid">
+    <div>
+      <div class="method-eyebrow">Do campo ao acervo</div>
+      <p class="lead">
+        O projeto funciona como um ciclo integrado: entrar no território, documentar organismos, validar dados e devolver conhecimento em formatos públicos.
+      </p>
+    </div>
+
+    <p>
+      Cada etapa conecta pesquisa de campo, coleções científicas, análises moleculares, formação de pessoas e comunicação. Assim, os dados coletados durante as expedições retornam como acervo, catálogo, material educativo, exposição e memória pública sobre o Alto Rio Negro.
+    </p>
+  </div>
+
+  <div class="method-river" aria-label="Fluxo integrado de trabalho">
+    <article class="method-step">
+      <span class="method-number">01</span>
+      <h3>Campo e território</h3>
+      <p>Expedições em diferentes habitats do Alto Rio Negro, articuladas com atores locais e comunidades indígenas, para registrar plantas, fungos e contextos ecológicos.</p>
+    </article>
+
+    <article class="method-step">
+      <span class="method-number">02</span>
+      <h3>Coleções e amostras</h3>
+      <p>Herborização, vouchers, fotografias, tecidos em sílica-gel e incorporação prioritária aos acervos amazônicos, fortalecendo INPA, MG e coleções parceiras.</p>
+    </article>
+
+    <article class="method-step">
+      <span class="method-number">03</span>
+      <h3>Dados e validação</h3>
+      <p>Revisão taxonômica, mineração de bases, HerbariumBlitz, sequenciamento, metabarcoding e análises para reduzir lacunas Linneanas, Wallaceanas e Darwinianas.</p>
+    </article>
+
+    <article class="method-step">
+      <span class="method-number">04</span>
+      <h3>Retorno e circulação</h3>
+      <p>Catálogo verificado, oficinas botânicas, materiais em múltiplas línguas, exposições, fotografia, ilustração científica, redes sociais e curta documental.</p>
+    </article>
+  </div>
+
+  <div class="impact-grid" aria-label="Produtos e impactos previstos">
+    <article class="impact-card">
+      <h3>Catálogo</h3>
+      <p>Primeira síntese taxonomicamente verificada da flora e funga da Cabeça do Cachorro.</p>
+    </article>
+
+    <article class="impact-card">
+      <h3>AmaTreeDNA</h3>
+      <p>Banco de tecidos e DNA associado a vouchers de herbário para pesquisas futuras.</p>
+    </article>
+
+    <article class="impact-card">
+      <h3>Bioeconomia</h3>
+      <p>PANC, segurança alimentar, nutrientes e metais analisados com foco em espécies locais.</p>
+    </article>
+
+    <article class="impact-card">
+      <h3>Memória pública</h3>
+      <p>Exposições, audiovisual e comunicação em português, inglês, Baniwa, Tukano e Nheengatu.</p>
+    </article>
+  </div>
+</section>
+```
+
+```{=html}
+<section id="objetivos" class="objectives-section" aria-label="Objetivos e abordagem do projeto">
+  <div class="objectives-carousel">
+
+    <article class="objective-slide active">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 01 · Campo</div>
+        <h2>Expedições nos rios Negro, Curicuriari, Içana e Vaupés</h2>
+        <p>
+          As campanhas de campo irão amostrar diferentes habitats da Cabeça do Cachorro, incluindo campinaranas, florestas de terra-firme, igapós, serras e afloramentos rochosos, com foco em plantas vasculares, criptógamas e fungos.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Levantamento de flora e funga em campo"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/levantamento_flora_funga_02.jpg" alt="Registro de campo de flora e funga"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/levantamento_flora_funga_03.jpg" alt="Amostragem em ambiente pouco estudado"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 02 · Diversidade críptica</div>
+        <h2>Metabarcoding para detectar biodiversidade invisível aos inventários tradicionais</h2>
+        <p>
+          Amostras ambientais de solo, água, sedimentos e tapetes de musgos serão analisadas para revelar linhagens crípticas, organismos raros e componentes pouco detectados por identificação morfológica convencional.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenômicas de ponta"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/metagenomica_02.jpg" alt="Leitura molecular da biodiversidade"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/metagenomica_03.jpg" alt="Processos ecológicos e biodiversidade amazônica"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 03 · Taxonomia integrativa</div>
+        <h2>Linhagens raras, negligenciadas e filogeneticamente enigmáticas</h2>
+        <p>
+          O projeto combina morfologia, moléculas, coleções históricas e novas coletas para revisar grupos pouco estudados, posicionar espécies na árvore da vida e apoiar descrições taxonômicas robustas.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/linhagens_raras_01.jpg" alt="Linhagens raras ou pouco conhecidas"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/linhagens_raras_02.jpg" alt="Identificação taxonômica em campo"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/linhagens_raras_03.jpg" alt="Espécies e grupos pouco documentados"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 04 · Interações ecológicas</div>
+        <h2>Fungos, hospedeiros e relações ecológicas complexas</h2>
+        <p>
+          Uma das frentes investiga a diversidade e a evolução de fungos associados a insetos, ampliando o conhecimento sobre interações biológicas amazônicas ainda pouco documentadas.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/colecoes_cientificas_01.jpg" alt="Material taxonômico para coleções científicas"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/colecoes_cientificas_02.jpg" alt="Preparação de material biológico"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/colecoes_cientificas_03.jpg" alt="Coleções científicas e documentação"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 05 · Bioeconomia e segurança alimentar</div>
+        <h2>PANC, nutrientes e metais em espécies de interesse local</h2>
+        <p>
+          A proposta inclui plantas alimentícias não convencionais, análise de macro e micronutrientes e avaliação de metais, conectando biodiversidade, alimentação, saúde ambiental e possíveis caminhos de bioeconomia.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/taxonomia_molecular_01.jpg" alt="Taxonomia, sistemática molecular e biomonitoramento"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_02.jpg" alt="Análises taxonômicas e moleculares"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_03.jpg" alt="Biodiversidade em múltiplas escalas"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 06 · Biomonitoramento</div>
+        <h2>Briófitas e bioindicadores para acompanhar qualidade ambiental</h2>
+        <p>
+          Musgos e outros grupos sensíveis serão utilizados para investigar padrões de acumulação de contaminantes e estabelecer uma base de referência para o monitoramento ambiental em áreas indígenas.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Amostragem de organismos em campo"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_02.jpg" alt="Biomonitoramento e análises científicas"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/metagenomica_03.jpg" alt="Biodiversidade e qualidade ambiental"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 07 · Acervos e dados públicos</div>
+        <h2>Catálogo verificado, herbários e banco AmaTreeDNA</h2>
+        <p>
+          As coletas irão fortalecer herbários amazônicos, apoiar a digitalização de espécimes, criar um banco de tecidos e DNA associado a vouchers e consolidar o primeiro catálogo da flora e funga da região.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_01.jpg" alt="Catálogo da flora e funga da Cabeça do Cachorro"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Dados taxonômicos verificados"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/catalogo_flora_funga_03.jpg" alt="Organização de registros de biodiversidade"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 08 · Formação e comunicação</div>
+        <h2>Oficinas, estudantes, parataxonomistas e comunicação multilíngue</h2>
+        <p>
+          A formação de recursos humanos, as Oficinas Botânicas, a participação de parataxonomistas e a tradução de resultados para Baniwa, Tukano e Nheengatu fazem parte da estratégia de retorno social do projeto.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Trabalho de campo com comunidades indígenas locais"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/comunidades_indigenas_02.jpg" alt="Colaboração territorial e conhecimento local"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/capacitacao_estudantes_01.jpg" alt="Capacitação de comunidades indígenas e formação de estudantes"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 3"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="objective-nav" aria-hidden="false">
+      <button class="objective-arrow objective-prev" type="button" aria-label="Objetivo anterior">‹</button>
+      <button class="objective-arrow objective-next" type="button" aria-label="Próximo objetivo">›</button>
+    </div>
+
+    <div class="objective-dots" aria-label="Navegação dos objetivos">
+      <button class="objective-dot active" type="button" aria-label="Objetivo 1"></button>
+      <button class="objective-dot" type="button" aria-label="Objetivo 2"></button>
+      <button class="objective-dot" type="button" aria-label="Objetivo 3"></button>
+      <button class="objective-dot" type="button" aria-label="Objetivo 4"></button>
+      <button class="objective-dot" type="button" aria-label="Objetivo 5"></button>
+      <button class="objective-dot" type="button" aria-label="Objetivo 6"></button>
+      <button class="objective-dot" type="button" aria-label="Objetivo 7"></button>
+      <button class="objective-dot" type="button" aria-label="Objetivo 8"></button>
+    </div>
+
+  </div>
+</section>
+```
+
+
+```{=html}
+<section id="expedicoes-recentes" class="content-card">
+  <div class="section-title">
+    <h2>Expedições recentes</h2>
+  </div>
+
+  <p class="lead">
+    As expedições são a unidade viva do Tsiino Hiiwiida: cada campanha articula logística, comunidades, pontos de coleta, registros fotográficos, vouchers, amostras de DNA e observações ecológicas.
+  </p>
+```
+
+```{r expedicoes-recentes}
+library(htmltools)
+
+expedicoes_home <- read_optional_csv(file.path("_input_data", "expedicoes_tsiino.csv"))
+
+if (nrow(expedicoes_home) > 0) {
+  expedicoes_home$expedicao <- col_or(expedicoes_home, c("expedicao", "expedição", "nome", "name"), "Expedição")
+  expedicoes_home$localidade <- col_or(expedicoes_home, c("localidade", "local", "ponto", "site"), "")
+  expedicoes_home$data <- col_or(expedicoes_home, c("data", "date", "periodo", "período"), "")
+  expedicoes_home$resumo <- col_or(expedicoes_home, c("resumo", "descricao", "descrição", "observacoes", "observações"), "")
+
+  expedicoes_home <- utils::tail(expedicoes_home, 3)
+
+  tagList(
+    tags$div(
+      class = "expedition-preview-grid",
+      lapply(seq_len(nrow(expedicoes_home)), function(i) {
+        tags$article(
+          class = "expedition-preview-card",
+          tags$div(class = "expedition-date", ifelse(nz(expedicoes_home$data[i]), expedicoes_home$data[i], "Campanha")),
+          tags$h3(expedicoes_home$expedicao[i]),
+          tags$p(ifelse(nz(expedicoes_home$resumo[i]), expedicoes_home$resumo[i], paste("Localidade:", expedicoes_home$localidade[i])))
+        )
+      })
+    ),
+    tags$div(
+      class = "hero-actions",
+      style = "margin-top: 1rem;",
+      tags$a(class = "btn-main", href = "expedicoes.html", "Explorar mapa e fotos das expedições")
+    )
+  )
+} else {
+  tagList(
+    tags$div(
+      class = "empty-media",
+      "Nenhuma expedição foi encontrada em _input_data/expedicoes_tsiino.csv. Quando o arquivo existir, as expedições recentes aparecerão automaticamente aqui."
+    ),
+    tags$div(
+      class = "hero-actions",
+      style = "margin-top: 1rem;",
+      tags$a(class = "btn-main", href = "expedicoes.html", "Abrir página de expedições")
+    )
+  )
+}
+```
+
+```{=html}
+</section>
+
+<style>
+/* ===== Divulgação: layout fixo, proporcional e sem cards cortados ===== */
+
+#divulgacao {
+  scroll-margin-top: 90px;
+}
+
+#divulgacao .lead {
+  max-width: 58rem;
+}
+
+#divulgacao .media-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.4rem);
+  align-items: stretch;
+}
+
+#divulgacao .media-panel {
+  min-width: 0;
+  background: rgba(246,241,232,0.72);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: clamp(1rem, 1.8vw, 1.25rem);
+  box-shadow: none;
+  height: 100%;
+}
+
+#divulgacao .media-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+#divulgacao .media-panel h3 {
+  margin: 0;
+  color: var(--green-dark);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+#divulgacao .media-panel-label {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.28rem 0.6rem;
+  background: var(--red);
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#divulgacao .media-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+#divulgacao .media-item {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: stretch;
+  background: var(--paper);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(98,106,56,0.18);
+  box-shadow: none;
+  min-height: 180px;
+}
+
+#divulgacao .media-thumb {
+  width: 100%;
+  height: 100%;
+  background: #efe8d9;
+  overflow: hidden;
+}
+
+#divulgacao .media-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+#divulgacao .media-body {
+  padding: 0.95rem 1rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#divulgacao .media-date {
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  margin-bottom: 0.45rem;
+  font-family: 'Space Mono', monospace;
+}
+
+#divulgacao .media-body h4 {
+  margin: 0 0 0.45rem 0;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.28;
+  font-weight: 800;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#divulgacao .media-body p {
+  margin: 0 0 0.8rem 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#divulgacao .media-link {
+  margin-top: auto;
+  color: var(--red) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  font-size: 0.72rem;
+  text-decoration: none;
+  font-family: 'Space Mono', monospace;
+}
+
+#divulgacao .empty-media {
+  padding: 1rem;
+  background: rgba(255,253,247,0.74);
+  border: 1px dashed rgba(169,54,50,0.32);
+  border-radius: 14px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 1100px) {
+  #divulgacao .media-item {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  #divulgacao .media-thumb {
+    height: 220px;
+  }
+}
+
+@media (max-width: 900px) {
+  #divulgacao .media-layout {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+```
+
+```{=html}
+
+<style>
+/* Refinamento final das seções dinâmicas: menos aparência de aviso e mais unidade editorial */
+#expedicoes-recentes .lead,
+#divulgacao .lead {
+  max-width: 66rem;
+}
+
+#expedicoes-recentes .empty-media,
+#divulgacao .empty-media {
+  background:
+    linear-gradient(135deg, rgba(215,221,197,0.38), rgba(255,253,247,0.88));
+  border: 1px dashed rgba(98,106,56,0.45);
+  border-radius: 16px;
+  color: var(--green-dark);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+#divulgacao .media-panel {
+  background:
+    linear-gradient(180deg, rgba(255,253,247,0.96), rgba(246,241,232,0.80));
+  border-color: rgba(98,106,56,0.22);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.055);
+}
+
+#divulgacao .media-panel-label {
+  background: var(--green);
+  color: var(--cream);
+}
+
+#divulgacao .media-item {
+  border-color: rgba(98,106,56,0.20);
+}
+
+#divulgacao .media-thumb {
+  background:
+    linear-gradient(135deg, rgba(46,59,36,0.90), rgba(98,106,56,0.74)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  color: var(--cream);
+}
+
+
+/* ===== Ajuste final: três eixos da proposta, sem barrinhas decorativas, e foto lateral maior ===== */
+.feature-title::before {
+  display: none !important;
+  content: none !important;
+}
+
+.feature-title {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.feature-band {
+  min-height: clamp(430px, 39vw, 590px);
+}
+
+.feature-photo,
+.feature-panel {
+  min-height: clamp(430px, 39vw, 590px);
+}
+
+.feature-panel {
+  justify-content: flex-start;
+  gap: 0.7rem;
+  padding: clamp(1.05rem, 2vw, 1.85rem);
+}
+
+.feature-panel h3 {
+  border-left: 0 !important;
+  padding: 0.46rem 0.76rem;
+  background: var(--red-dark);
+  color: var(--cream);
+}
+
+.feature-panel p.axis-title {
+  margin: auto 0 0 0 !important;
+  max-width: 18rem;
+  color: var(--cream) !important;
+  font-size: clamp(1.15rem, 1.75vw, 1.72rem) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.045em !important;
+  text-transform: none !important;
+  hyphens: none;
+}
+
+.feature-panel p.axis-detail {
+  margin: 0.65rem 0 0 0 !important;
+  max-width: 18.5rem;
+  color: rgba(255,253,247,0.86) !important;
+  font-size: clamp(0.78rem, 0.9vw, 0.94rem) !important;
+  line-height: 1.42 !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  hyphens: none;
+}
+
+#o-projeto .about-intro-grid {
+  grid-template-columns: minmax(0, 0.88fr) minmax(520px, 0.78fr);
+}
+
+#o-projeto .about-photo-expanded {
+  min-height: clamp(620px, 62vw, 820px);
+}
+
+#o-projeto .about-photo-expanded img {
+  min-height: clamp(620px, 62vw, 820px);
+  height: clamp(620px, 62vw, 820px);
+  object-position: center center;
+}
+
+#o-projeto .about-stat-overlay {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 285px;
+  right: auto;
+  gap: 0.62rem;
+}
+
+#o-projeto .about-stat-overlay .about-stat {
+  min-height: 106px;
+  padding: 0.72rem;
+}
+
+#o-projeto .about-stat-overlay .about-stat strong {
+  font-size: clamp(1.8rem, 2.8vw, 2.75rem);
+}
+
+#o-projeto .about-stat-overlay .about-stat span {
+  font-size: clamp(0.52rem, 0.58vw, 0.62rem);
+  line-height: 1.24;
+}
+
+@media (max-width: 1180px) {
+  .feature-band {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .feature-photo,
+  .feature-panel {
+    min-height: 360px;
+  }
+
+  #o-projeto .about-intro-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(470px, 0.75fr);
+  }
+}
+
+@media (max-width: 980px) {
+  #o-projeto .about-intro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(500px, 82vw, 660px);
+    height: clamp(500px, 82vw, 660px);
+  }
+
+  #o-projeto .about-stat-overlay {
+    max-width: 330px;
+  }
+}
+
+@media (max-width: 760px) {
+  .feature-band {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-photo,
+  .feature-panel {
+    min-height: 310px;
+  }
+
+  .feature-panel p.axis-title,
+  .feature-panel p.axis-detail {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  #o-projeto .about-stat-overlay {
+    max-width: none;
+  }
+}
+</style>
+
+<style>
+/* ===== Ajuste estrutural final da abertura "O projeto" ===== */
+#o-projeto.content-card,
+#o-projeto.about-section {
+  width: min(1320px, calc(100vw - 1.5rem)) !important;
+  overflow: visible;
+}
+
+#o-projeto .about-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(440px, 0.72fr) !important;
+  gap: clamp(1.6rem, 3.6vw, 3.2rem) !important;
+  align-items: stretch;
+}
+
+#o-projeto .about-copy-editorial {
+  min-width: 0;
+  align-self: start;
+  padding-top: clamp(0.15rem, 0.8vw, 0.6rem);
+}
+
+#o-projeto .about-display-title {
+  max-width: 820px;
+  font-size: clamp(2.55rem, 4.9vw, 5.35rem);
+  line-height: 0.9;
+  letter-spacing: -0.078em;
+  text-wrap: balance;
+}
+
+#o-projeto .lead {
+  max-width: 800px;
+}
+
+#o-projeto .about-copy-columns {
+  max-width: 860px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#o-projeto .about-pullquote {
+  max-width: 900px;
+  margin-top: clamp(1.25rem, 2.2vw, 1.8rem);
+}
+
+#o-projeto .about-visual-module {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-self: stretch;
+}
+
+#o-projeto .about-photo-expanded {
+  width: 100%;
+  min-height: clamp(570px, 54vw, 760px) !important;
+  height: 100%;
+  margin: 0;
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+#o-projeto .about-photo-expanded img {
+  width: 100%;
+  height: 100% !important;
+  min-height: clamp(570px, 54vw, 760px) !important;
+  object-fit: cover;
+  object-position: center center;
+}
+
+#o-projeto .about-stat-overlay {
+  position: absolute;
+  top: 1.05rem;
+  left: 1.05rem;
+  right: auto;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 300px;
+  gap: 0.62rem;
+  margin: 0;
+}
+
+#o-projeto .about-stat-overlay .about-stat {
+  min-height: 108px;
+  padding: 0.74rem;
+  border-radius: 18px;
+  justify-content: space-between;
+}
+
+#o-projeto .about-stat-overlay .about-stat strong {
+  font-size: clamp(1.85rem, 2.7vw, 2.8rem);
+}
+
+#o-projeto .about-stat-overlay .about-stat span {
+  font-size: clamp(0.5rem, 0.58vw, 0.62rem);
+  line-height: 1.22;
+  letter-spacing: 0.055em;
+}
+
+#o-projeto .about-photo-expanded figcaption {
+  z-index: 6;
+  width: auto;
+  max-width: calc(100% - 2.1rem);
+  left: 1.05rem;
+  right: 1.05rem;
+  bottom: 1.05rem;
+  text-wrap: balance;
+}
+
+#o-projeto .about-map-compact {
+  margin: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.11);
+}
+
+#o-projeto .about-map-compact #project-sgc-map {
+  height: 215px;
+}
+
+#o-projeto .about-map-compact .project-map-header {
+  padding: 0.82rem 1rem 0.72rem;
+}
+
+#o-projeto .about-map-compact .project-map-header h3 {
+  font-size: 0.72rem;
+}
+
+#o-projeto .about-map-compact .project-map-header p {
+  font-size: 0.78rem !important;
+  line-height: 1.38 !important;
+}
+
+/* Mantém os três eixos na paleta da identidade, sem a barrinha decorativa anterior. */
+.feature-title::before,
+.feature-panel h3::before {
+  display: none !important;
+  content: none !important;
+}
+
+.feature-panel h3 {
+  border-left: 0 !important;
+}
+
+.feature-panel p.axis-title {
+  text-transform: none !important;
+  hyphens: none;
+}
+
+.feature-panel p.axis-detail {
+  text-transform: none !important;
+  hyphens: none;
+}
+
+@media (max-width: 1160px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #o-projeto .about-visual-module {
+    grid-template-columns: minmax(0, 1fr) minmax(310px, 0.58fr);
+    grid-template-rows: none;
+    align-items: stretch;
+  }
+
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(500px, 62vw, 650px) !important;
+  }
+
+  #o-projeto .about-map-compact {
+    height: 100%;
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    height: calc(100% - 112px);
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 860px) {
+  #o-projeto.content-card,
+  #o-projeto.about-section {
+    width: min(760px, calc(100vw - 1rem)) !important;
+  }
+
+  #o-projeto .about-visual-module {
+    grid-template-columns: 1fr;
+  }
+
+  #o-projeto .about-copy-columns {
+    grid-template-columns: 1fr;
+  }
+
+  #o-projeto .about-display-title {
+    font-size: clamp(2.4rem, 10vw, 4.4rem);
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    height: 260px;
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 640px) {
+  #o-projeto .about-photo-expanded {
+    display: flex;
+    flex-direction: column;
+    min-height: 0 !important;
+  }
+
+  #o-projeto .about-photo-expanded img {
+    min-height: 420px !important;
+    height: 420px !important;
+  }
+
+  #o-projeto .about-stat-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    max-width: none;
+    margin: -0.9rem 0.85rem 0.85rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #o-projeto .about-photo-expanded figcaption {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: 0 0.85rem 0.85rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const selectors = [
+    "#o-projeto .section-title",
+    "#o-projeto .about-eyebrow",
+    "#o-projeto .about-display-title",
+    "#o-projeto .lead",
+    "#o-projeto .about-copy-columns p",
+    "#o-projeto .about-pullquote",
+    "#o-projeto .about-photo-expanded",
+    "#o-projeto .about-map-compact",
+    ".feature-title-wrap",
+    ".feature-photo",
+    ".feature-panel",
+    ".method-intro-grid > *",
+    ".method-step",
+    ".impact-card",
+    ".objective-slide.active .objective-text",
+    ".objective-slide.active .objective-image-wrap",
+    "#expedicoes-recentes .lead",
+    "#divulgacao .lead",
+    ".media-panel",
+    ".researchers-copy",
+    ".researcher-card"
+  ];
+
+  const revealTargets = Array.from(document.querySelectorAll(selectors.join(",")))
+    .filter(el => !el.classList.contains("reveal-ready"));
+
+  revealTargets.forEach((el, index) => {
+    el.classList.add("reveal-ready");
+    el.style.setProperty("--reveal-delay", `${Math.min(index % 8, 7) * 45}ms`);
+  });
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    revealTargets.forEach(el => el.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.08,
+    rootMargin: "0px 0px -6% 0px"
+  });
+
+  revealTargets.forEach(el => observer.observe(el));
+});
+</script>
+
+<style>
+/* ===== Divulgação full-width com prévias horizontais ===== */
+#divulgacao.content-card {
+  width: min(1520px, calc(100vw - clamp(1rem, 3.8vw, 4rem))) !important;
+  max-width: none !important;
+  padding: clamp(1.45rem, 3vw, 2.9rem) clamp(1rem, 3vw, 3rem) clamp(1.6rem, 3.2vw, 3.2rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .section-title,
+#divulgacao .lead {
+  max-width: 1180px !important;
+}
+
+#divulgacao .lead {
+  margin-bottom: clamp(1.2rem, 2.5vw, 2rem) !important;
+}
+
+#divulgacao .media-layout {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: clamp(1rem, 2vw, 1.45rem) !important;
+}
+
+#divulgacao .media-panel {
+  display: grid !important;
+  grid-template-columns: minmax(180px, 0.23fr) minmax(0, 1fr) !important;
+  gap: clamp(1rem, 2vw, 1.6rem) !important;
+  align-items: stretch !important;
+  padding: clamp(0.85rem, 1.8vw, 1.25rem) !important;
+  border-radius: 24px !important;
+  background: linear-gradient(135deg, rgba(255,253,247,0.98), rgba(246,241,232,0.82)) !important;
+  border: 1px solid rgba(98,106,56,0.24) !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.075) !important;
+}
+
+#divulgacao .media-panel-header {
+  margin: 0 !important;
+  min-height: 100% !important;
+  align-self: stretch !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 1.2rem !important;
+  padding: clamp(0.95rem, 1.7vw, 1.25rem) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(46,59,36,0.98), rgba(98,106,56,0.95)),
+    url("figures/tsiino_bg.png") !important;
+  background-size: cover !important;
+  color: var(--cream) !important;
+}
+
+#divulgacao .media-panel-header::after {
+  content: "prévia atualizada";
+  color: rgba(255,253,247,0.62);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#divulgacao .media-panel h3 {
+  color: var(--cream) !important;
+  font-size: clamp(0.72rem, 0.9vw, 0.86rem) !important;
+  line-height: 1.35 !important;
+  max-width: 11rem;
+}
+
+#divulgacao .media-panel-label {
+  order: -1;
+  background: var(--red) !important;
+  color: var(--cream) !important;
+  padding: 0.34rem 0.68rem !important;
+  border-radius: 999px !important;
+}
+
+#divulgacao .media-grid {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(0.85rem, 1.5vw, 1.15rem) !important;
+  align-items: stretch !important;
+}
+
+#divulgacao .media-item {
+  min-width: 0 !important;
+  min-height: clamp(210px, 17vw, 260px) !important;
+  display: grid !important;
+  grid-template-columns: minmax(170px, 42%) minmax(0, 1fr) !important;
+  border-radius: 20px !important;
+  background: rgba(255,253,247,0.98) !important;
+  border: 1px solid rgba(98,106,56,0.22) !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.055) !important;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+#divulgacao .media-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.10) !important;
+  border-color: rgba(169,54,50,0.26) !important;
+}
+
+#divulgacao .media-thumb {
+  position: relative !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(135deg, rgba(46,59,36,0.94), rgba(98,106,56,0.78)),
+    url("figures/tsiino_bg.png") !important;
+  background-size: cover !important;
+  color: rgba(255,253,247,0.82) !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.20));
+  pointer-events: none;
+}
+
+#divulgacao .media-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+}
+
+#divulgacao .media-item-instagram .media-thumb img {
+  transform: scale(1.08);
+}
+
+#divulgacao .media-body {
+  padding: clamp(1rem, 1.8vw, 1.35rem) !important;
+  min-width: 0 !important;
+}
+
+#divulgacao .media-date {
+  margin-bottom: 0.55rem !important;
+  color: var(--red) !important;
+  font-size: clamp(0.62rem, 0.75vw, 0.74rem) !important;
+}
+
+#divulgacao .media-body h4 {
+  font-size: clamp(1.02rem, 1.35vw, 1.32rem) !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.025em !important;
+  -webkit-line-clamp: 4 !important;
+}
+
+#divulgacao .media-body p {
+  font-size: clamp(0.86rem, 0.9vw, 0.96rem) !important;
+  line-height: 1.48 !important;
+  -webkit-line-clamp: 3 !important;
+}
+
+#divulgacao .media-link {
+  align-self: flex-start;
+  margin-top: auto !important;
+  padding-top: 0.3rem;
+}
+
+#divulgacao .empty-media {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 1180px) {
+  #divulgacao .media-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-panel-header {
+    min-height: auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  #divulgacao .media-panel-header::after {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 980px) {
+  #divulgacao.content-card {
+    width: min(100%, calc(100vw - 1rem)) !important;
+  }
+
+  #divulgacao .media-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-item {
+    min-height: 220px !important;
+    grid-template-columns: minmax(180px, 38%) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 680px) {
+  #divulgacao.content-card {
+    padding: 1.2rem 0.95rem 1.35rem !important;
+  }
+
+  #divulgacao .section-title {
+    grid-template-columns: 42px 1fr !important;
+    gap: 0.55rem !important;
+  }
+
+  #divulgacao .media-panel {
+    border-radius: 20px !important;
+    padding: 0.75rem !important;
+  }
+
+  #divulgacao .media-panel-header {
+    flex-wrap: wrap !important;
+    gap: 0.65rem !important;
+  }
+
+  #divulgacao .media-panel-header::after {
+    display: none;
+  }
+
+  #divulgacao .media-item {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+
+  #divulgacao .media-thumb {
+    min-height: 230px !important;
+    height: 230px !important;
+  }
+
+  #divulgacao .media-body h4 {
+    -webkit-line-clamp: 3 !important;
+  }
+}
+</style>
+
+<section id="divulgacao" class="content-card">
+  <div class="section-title">
+    <h2>Divulgação</h2>
+  </div>
+
+  <p class="lead">
+    Acompanhe a circulação pública do projeto Tsiino Hiiwiida.
+  </p>
+```
+
+```{r divulgacao-dinamica}
+library(htmltools)
+library(rvest)
+library(xml2)
+
+get_meta_content <- function(doc, selectors) {
+  for (selector in selectors) {
+    value <- doc |>
+      html_element(selector) |>
+      html_attr("content")
+
+    if (!is.na(value) && nzchar(trimws(value))) {
+      return(trimws(value))
+    }
+  }
+
+  ""
+}
+
+fetch_link_preview <- function(url) {
+  empty <- list(
+    titulo = "",
+    descricao = "",
+    imagem = ""
+  )
+
+  if (!nz(url) || url == "#") return(empty)
+
+  tryCatch({
+    doc <- read_html(url)
+
+    titulo <- get_meta_content(
+      doc,
+      c(
+        "meta[property='og:title']",
+        "meta[name='twitter:title']"
+      )
+    )
+
+    if (!nz(titulo)) {
+      titulo <- doc |>
+        html_element("title") |>
+        html_text2()
+    }
+
+    descricao <- get_meta_content(
+      doc,
+      c(
+        "meta[property='og:description']",
+        "meta[name='twitter:description']",
+        "meta[name='description']"
+      )
+    )
+
+    imagem <- get_meta_content(
+      doc,
+      c(
+        "meta[property='og:image']",
+        "meta[property='og:image:secure_url']",
+        "meta[name='twitter:image']"
+      )
+    )
+
+    if (nz(imagem)) {
+      imagem <- xml2::url_absolute(imagem, url)
+    }
+
+    list(
+      titulo = ifelse(is.na(titulo), "", titulo),
+      descricao = ifelse(is.na(descricao), "", descricao),
+      imagem = ifelse(is.na(imagem), "", imagem)
+    )
+  }, error = function(e) {
+    empty
+  })
+}
+
+insta <- read_optional_csv(file.path("_input_data", "divulgacao_instagram.csv"))
+news <- read_optional_csv(file.path("_input_data", "divulgacao_reportagens.csv"))
+
+make_media_items <- function(data, kind = c("instagram", "reportagem")) {
+  kind <- match.arg(kind)
+
+  if (nrow(data) == 0) {
+    arquivo <- if (kind == "instagram") {
+      "_input_data/divulgacao_instagram.csv"
+    } else {
+      "_input_data/divulgacao_reportagens.csv"
+    }
+
+    return(
+      tags$div(
+        class = "empty-media",
+        paste0("Nenhum item encontrado em ", arquivo, ". Ao adicionar linhas nesse CSV e renderizar o site novamente, os cards aparecerão automaticamente aqui.")
+      )
+    )
+  }
+  
+  if (nrow(data) > 2) {
+  data <- utils::tail(data, 2)
+}
+data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
+
+  titulo <- col_or(data, c("titulo", "título", "title", "post"), "Sem título")
+  url <- col_or(data, c("url", "link", "href"), "#")
+  data_item <- col_or(data, c("data", "date", "ano"), "")
+  imagem <- col_or(data, c("imagem", "image", "thumb", "thumbnail", "capa"), "")
+  descricao <- col_or(data, c("descricao", "descrição", "resumo", "caption", "texto"), "")
+  veiculo <- col_or(data, c("veiculo", "veículo", "fonte", "source"), "")
+
+  for (i in seq_len(nrow(data))) {
+  preview <- fetch_link_preview(url[i])
+
+  if (!nz(titulo[i]) || titulo[i] == "Sem título") {
+    titulo[i] <- preview$titulo
+  }
+
+  if (!nz(descricao[i])) {
+    descricao[i] <- preview$descricao
+  }
+
+  if (!nz(imagem[i])) {
+    imagem[i] <- preview$imagem
+  }
+}
+  
+  tags$div(
+    class = "media-grid",
+    lapply(seq_len(nrow(data)), function(i) {
+      thumb <- if (nz(imagem[i])) {
+        tags$div(class = "media-thumb", tags$img(src = imagem[i], alt = titulo[i], loading = "lazy"))
+      } else {
+        tags$div(class = "media-thumb", ifelse(kind == "instagram", "Instagram", "Reportagem"))
+      }
+
+      label <- if (kind == "instagram") {
+        "Post"
+      } else if (nz(veiculo[i])) {
+        veiculo[i]
+      } else {
+        "Matéria"
+      }
+
+      tags$article(
+        class = paste("media-item", paste0("media-item-", kind)),
+        thumb,
+        tags$div(
+          class = "media-body",
+          tags$div(class = "media-date", paste(label, ifelse(nz(data_item[i]), paste("·", data_item[i]), ""))),
+          tags$h4(titulo[i]),
+          if (nz(descricao[i])) tags$p(descricao[i]),
+          tags$a(
+            class = "media-link",
+            href = url[i],
+            target = "_blank",
+            rel = "noopener",
+            ifelse(kind == "instagram", "Ver no Instagram →", "Ler reportagem →")
+          )
+        )
+      )
+    })
+  )
+}
+
+tagList(
+  tags$div(
+    class = "media-layout",
+    tags$div(
+      class = "media-panel",
+      tags$div(
+        class = "media-panel-header",
+        tags$h3("Instagram do projeto"),
+        tags$span(class = "media-panel-label", "Social")
+      ),
+      make_media_items(insta, "instagram")
+    ),
+    tags$div(
+      class = "media-panel",
+      tags$div(
+        class = "media-panel-header",
+        tags$h3("Reportagens e notícias"),
+        tags$span(class = "media-panel-label", "Imprensa")
+      ),
+      make_media_items(news, "reportagem")
+    )
+  )
+)
+```
+
+```{=html}
+</section>
+```
+
+```{=html}
+<section id="pesquisadores-responsaveis" class="content-card researchers-section">
+  <div class="section-title">
+    <h2>Rede de coordenação científica</h2>
+  </div>
+
+  <div class="researchers-layout">
+    <div class="researchers-copy">
+      <div class="researchers-kicker">Rede de coordenação científica</div>
+
+      <p class="lead researchers-lead">
+        A proposta é coordenada por uma rede multidisciplinar vinculada a instituições amazônicas, centros de pesquisa de outros estados brasileiros e parceiros do Reino Unido.
+      </p>
+
+      <p>
+        A rede combina taxonomia, sistemática, bioinformática, micologia, briologia, florística, química de solos, comunicação científica, audiovisual e colaboração com parataxonomistas e representantes indígenas.
+      </p>
+
+      <div class="researchers-summary">
+        <div>
+          <span class="researchers-number">30</span>
+          <span class="researchers-label">instituições articuladas</span>
+        </div>
+
+        <div>
+          <span class="researchers-number">66</span>
+          <span class="researchers-label">pesquisadores, estudantes e equipe técnica</span>
+        </div>
+      </div>
+
+      <div class="hero-actions researchers-actions">
+        <a class="btn-main" href="team/">Conhecer a equipe completa</a>
+      </div>
+    </div>
+
+    <div class="researchers-panel">
+      <div class="researchers-panel-header">
+        <h3></h3>
+      </div>
+
+      <div class="researchers-list">
+        <article class="researcher-card">
+          <span class="agency-pill">FAPEAM</span>
+          <h4>Charles Eugene Zartman</h4>
+          <p>Instituto Nacional de Pesquisas da Amazônia — INPA</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">FAPERJ</span>
+          <h4>Domingos Benicio Oliveira Silva Cardoso</h4>
+          <p>Jardim Botânico do Rio de Janeiro — JBRJ</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">UKRI</span>
+          <h4>Sandra Diane Knapp</h4>
+          <p>Natural History Museum</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">FAPESPA</span>
+          <h4>Anna Luiza Ilkiu-Borges</h4>
+          <p>Museu Paraense Emílio Goeldi — MPEG</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">FACEPE</span>
+          <h4>Clistenes Williams Araújo do Nascimento</h4>
+          <p>Universidade Federal Rural de Pernambuco — UFRPE</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">FAPEMA</span>
+          <h4>Dirce Leimi Komura</h4>
+          <p>Instituto Federal do Maranhão — IFMA</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">FAPESP</span>
+          <h4>Denilson Fernandes Peralta</h4>
+          <p>Instituto de Pesquisas Ambientais — IPA</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">FAPESQ</span>
+          <h4>Felipe Wartchow</h4>
+          <p>Universidade Federal da Paraíba — UFPB</p>
+        </article>
+
+        <article class="researcher-card">
+          <span class="agency-pill">FAPDF</span>
+          <h4>Micheline Carvalho-Silva</h4>
+          <p>Universidade de Brasília — UnB</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+```{=html}
+<style>
+/* ===== Ajuste responsivo final — abertura O projeto e eixos ===== */
+#o-projeto.content-card,
+#o-projeto.about-section {
+  container-type: inline-size;
+  container-name: projetoAbout;
+  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
+  max-width: 1320px !important;
+  margin-inline: auto !important;
+  padding-inline: clamp(1.05rem, 3vw, 3rem) !important;
+  overflow: hidden !important;
+}
+
+#o-projeto .about-hero-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) !important;
+  grid-template-areas: "copy visual" !important;
+  gap: clamp(1.35rem, 3.2vw, 3.2rem) !important;
+  align-items: start !important;
+  width: 100% !important;
+}
+
+#o-projeto .about-copy-editorial {
+  grid-area: copy !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-self: stretch !important;
+}
+
+#o-projeto .about-copy-editorial > * {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#o-projeto .about-display-title {
+  max-width: 900px !important;
+  font-size: clamp(3.1rem, 6.2vw, 6.35rem) !important;
+  line-height: 0.89 !important;
+  letter-spacing: -0.082em !important;
+  text-wrap: balance;
+}
+
+#o-projeto .lead,
+#o-projeto .about-copy-columns,
+#o-projeto .about-pullquote {
+  width: 100% !important;
+  max-width: 900px !important;
+}
+
+#o-projeto .about-copy-columns {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(1rem, 2.2vw, 1.8rem) !important;
+}
+
+#o-projeto .about-visual-module {
+  grid-area: visual !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  gap: 1rem !important;
+  align-self: stretch !important;
+}
+
+#o-projeto .about-photo-expanded {
+  width: 100% !important;
+  min-height: clamp(560px, 52vw, 760px) !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: clamp(22px, 2vw, 32px) !important;
+  overflow: hidden !important;
+}
+
+#o-projeto .about-photo-expanded img {
+  width: 100% !important;
+  min-height: clamp(560px, 52vw, 760px) !important;
+  height: clamp(560px, 52vw, 760px) !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+#o-projeto .about-stat-overlay {
+  position: absolute !important;
+  top: clamp(0.7rem, 1.3vw, 1.1rem) !important;
+  left: clamp(0.7rem, 1.3vw, 1.1rem) !important;
+  right: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  width: min(310px, calc(100% - 1.4rem)) !important;
+  max-width: 310px !important;
+  gap: clamp(0.45rem, 0.9vw, 0.68rem) !important;
+  margin: 0 !important;
+}
+
+#o-projeto .about-stat-overlay .about-stat {
+  min-height: clamp(92px, 9vw, 112px) !important;
+  padding: clamp(0.55rem, 1vw, 0.75rem) !important;
+  border-radius: 17px !important;
+}
+
+#o-projeto .about-stat-overlay .about-stat strong {
+  font-size: clamp(1.9rem, 3.2vw, 2.85rem) !important;
+}
+
+#o-projeto .about-stat-overlay .about-stat span {
+  font-size: clamp(0.48rem, 0.62vw, 0.62rem) !important;
+  line-height: 1.22 !important;
+  overflow-wrap: anywhere !important;
+}
+
+#o-projeto .about-map-compact {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+#o-projeto .about-map-compact #project-sgc-map {
+  height: clamp(210px, 24vw, 285px) !important;
+  min-height: 210px !important;
+}
+
+@container projetoAbout (max-width: 1040px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "copy"
+      "visual" !important;
+  }
+
+  #o-projeto .about-copy-editorial,
+  #o-projeto .about-visual-module,
+  #o-projeto .lead,
+  #o-projeto .about-copy-columns,
+  #o-projeto .about-pullquote {
+    max-width: none !important;
+  }
+
+  #o-projeto .about-display-title {
+    max-width: 760px !important;
+    font-size: clamp(2.85rem, 9vw, 5.4rem) !important;
+  }
+
+  #o-projeto .about-visual-module {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.58fr) !important;
+    grid-template-rows: none !important;
+    align-items: stretch !important;
+  }
+
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(460px, 58vw, 620px) !important;
+    height: clamp(460px, 58vw, 620px) !important;
+  }
+
+  #o-projeto .about-map-compact {
+    height: 100% !important;
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    height: calc(100% - 112px) !important;
+    min-height: 300px !important;
+  }
+}
+
+@container projetoAbout (max-width: 760px) {
+  #o-projeto.content-card,
+  #o-projeto.about-section {
+    width: min(100%, calc(100vw - 1rem)) !important;
+    padding: 1.2rem 1rem 1.35rem !important;
+  }
+
+  #o-projeto .section-title {
+    grid-template-columns: 42px 1fr !important;
+    gap: 0.55rem !important;
+  }
+
+  #o-projeto .about-display-title {
+    font-size: clamp(2.55rem, 13vw, 4.2rem) !important;
+    line-height: 0.91 !important;
+  }
+
+  #o-projeto .about-copy-columns {
+    grid-template-columns: 1fr !important;
+  }
+
+  #o-projeto .about-visual-module {
+    grid-template-columns: 1fr !important;
+  }
+
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(430px, 88vw, 560px) !important;
+    height: clamp(430px, 88vw, 560px) !important;
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    height: 255px !important;
+    min-height: 255px !important;
+  }
+}
+
+@container projetoAbout (max-width: 520px) {
+  #o-projeto .about-pullquote {
+    font-size: clamp(1.08rem, 5.4vw, 1.35rem) !important;
+    line-height: 1.34 !important;
+  }
+
+  #o-projeto .about-photo-expanded {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+
+  #o-projeto .about-photo-expanded img {
+    min-height: 390px !important;
+    height: 390px !important;
+  }
+
+  #o-projeto .about-stat-overlay {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: -0.85rem 0.75rem 0.75rem !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #o-projeto .about-stat-overlay .about-stat {
+    min-height: 88px !important;
+  }
+
+  #o-projeto .about-photo-expanded figcaption {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    max-width: none !important;
+    margin: 0 0.75rem 0.75rem !important;
+  }
+}
+
+/* Fallback para navegadores sem container queries */
+@media (max-width: 1040px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "copy"
+      "visual" !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #o-projeto .about-visual-module,
+  #o-projeto .about-copy-columns {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Três eixos: melhora leitura em desktop, tablet e mobile */
+#frentes-integradas .feature-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.7rem !important;
+  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
+}
+
+#frentes-integradas .feature-title {
+  max-width: 100% !important;
+  white-space: normal !important;
+  font-size: clamp(1.65rem, 4.4vw, 3.15rem) !important;
+  line-height: 0.98 !important;
+}
+
+#frentes-integradas .feature-band {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+#frentes-integradas .feature-photo,
+#frentes-integradas .feature-panel {
+  min-height: clamp(390px, 36vw, 560px) !important;
+}
+
+#frentes-integradas .feature-panel p.axis-title {
+  font-size: clamp(1.1rem, 1.55vw, 1.55rem) !important;
+  line-height: 1.05 !important;
+  overflow-wrap: anywhere !important;
+}
+
+#frentes-integradas .feature-panel p.axis-detail {
+  font-size: clamp(0.76rem, 0.85vw, 0.92rem) !important;
+}
+
+@media (max-width: 1220px) {
+  #frentes-integradas .feature-band {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #frentes-integradas .feature-title-wrap {
+    display: grid !important;
+    gap: 0.65rem !important;
+  }
+
+  #frentes-integradas .feature-band {
+    grid-template-columns: 1fr !important;
+  }
+
+  #frentes-integradas .feature-photo,
+  #frentes-integradas .feature-panel {
+    min-height: 310px !important;
+  }
+
+  #frentes-integradas .feature-panel p.axis-title,
+  #frentes-integradas .feature-panel p.axis-detail {
+    max-width: 100% !important;
+  }
+}
+</style>
+```
+
+```{=html}
+<style>
+/* ===== Ajuste fino da abertura: evita que o título invada a foto ===== */
+#o-projeto .about-hero-grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(430px, 0.64fr) !important;
+  gap: clamp(2.1rem, 4.5vw, 4.2rem) !important;
+}
+
+#o-projeto .about-copy-editorial {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+#o-projeto .about-visual-module {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+#o-projeto .about-display-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: min(720px, 100%) !important;
+  font-size: clamp(3.15rem, 4.25vw, 4.85rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: -0.076em !important;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+#o-projeto .about-display-title span {
+  display: block;
+  max-width: 100%;
+}
+
+#o-projeto .about-display-title span:nth-child(2) {
+  margin-left: clamp(0.18rem, 1vw, 0.75rem);
+}
+
+#o-projeto .about-display-title span:nth-child(3) {
+  margin-left: clamp(0.34rem, 1.7vw, 1.4rem);
+}
+
+#o-projeto .about-photo-expanded {
+  min-height: clamp(600px, 54vw, 780px) !important;
+}
+
+#o-projeto .about-photo-expanded img {
+  min-height: clamp(600px, 54vw, 780px) !important;
+}
+
+@media (max-width: 1320px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: minmax(0, 1.02fr) minmax(410px, 0.62fr) !important;
+    gap: clamp(1.8rem, 3.6vw, 3.2rem) !important;
+  }
+
+  #o-projeto .about-display-title {
+    font-size: clamp(3rem, 4.05vw, 4.35rem) !important;
+    max-width: 660px !important;
+  }
+}
+
+@media (max-width: 1160px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #o-projeto .about-display-title {
+    font-size: clamp(3rem, 7vw, 4.8rem) !important;
+    max-width: 760px !important;
+  }
+}
+
+@media (max-width: 860px) {
+  #o-projeto .about-display-title {
+    font-size: clamp(2.45rem, 10vw, 4.25rem) !important;
+    max-width: 100% !important;
+  }
+
+  #o-projeto .about-display-title span:nth-child(2),
+  #o-projeto .about-display-title span:nth-child(3) {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  #o-projeto .about-display-title {
+    font-size: clamp(2.2rem, 11vw, 3.35rem) !important;
+    line-height: 0.94 !important;
+    letter-spacing: -0.064em !important;
+  }
+}
+</style>
+```
+
+```{=html}
+<style>
+/* ===== Ajuste final: Divulgação ocupando a largura total da página ===== */
+#divulgacao.content-card {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  border-radius: 0 !important;
+  padding-left: max(1rem, calc((100vw - 1500px) / 2 + 2rem)) !important;
+  padding-right: max(1rem, calc((100vw - 1500px) / 2 + 2rem)) !important;
+}
+
+#divulgacao .section-title,
+#divulgacao .lead,
+#divulgacao .media-layout {
+  width: min(1500px, 100%) !important;
+  max-width: 1500px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (max-width: 760px) {
+  #divulgacao.content-card {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+</style>
+```
+
+```{=html}
+<style>
+/* ===== Correção responsiva para desktop estreito / meia tela ===== */
+@media (max-width: 1180px) {
+  #o-projeto.content-card,
+  #o-projeto.about-section {
+    width: min(100%, calc(100vw - 1rem)) !important;
+    max-width: calc(100vw - 1rem) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: clamp(1rem, 3vw, 1.8rem) !important;
+    padding-right: clamp(1rem, 3vw, 1.8rem) !important;
+    overflow: hidden !important;
+  }
+
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "copy" "visual" !important;
+    gap: clamp(1.35rem, 3.2vw, 2.2rem) !important;
+  }
+
+  #o-projeto .about-copy-editorial,
+  #o-projeto .about-visual-module,
+  #o-projeto .lead,
+  #o-projeto .about-copy-columns,
+  #o-projeto .about-pullquote {
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  #o-projeto .about-display-title {
+    max-width: 900px !important;
+    font-size: clamp(3rem, 8.6vw, 5.15rem) !important;
+    line-height: 0.9 !important;
+  }
+
+  #o-projeto .about-visual-module {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 1rem !important;
+    overflow: hidden !important;
+  }
+
+  #o-projeto .about-photo-expanded {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: clamp(470px, 62vw, 640px) !important;
+    height: auto !important;
+    border-radius: clamp(20px, 2.4vw, 28px) !important;
+  }
+
+  #o-projeto .about-photo-expanded img {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: clamp(470px, 62vw, 640px) !important;
+    height: clamp(470px, 62vw, 640px) !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  #o-projeto .about-map-compact {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    width: 100% !important;
+    height: clamp(260px, 42vw, 360px) !important;
+    min-height: 260px !important;
+  }
+
+  #o-projeto .about-stat-overlay {
+    width: min(330px, calc(100% - 1.4rem)) !important;
+    max-width: 330px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #o-projeto .about-copy-columns { grid-template-columns: 1fr !important; }
+  #o-projeto .about-display-title {
+    max-width: 100% !important;
+    font-size: clamp(2.5rem, 10.5vw, 4.45rem) !important;
+  }
+  #o-projeto .about-display-title span:nth-child(2),
+  #o-projeto .about-display-title span:nth-child(3) { margin-left: 0 !important; }
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(420px, 82vw, 560px) !important;
+    height: clamp(420px, 82vw, 560px) !important;
+  }
+}
+
+@media (max-width: 620px) {
+  #o-projeto.content-card,
+  #o-projeto.about-section {
+    width: calc(100vw - 0.65rem) !important;
+    max-width: calc(100vw - 0.65rem) !important;
+    padding-left: 0.95rem !important;
+    padding-right: 0.95rem !important;
+  }
+  #o-projeto .about-display-title {
+    font-size: clamp(2.15rem, 11.6vw, 3.35rem) !important;
+    letter-spacing: -0.064em !important;
+  }
+  #o-projeto .about-stat-overlay {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: -0.85rem 0.75rem 0.75rem !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #o-projeto .about-photo-expanded {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  #o-projeto .about-photo-expanded img {
+    min-height: 390px !important;
+    height: 390px !important;
+  }
+  #o-projeto .about-photo-expanded figcaption {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 0.75rem 0.75rem !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .objectives-section {
+    width: min(100%, calc(100vw - 1rem)) !important;
+    max-width: calc(100vw - 1rem) !important;
+    overflow: hidden !important;
+  }
+  .objective-slide {
+    grid-template-columns: 1fr !important;
+    gap: 1.6rem !important;
+    min-height: auto !important;
+    padding: clamp(1.5rem, 4vw, 2.6rem) clamp(1rem, 3vw, 2rem) 4.5rem !important;
+  }
+  .objective-text { max-width: 100% !important; }
+  .objective-text h2 {
+    max-width: 920px !important;
+    font-size: clamp(1.9rem, 5.2vw, 3.05rem) !important;
+  }
+  .objective-text p { max-width: 820px !important; }
+  .objective-image { width: min(390px, 76vw) !important; }
+}
+
+@media (min-width: 761px) and (max-width: 1080px) {
+  #frentes-integradas .feature-band { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #frentes-integradas .feature-photo,
+  #frentes-integradas .feature-panel { min-height: 360px !important; }
+}
+</style>
+```
+
+```{=html}
+<style>
+/* ===== CORREÇÃO FINAL DE OVERFLOW HORIZONTAL — HOME / SOBRE =====
+   Mantém hero e faixa "Três eixos" em largura total, mas trava as demais
+   seções dentro da largura real da tela. */
+
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  position: relative;
+}
+
+#quarto-content,
+.page-columns,
+.page-layout-full,
+main,
+main.content,
+.content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: visible !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img,
+video,
+iframe,
+svg,
+canvas {
+  max-width: 100% !important;
+}
+
+/* Full-bleed real: ocupa a largura inteira da janela, sem limitar ao corpo do Quarto. */
+.hero-strip,
+.full-bleed-feature,
+#frentes-integradas {
+  position: relative !important;
+  left: 50% !important;
+  right: auto !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(-50%) !important;
+  overflow: hidden !important;
+}
+
+.hero-video,
+.hero-overlay {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.hero-title-panel {
+  max-width: min(940px, calc(100vw - 4rem)) !important;
+}
+
+/* Preserva a animação da faixa full-bleed sem perder o translateX(-50%). */
+.full-bleed-feature.reveal-ready {
+  transform: translateX(-50%) translateY(44px) !important;
+}
+
+.full-bleed-feature.reveal-ready.is-visible {
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .full-bleed-feature.reveal-ready,
+  .full-bleed-feature.reveal-ready.is-visible {
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* Seções centrais: não usam 100vw direto; ficam contidas e centralizadas. */
+.content-card,
+.objectives-section,
+.about-section,
+.method-section,
+.researchers-section,
+#expedicoes-recentes,
+#o-projeto.content-card,
+#o-projeto.about-section {
+  width: min(1260px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow: hidden !important;
+}
+
+#o-projeto.content-card,
+#o-projeto.about-section {
+  width: min(1320px, calc(100vw - 1.5rem)) !important;
+  max-width: calc(100vw - 1.5rem) !important;
+}
+
+.objectives-section {
+  width: min(1280px, calc(100vw - 1rem)) !important;
+  max-width: calc(100vw - 1rem) !important;
+}
+
+/* Divulgação: larga, mas sem criar rolagem lateral. */
+#divulgacao.content-card {
+  width: min(1520px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border-radius: 0 !important;
+  padding-left: clamp(1rem, 3vw, 3rem) !important;
+  padding-right: clamp(1rem, 3vw, 3rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .section-title,
+#divulgacao .lead,
+#divulgacao .media-layout {
+  width: min(1500px, 100%) !important;
+  max-width: 1500px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Grids: remove mínimos rígidos que empurram a página para a direita. */
+.two-col,
+.about-intro-grid,
+#o-projeto .about-hero-grid,
+.researchers-layout,
+.method-intro-grid,
+.objective-slide,
+.media-layout,
+#divulgacao .media-layout,
+#divulgacao .media-panel,
+#divulgacao .media-grid,
+#divulgacao .media-item,
+.expedition-preview-grid,
+.info-grid,
+.info-grid-three,
+.contact-grid,
+.impact-grid,
+.method-river,
+.feature-band,
+#frentes-integradas .feature-band {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+#o-projeto .about-hero-grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.64fr) !important;
+}
+
+#o-projeto .about-copy-editorial,
+#o-projeto .about-visual-module,
+#o-projeto .about-photo-expanded,
+#o-projeto .about-map-compact,
+#o-projeto .lead,
+#o-projeto .about-copy-columns,
+#o-projeto .about-pullquote,
+.researchers-copy,
+.researchers-panel,
+.media-panel,
+.media-grid,
+.media-item,
+.media-body,
+.feature-photo,
+.feature-panel,
+.objective-text,
+.objective-image-wrap {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Três eixos: a faixa é full-bleed, e o conteúdo interno ocupa toda a largura dela. */
+#frentes-integradas .feature-title-wrap {
+  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
+  max-width: calc(100vw - 1rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#frentes-integradas .feature-band {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Divulgação: cards horizontais quando couber, empilhados antes de estourar. */
+#divulgacao .media-panel {
+  grid-template-columns: minmax(0, 0.23fr) minmax(0, 1fr) !important;
+}
+
+#divulgacao .media-item {
+  grid-template-columns: minmax(0, 42%) minmax(0, 1fr) !important;
+}
+
+/* Títulos longos não podem criar largura extra. */
+.section-title,
+.section-title h2,
+.about-display-title,
+.objective-text h2,
+.feature-title,
+.feature-panel p,
+.media-body h4,
+.media-body p,
+.researcher-card h4,
+.researcher-card p,
+.expedition-preview-card h3,
+.expedition-preview-card p {
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Navegação do carrossel não pode empurrar a página. */
+.objective-nav,
+.objective-dots {
+  max-width: calc(100% - 2rem) !important;
+}
+
+/* Notebooks e tablets: empilha blocos que antes tinham mínimos de 400–520px. */
+@media (max-width: 1180px) {
+  .content-card,
+  .about-section,
+  .method-section,
+  .researchers-section,
+  #expedicoes-recentes,
+  #o-projeto.content-card,
+  #o-projeto.about-section,
+  .objectives-section {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  #o-projeto .about-hero-grid,
+  .about-intro-grid,
+  .method-intro-grid,
+  .objective-slide,
+  .researchers-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: none !important;
+  }
+
+  #o-projeto .about-copy-editorial,
+  #o-projeto .about-visual-module {
+    grid-area: auto !important;
+  }
+
+  #divulgacao .media-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-panel-header {
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .expedition-preview-grid,
+  .info-grid,
+  .info-grid-three,
+  .contact-grid,
+  .impact-grid,
+  .method-river,
+  #divulgacao .media-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-item {
+    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .content-card,
+  .about-section,
+  .method-section,
+  .researchers-section,
+  #expedicoes-recentes,
+  #o-projeto.content-card,
+  #o-projeto.about-section,
+  .objectives-section {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+  }
+
+  .hero-strip,
+  .full-bleed-feature,
+  #frentes-integradas {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  #divulgacao.content-card {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+  }
+
+  #divulgacao .media-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-thumb {
+    height: 230px !important;
+    min-height: 230px !important;
+  }
+
+  .feature-band,
+  #frentes-integradas .feature-band {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-title-panel {
+    left: 1rem !important;
+    width: calc(100vw - 2rem) !important;
+  }
+
+  .section-title {
+    grid-template-columns: 42px 1fr !important;
+  }
+}
+</style>
+```
