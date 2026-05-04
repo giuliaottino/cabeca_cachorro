@@ -1185,61 +1185,141 @@ curicuriari-janeiro-2026
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
+(function () {
 
-  const footer = document.querySelector(".tsiino-site-footer");
+  const PROJECT_BASE = "cabeca_cachorro";
 
 
 
-  // Move o footer para fora do container do Quarto,
+  function getPathInsideSite() {
 
-  if (footer && footer.parentElement !== document.body) {
+    let path = window.location.pathname;
 
-    document.body.appendChild(footer);
+
+
+    if (path.startsWith("/" + PROJECT_BASE + "/")) {
+
+      path = path.replace("/" + PROJECT_BASE, "");
+
+    }
+
+
+
+    if (path === "" || path === "/") {
+
+      path = "/index.html";
+
+    }
+
+
+
+    if (path.endsWith("/")) {
+
+      path = path + "index.html";
+
+    }
+
+
+
+    return path;
 
   }
 
 
 
-  const path = window.location.pathname;
+  function getRelativePrefix() {
 
-  const pathParts = path.split("/").filter(Boolean);
+    const path = getPathInsideSite();
 
-  const currentFile = pathParts[pathParts.length - 1] || "";
-
-  const isHtmlFile = currentFile.endsWith(".html");
+    const parts = path.split("/").filter(Boolean);
 
 
 
-  const depth = isHtmlFile ? pathParts.length - 1 : pathParts.length;
+    if (parts.length <= 1) {
 
-  const prefix = depth > 0 ? "../".repeat(depth) : "";
+      return "";
 
-
-
-  document.querySelectorAll(".tsiino-site-footer img[data-src]").forEach(function (img) {
-
-    img.src = prefix + img.dataset.src;
+    }
 
 
 
-    img.addEventListener("error", function () {
+    return "../".repeat(parts.length - 1);
 
-      img.classList.add("tsiino-footer-logo-missing");
+  }
+
+
+
+  function fixFooterPaths() {
+
+    const footer = document.querySelector(".tsiino-site-footer");
+
+
+
+    if (footer && footer.parentElement !== document.body) {
+
+      document.body.appendChild(footer);
+
+    }
+
+
+
+    const prefix = getRelativePrefix();
+
+
+
+    document.querySelectorAll(".tsiino-site-footer img[data-src]").forEach(function (img) {
+
+      const src = img.getAttribute("data-src");
+
+
+
+      if (!src) {
+
+        return;
+
+      }
+
+
+
+      img.src = prefix + src.replace(/^\/+/, "");
+
+
+
+      img.addEventListener("error", function () {
+
+        img.classList.add("tsiino-footer-logo-missing");
+
+      });
 
     });
 
-  });
+
+
+    document.querySelectorAll(".tsiino-footer-home").forEach(function (link) {
+
+      link.href = prefix + "index.html";
+
+    });
+
+  }
 
 
 
-  document.querySelectorAll(".tsiino-footer-home").forEach(function (link) {
+  if (document.readyState === "loading") {
 
-    link.href = prefix + "index.html";
+    document.addEventListener("DOMContentLoaded", fixFooterPaths);
 
-  });
+  } else {
 
-});
+    fixFooterPaths();
+
+  }
+
+
+
+  window.addEventListener("load", fixFooterPaths);
+
+})();
 
 </script>
 <script src="../js/translations.js"></script>
