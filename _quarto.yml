@@ -3,7 +3,7 @@ project:
   type: website
   render:
     - index.qmd
-    - conservacao/index.qmd
+    - acesso/index.qmd
     - expedicoes/index.qmd
     - team/index.qmd
   resources:
@@ -29,15 +29,16 @@ website:
         href: index.qmd
       - text: "Expedições"
         href: expedicoes/index.qmd
-      - text: "Conservação"
-        href: conservacao/index.qmd
+      - text: "Acesso aos dados"
+        href: acesso/index.qmd
       - text: "Equipe"
         href: team/index.qmd
         
 format:
   html:
     toc: true
-    embed-resources: true
+    embed-resources: false
+    self-contained: false
     code-copy: true
     code-overflow: wrap
     code-tools: true

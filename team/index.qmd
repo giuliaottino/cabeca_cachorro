@@ -171,7 +171,7 @@ responsible_names <- c(
   "Sandra Diane Knapp",
   "Anna Luiza Ilkiu-Borges",
   "Clistenes Williams Araújo do Nascimento",
-  "Dirce Leimi Komura",
+  "Dirce Komura",
   "Denilson Fernandes Peralta",
   "Felipe Wartchow",
   "Micheline Carvalho-Silva"
@@ -1481,4 +1481,472 @@ document.addEventListener("DOMContentLoaded", function () {
   applyFilters();
 });
 </script>
+```
+
+```{=html}
+<style>
+/* ===== PATCH FINAL — hero da página Equipe em largura total real =====
+   Mantém os filtros alfabéticos e a busca como estão, mas impede que
+   ancestrais do Quarto cortem o full-bleed da faixa do título. */
+
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  position: relative !important;
+}
+
+/* O full-bleed precisa de overflow visível nos contêineres do Quarto.
+   O overflow horizontal é bloqueado apenas em html/body. */
+#quarto-content,
+.page-columns,
+.page-layout-full,
+main,
+main.content,
+.content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: visible !important;
+}
+
+/* Faixa do título: ocupa 100% do viewport, independentemente da largura
+   do contêiner central onde o QMD foi renderizado. */
+.page-hero,
+.page-hero.page-hero-team {
+  position: relative !important;
+  display: block !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: 100vw !important;
+  min-width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+@supports (width: 100dvw) {
+  .page-hero,
+  .page-hero.page-hero-team {
+    width: 100dvw !important;
+    min-width: 100dvw !important;
+    max-width: 100dvw !important;
+    margin-left: calc(50% - 50dvw) !important;
+    margin-right: calc(50% - 50dvw) !important;
+  }
+}
+
+.page-hero-team {
+  background-image:
+    linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.48) 46%, rgba(0,0,0,0.10) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.68) 100%),
+    url("../figures/equipe.jpg") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+.page-hero-overlay {
+  pointer-events: none !important;
+}
+
+.page-hero-content {
+  left: clamp(1.25rem, 5vw, 5rem) !important;
+  width: min(900px, calc(100vw - 2.5rem)) !important;
+  max-width: calc(100vw - 2.5rem) !important;
+}
+
+.page-hero-logo {
+  left: clamp(1.25rem, 3.5vw, 2.5rem) !important;
+}
+
+/* Mantém as seções abaixo contidas para não criar rolagem lateral. */
+.content-card,
+.team-controls {
+  width: min(1280px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow: hidden !important;
+}
+
+.team-overview-grid,
+.team-search-row,
+.team-filter-buttons,
+.team-index,
+.team-grid,
+.team-card,
+.team-card *,
+.team-photo-wrap,
+.team-photo,
+.team-info {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+@media (max-width: 991.98px) {
+  .page-hero,
+  .page-hero.page-hero-team {
+    min-height: 100vh !important;
+  }
+
+  .page-hero-content {
+    top: 11.4rem !important;
+    left: 0.85rem !important;
+    width: calc(100vw - 1.7rem) !important;
+    max-width: calc(100vw - 1.7rem) !important;
+  }
+
+  .page-hero-logo {
+    left: 0.85rem !important;
+  }
+
+  .content-card,
+  .team-controls {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-hero-content {
+    left: 0.85rem !important;
+    width: calc(100vw - 1.7rem) !important;
+    max-width: calc(100vw - 1.7rem) !important;
+  }
+
+  .content-card,
+  .team-controls {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+  }
+}
+</style>
+```
+
+```{=html}
+<style>
+/* ======================================================================
+   PATCH FINAL — Equipe sem escape horizontal + cards mais confortáveis
+   ----------------------------------------------------------------------
+   Este bloco precisa ficar no final do QMD para sobrescrever as regras
+   anteriores que usavam 100vw nos cards. A hero continua full-bleed.
+   ====================================================================== */
+
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: hidden !important;
+}
+
+@supports (overflow-x: clip) {
+  html,
+  body {
+    overflow-x: clip !important;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box !important;
+}
+
+img,
+video,
+svg,
+canvas,
+iframe {
+  max-width: 100% !important;
+}
+
+/* Contêineres do Quarto: não devem limitar a faixa da hero,
+   mas também não podem gerar largura extra nos cards. */
+#quarto-content,
+.page-columns,
+.page-layout-full,
+main,
+main.content,
+.content,
+#quarto-document-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  overflow-x: visible !important;
+}
+
+/* A faixa do título permanece em largura total da tela. */
+.page-hero,
+.page-hero.page-hero-team {
+  position: relative !important;
+  display: block !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: 100vw !important;
+  min-width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  overflow: hidden !important;
+}
+
+@supports (width: 100dvw) {
+  .page-hero,
+  .page-hero.page-hero-team {
+    width: 100dvw !important;
+    min-width: 100dvw !important;
+    max-width: 100dvw !important;
+    margin-left: calc(50% - 50dvw) !important;
+    margin-right: calc(50% - 50dvw) !important;
+  }
+}
+
+/* Seções abaixo da hero: agora usam a largura real do contêiner,
+   não 100vw. Isso resolve o escape à direita em notebook menor. */
+.content-card,
+.team-controls,
+#visao-geral-equipe.content-card,
+#pesquisadores-responsaveis.content-card,
+#integrantes.content-card {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: min(1280px, calc(100% - 2rem)) !important;
+  max-width: calc(100% - 2rem) !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow: hidden !important;
+}
+
+/* Em telas de notebook menores, deixa uma margem segura sem usar 100vw. */
+@media (max-width: 1368px) {
+  .content-card,
+  .team-controls,
+  #visao-geral-equipe.content-card,
+  #pesquisadores-responsaveis.content-card,
+  #integrantes.content-card {
+    width: min(1220px, calc(100% - 1.25rem)) !important;
+    max-width: calc(100% - 1.25rem) !important;
+    padding-left: clamp(0.95rem, 2vw, 1.6rem) !important;
+    padding-right: clamp(0.95rem, 2vw, 1.6rem) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .content-card,
+  .team-controls,
+  #visao-geral-equipe.content-card,
+  #pesquisadores-responsaveis.content-card,
+  #integrantes.content-card {
+    width: calc(100% - 0.75rem) !important;
+    max-width: calc(100% - 0.75rem) !important;
+    padding-left: 0.95rem !important;
+    padding-right: 0.95rem !important;
+  }
+}
+
+/* Tudo dentro das seções da equipe respeita a largura do pai. */
+.team-overview-grid,
+.team-summary-box,
+.team-search-row,
+.team-filter-buttons,
+.team-index,
+.team-section,
+.team-section-header,
+.team-grid,
+.team-card,
+.team-card *,
+.team-photo-wrap,
+.team-photo,
+.team-info,
+.team-icons {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Grade dos cards: 3 responsáveis no desktop largo, mas sem forçar
+   3 colunas quando o notebook estiver estreito. */
+#pesquisadores-responsaveis .team-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(0.85rem, 1.25vw, 1.15rem) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+#integrantes .team-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: clamp(0.85rem, 1.25vw, 1.15rem) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 1368px) {
+  #integrantes .team-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1120px) {
+  #pesquisadores-responsaveis .team-grid,
+  #integrantes .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  #pesquisadores-responsaveis .team-grid,
+  #integrantes .team-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Card: evita que conteúdo interno empurre a largura do card. */
+.team-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  padding: clamp(0.85rem, 1.15vw, 1rem) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Foto menos horizontal: formato quadrado para não cortar tanto retratos
+   nem deixar o default largo demais. */
+.team-photo-wrap {
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  margin-bottom: 1rem !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  background: rgba(215,221,197,0.78) !important;
+}
+
+.team-photo {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  object-position: center 38% !important;
+  border-radius: 16px !important;
+  display: block !important;
+}
+
+.team-photo-default {
+  object-fit: contain !important;
+  object-position: center center !important;
+  padding: clamp(1.05rem, 9%, 2rem) !important;
+  background: rgba(215,221,197,0.78) !important;
+}
+
+/* Conteúdo textual: remove linhas fixas que causavam sobreposição entre
+   instituição e ícones/links. */
+.team-info {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  grid-template-rows: none !important;
+  align-content: stretch !important;
+  gap: 0.62rem !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+.team-name {
+  min-height: 2.45rem !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+}
+
+.team-project-role {
+  min-height: 3.1rem !important;
+  margin-top: 0.1rem !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+}
+
+.team-institution {
+  display: block !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.7rem !important;
+  min-height: 2.8rem !important;
+  max-width: 100% !important;
+  color: var(--ink) !important;
+  font-size: clamp(0.86rem, 1vw, 0.98rem) !important;
+  line-height: 1.42 !important;
+  overflow-wrap: break-word !important;
+}
+
+.team-institution-empty {
+  min-height: 2.8rem !important;
+}
+
+.team-icons {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.42rem !important;
+  margin-top: auto !important;
+  padding-top: 0.8rem !important;
+  border-top: 1px dashed rgba(98,106,56,0.26) !important;
+  min-height: 2.45rem !important;
+  overflow: visible !important;
+}
+
+.icon-link {
+  width: 31px !important;
+  height: 31px !important;
+  margin: 0 !important;
+  flex: 0 0 31px !important;
+}
+
+.icon-link img {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Busca, filtros e títulos longos não devem gerar largura extra. */
+.team-search,
+.team-filter,
+.section-title,
+.section-title h2,
+.team-section-header h3,
+.team-section-header p,
+.team-name,
+.team-project-role,
+.team-institution {
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+</style>
 ```
