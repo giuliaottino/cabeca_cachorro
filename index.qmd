@@ -1,6 +1,6 @@
----
+﻿---
 title: "Tsiino Hiiwiida"
-subtitle: "Dimensões da biodiversidade de plantas e fungos no Alto Rio Negro"
+subtitle: "DimensÃµes da biodiversidade de plantas e fungos no Alto Rio Negro"
 format:
   html:
     toc: false
@@ -61,7 +61,7 @@ nz <- function(x) !is.na(x) & nzchar(trimws(as.character(x)))
 
 safe <- function(x) {
   x <- as.character(x)
-  x[is.na(x) | trimws(x) == ""] <- "—"
+  x[is.na(x) | trimws(x) == ""] <- "â€”"
   htmltools::htmlEscape(x)
 }
 ```
@@ -151,7 +151,7 @@ safe <- function(x) {
   
 /* NAVBAR FLUTUANTE NA HOME */
 
-/* Remove qualquer espaço reservado pelo Quarto acima do conteúdo */
+/* Remove qualquer espaÃ§o reservado pelo Quarto acima do conteÃºdo */
 html,
 body{
   margin-top: 0 !important;
@@ -170,7 +170,7 @@ main.content{
   padding-top: 0 !important;
 }
 
-/* Header transparente, sem faixa própria */
+/* Header transparente, sem faixa prÃ³pria */
 #quarto-header{
   position: absolute !important;
   top: 0 !important;
@@ -182,7 +182,7 @@ main.content{
   box-shadow: none !important;
 }
 
-/* Navbar sobre o vídeo, sem caixa cinza e sem linha */
+/* Navbar sobre o vÃ­deo, sem caixa cinza e sem linha */
 #quarto-header .navbar{
   position: relative !important;
   top: 0 !important;
@@ -196,7 +196,7 @@ main.content{
   -webkit-backdrop-filter: none !important;
 }
 
-/* Degradê sutil por cima do vídeo, sem virar faixa sólida */
+/* DegradÃª sutil por cima do vÃ­deo, sem virar faixa sÃ³lida */
 #quarto-header::before{
   content: "";
   position: absolute;
@@ -212,12 +212,12 @@ main.content{
   z-index: -1;
 }
 
-/* Esconde o nome textual da navbar na home; a marca já aparece na hero */
+/* Esconde o nome textual da navbar na home; a marca jÃ¡ aparece na hero */
 #quarto-header .navbar-brand{
   display: none !important;
 }
 
-/* Links e ícones brancos */
+/* Links e Ã­cones brancos */
 #quarto-header .navbar .nav-link,
 #quarto-header .navbar .nav-link:visited{
   color: #fff !important;
@@ -242,8 +242,8 @@ main.content{
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.55));
 }
 
-  /* HERO inspirado na lógica visual Oxford:
-     vídeo visível + degradê + texto sobreposto, sem card gigante */
+  /* HERO inspirado na lÃ³gica visual Oxford:
+     vÃ­deo visÃ­vel + degradÃª + texto sobreposto, sem card gigante */
 .hero-strip{
   position: relative;
   left: 50%;
@@ -423,7 +423,7 @@ main.content{
     box-shadow: 0 8px 20px rgba(0,0,0,0.22);
   }
 
-  /* SEÇÕES */
+  /* SEÃ‡Ã•ES */
   .content-card{
     width: min(1120px, calc(100vw - 2rem));
     margin: 2.6rem auto 0 auto;
@@ -629,7 +629,7 @@ main.content{
   background: rgba(246,241,232,0.88);
 }
 
-/* ===== Ajuste editorial da seção O projeto ===== */
+/* ===== Ajuste editorial da seÃ§Ã£o O projeto ===== */
 
 #o-projeto.content-card {
   width: min(1180px, calc(100vw - 2rem));
@@ -1194,7 +1194,7 @@ main.content{
   display: block;
 }
 
-/* Setas internas do carrossel de fotos — discretas dentro da imagem circular */
+/* Setas internas do carrossel de fotos â€” discretas dentro da imagem circular */
 
 .objective-photo-arrow {
   width: 32px;
@@ -1243,7 +1243,7 @@ main.content{
   background: #fff;
 }
 
-/* Navegação principal do carrossel de objetivos — controle inferior */
+/* NavegaÃ§Ã£o principal do carrossel de objetivos â€” controle inferior */
 
 .objective-nav {
   position: absolute;
@@ -1429,7 +1429,7 @@ main.content{
     
   }
   
- /* Ajustes para tela intermediária: notebook meia tela / tablet horizontal */
+ /* Ajustes para tela intermediÃ¡ria: notebook meia tela / tablet horizontal */
 @media (max-width: 991.98px) {
   .hero-logo-badge {
     top: 4.9rem;
@@ -1443,7 +1443,7 @@ main.content{
     width: calc(100% - 1.5rem);
   }
 
-  /* Menu colapsado mais legível sobre o vídeo */
+  /* Menu colapsado mais legÃ­vel sobre o vÃ­deo */
   #quarto-header .navbar-collapse.show,
   #quarto-header .navbar-collapse.collapsing {
     margin-top: 0.6rem;
@@ -1471,7 +1471,7 @@ main.content{
   }
 }
 
-/* ===== Pesquisadores responsáveis ===== */
+/* ===== Pesquisadores responsÃ¡veis ===== */
 
 .researchers-section {
   width: min(1180px, calc(100vw - 2rem));
@@ -1686,7 +1686,7 @@ main.content{
   }
 }
 
-/* ===== Redesenho editorial da página inicial / about ===== */
+/* ===== Redesenho editorial da pÃ¡gina inicial / about ===== */
 
 .reveal-ready {
   opacity: 0;
@@ -2222,7 +2222,7 @@ main.content{
 }
 
 
-/* ===== Refinamentos de layout solicitados: cards mais legíveis e paleta unificada ===== */
+/* ===== Refinamentos de layout solicitados: cards mais legÃ­veis e paleta unificada ===== */
 
 .about-section,
 .method-section,
@@ -2277,7 +2277,7 @@ main.content{
   hyphens: none;
 }
 
-/* Seção em largura cheia: mantém a dinâmica fluida, mas volta para a paleta da identidade */
+/* SeÃ§Ã£o em largura cheia: mantÃ©m a dinÃ¢mica fluida, mas volta para a paleta da identidade */
 .full-bleed-feature {
   background:
     linear-gradient(180deg, rgba(246,241,232,0.94), rgba(246,241,232,0.78)),
@@ -2397,7 +2397,7 @@ main.content{
   hyphens: auto;
 }
 
-/* Demais seções na mesma linguagem visual */
+/* Demais seÃ§Ãµes na mesma linguagem visual */
 .method-river {
   border: 1px solid rgba(98,106,56,0.20);
 }
@@ -2480,7 +2480,7 @@ main.content{
 }
 
 
-/* ===== Expansão da foto lateral da seção O projeto ===== */
+/* ===== ExpansÃ£o da foto lateral da seÃ§Ã£o O projeto ===== */
 #o-projeto.about-section {
   width: min(1280px, calc(100vw - 1.25rem));
 }
@@ -2635,7 +2635,7 @@ main.content{
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  /* Destaque automático da navbar */
+  /* Destaque automÃ¡tico da navbar */
   const sections = document.querySelectorAll("section[id]");
   const navLinks = document.querySelectorAll(".navbar a[href*='#']");
 
@@ -2666,7 +2666,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (section.id) observer.observe(section);
   });
 
-  /* Botão play/pause do vídeo da hero */
+  /* BotÃ£o play/pause do vÃ­deo da hero */
   const video = document.querySelector(".hero-video");
   const toggle = document.querySelector(".hero-video-toggle");
 
@@ -2674,12 +2674,12 @@ document.addEventListener("DOMContentLoaded", function () {
     toggle.addEventListener("click", function () {
       if (video.paused) {
         video.play();
-        toggle.textContent = "Ⅱ";
-        toggle.setAttribute("aria-label", "Pausar vídeo");
+        toggle.textContent = "â…¡";
+        toggle.setAttribute("aria-label", "Pausar vÃ­deo");
       } else {
         video.pause();
-        toggle.textContent = "▶";
-        toggle.setAttribute("aria-label", "Reproduzir vídeo");
+        toggle.textContent = "â–¶";
+        toggle.setAttribute("aria-label", "Reproduzir vÃ­deo");
       }
     });
   }
@@ -2846,7 +2846,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const current = Number(activeSlide.dataset.photoIndex || 0);
     showObjectivePhoto(activeSlide, current + 1);
   }, 3500);
-  /* Mapa do município de São Gabriel da Cachoeira na seção O projeto */
+  /* Mapa do municÃ­pio de SÃ£o Gabriel da Cachoeira na seÃ§Ã£o O projeto */
   const projectMapEl = document.getElementById("project-sgc-map");
 
   if (projectMapEl && typeof L !== "undefined") {
@@ -2867,7 +2867,7 @@ L.tileLayer(
     fetch("_input_data/limites/sao_gabriel_da_cachoeira.geojson")
       .then(response => {
         if (!response.ok) {
-          throw new Error("GeoJSON não encontrado");
+          throw new Error("GeoJSON nÃ£o encontrado");
         }
         return response.json();
       })
@@ -2892,7 +2892,7 @@ L.tileLayer(
       })
       .catch(error => {
         projectMapEl.innerHTML =
-          '<div style="padding:1rem;font-family:Montserrat,Arial,sans-serif;font-size:0.85rem;color:#2E3B24;">Não foi possível carregar o limite municipal. Confira se o arquivo <strong>_input_data/limites/sao_gabriel_da_cachoeira.geojson</strong> existe.</div>';
+          '<div style="padding:1rem;font-family:Montserrat,Arial,sans-serif;font-size:0.85rem;color:#2E3B24;">NÃ£o foi possÃ­vel carregar o limite municipal. Confira se o arquivo <strong>_input_data/limites/sao_gabriel_da_cachoeira.geojson</strong> existe.</div>';
       });
   }
 });
@@ -2959,13 +2959,13 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 
   <div class="hero-title-panel">
-    <div class="hero-kicker">· Chamada Expedições · Iniciativa Amazônia+10 ·</div>
+    <div class="hero-kicker">Â· Chamada ExpediÃ§Ãµes Â· Iniciativa AmazÃ´nia+10 Â·</div>
     <h1>Tsiino Hiiwiida</h1>
-    <p class="hero-subtitle">Dimensões da biodiversidade de plantas e fungos no Alto Rio Negro</p>
+    <p class="hero-subtitle">DimensÃµes da biodiversidade de plantas e fungos no Alto Rio Negro</p>
     <p class="hero-description"></p>
   </div>
 
-  <button class="hero-video-toggle" type="button" aria-label="Pausar vídeo">Ⅱ</button>
+  <button class="hero-video-toggle" type="button" aria-label="Pausar vÃ­deo">â…¡</button>
 </section>
 ```
 
@@ -2977,41 +2977,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
   <div class="about-intro-grid about-hero-grid">
     <div class="about-copy about-copy-editorial">
-      <div class="about-eyebrow">Síntese</div>
+      <div class="about-eyebrow">SÃ­ntese</div>
 
       <h3 class="about-display-title">
-        <span>Revelar múltiplas dimensões da</span>
+        <span>Revelar mÃºltiplas dimensÃµes da</span>
         <span>biodiversidade</span>
         <span>no Alto Rio Negro.</span>
       </h3>
 
       <p class="lead">
-        <strong>Tsiino Hiiwiida</strong>, nome Baniwa da região conhecida como Cabeça do Cachorro, é uma das últimas grandes fronteiras de conhecimento sobre a biodiversidade amazônica. O projeto foi aprovada na <strong>Chamada Expedições da Iniciativa Amazônia+10</strong> e articula instituições do Brasil e do Reino Unido para revelar múltiplas dimensões da flora e da funga no Alto Rio Negro.
+        <strong>Tsiino Hiiwiida</strong>, nome Baniwa da regiÃ£o conhecida como CabeÃ§a do Cachorro, Ã© uma das Ãºltimas grandes fronteiras de conhecimento sobre a biodiversidade amazÃ´nica. O projeto foi aprovada na <strong>Chamada ExpediÃ§Ãµes da Iniciativa AmazÃ´nia+10</strong> e articula instituiÃ§Ãµes do Brasil e do Reino Unido para revelar mÃºltiplas dimensÃµes da flora e da funga no Alto Rio Negro.
       </p>
 
       <div class="about-copy-columns">
         <p>
-          Campinaranas, florestas de terra-firme, igapós, serras e formações aluviais na fronteira entre Brasil, Colômbia e Venezuela. A heterogeneidade ambiental e a longa história geológica da Bacia Amazônica fazem da região um grande cenário para entender evolução, distribuição e endemismos.
+          Campinaranas, florestas de terra-firme, igapÃ³s, serras e formaÃ§Ãµes aluviais na fronteira entre Brasil, ColÃ´mbia e Venezuela. A heterogeneidade ambiental e a longa histÃ³ria geolÃ³gica da Bacia AmazÃ´nica fazem da regiÃ£o um grande cenÃ¡rio para entender evoluÃ§Ã£o, distribuiÃ§Ã£o e endemismos.
         </p>
 
         <p>
-          O objetivo é acelerar a documentação de plantas e fungos, preencher lacunas taxonômicas, biogeográficas e evolutivas, e formar novas redes de pesquisa com participação local. A expedições de campo, identificação taxonômica, coleções científicas, sistemática molecular, metagenômica, biomonitoramento e comunicação pública.
+          O objetivo Ã© acelerar a documentaÃ§Ã£o de plantas e fungos, preencher lacunas taxonÃ´micas, biogeogrÃ¡ficas e evolutivas, e formar novas redes de pesquisa com participaÃ§Ã£o local. A expediÃ§Ãµes de campo, identificaÃ§Ã£o taxonÃ´mica, coleÃ§Ãµes cientÃ­ficas, sistemÃ¡tica molecular, metagenÃ´mica, biomonitoramento e comunicaÃ§Ã£o pÃºblica.
         </p>
       </div>
 
       <div class="about-pullquote">
-        Da coleta em rios e serras ao catálogo público: o projeto transforma registros de campo, coleções biológicas em conhecimento acessível sobre a flora e a funga da Cabeça do Cachorro.
+        Da coleta em rios e serras ao catÃ¡logo pÃºblico: o projeto transforma registros de campo, coleÃ§Ãµes biolÃ³gicas em conhecimento acessÃ­vel sobre a flora e a funga da CabeÃ§a do Cachorro.
       </div>
     </div>
 
     <aside class="about-visual-module" aria-label="Resumo territorial e institucional">
       <figure class="about-photo-quote about-photo-expanded">
-        <img src="figures/projeto_rio_bela_adormecida.png" alt="Vista aérea do Alto Rio Negro com a formação da Bela Adormecida ao fundo">
+        <img src="figures/projeto_rio_bela_adormecida.png" alt="Vista aÃ©rea do Alto Rio Negro com a formaÃ§Ã£o da Bela Adormecida ao fundo">
 
-        <div class="about-stat-grid about-stat-overlay" aria-label="Números-chave do projeto">
+        <div class="about-stat-grid about-stat-overlay" aria-label="NÃºmeros-chave do projeto">
           <div class="about-stat">
             <strong>36</strong>
-            <span>meses de duração</span>
+            <span>meses de duraÃ§Ã£o</span>
           </div>
 
           <div class="about-stat">
@@ -3021,7 +3021,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           <div class="about-stat">
             <strong>30</strong>
-            <span>instituições Brasil + Reino Unido</span>
+            <span>instituiÃ§Ãµes Brasil + Reino Unido</span>
           </div>
 
           <div class="about-stat">
@@ -3030,16 +3030,16 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
         </div>
 
-        <figcaption>Alto Rio Negro · território, ciência e colaboração</figcaption>
+        <figcaption>Alto Rio Negro Â· territÃ³rio, ciÃªncia e colaboraÃ§Ã£o</figcaption>
       </figure>
 
       <div class="project-map-card about-map-compact">
         <div class="project-map-header">
-          <h3>São Gabriel da Cachoeira</h3>
-          <p>Município de atuação do projeto na região da Cabeça do Cachorro, Alto Rio Negro.</p>
+          <h3>SÃ£o Gabriel da Cachoeira</h3>
+          <p>MunicÃ­pio de atuaÃ§Ã£o do projeto na regiÃ£o da CabeÃ§a do Cachorro, Alto Rio Negro.</p>
         </div>
 
-        <div id="project-sgc-map" aria-label="Mapa do município de São Gabriel da Cachoeira"></div>
+        <div id="project-sgc-map" aria-label="Mapa do municÃ­pio de SÃ£o Gabriel da Cachoeira"></div>
       </div>
     </aside>
   </div>
@@ -3048,10 +3048,10 @@ document.addEventListener("DOMContentLoaded", function () {
 ```
 
 ```{=html}
-<section id="frentes-integradas" class="full-bleed-feature" aria-label="Três eixos do projeto de pesquisa">
+<section id="frentes-integradas" class="full-bleed-feature" aria-label="TrÃªs eixos do projeto de pesquisa">
   <div class="feature-title-wrap">
     <div class="feature-eyebrow"></div>
-    <div class="feature-title">Três eixos do Projeto</div>
+    <div class="feature-title">TrÃªs eixos do Projeto</div>
   </div>
 
   <div class="feature-band">
@@ -3061,28 +3061,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="feature-panel feature-panel-green">
       <h3>Eixo 1</h3>
-      <p class="axis-title">Habitats e espécies</p>
-      <p class="axis-detail">Compreender campinaranas, florestas de terra-firme, igapós, serras e formações aluviais como mosaicos vivos da flora e da funga do Alto Rio Negro.</p>
+      <p class="axis-title">Habitats e espÃ©cies</p>
+      <p class="axis-detail">Compreender campinaranas, florestas de terra-firme, igapÃ³s, serras e formaÃ§Ãµes aluviais como mosaicos vivos da flora e da funga do Alto Rio Negro.</p>
     </article>
 
-    <article class="feature-photo" data-label="Registro científico e taxonômico de plantas e fungos">
-      <img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Registro científico e taxonômico de plantas e fungos" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+    <article class="feature-photo" data-label="Registro cientÃ­fico e taxonÃ´mico de plantas e fungos">
+      <img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Registro cientÃ­fico e taxonÃ´mico de plantas e fungos" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
     </article>
 
     <article class="feature-panel feature-panel-deep">
       <h3>Eixo 2</h3>
       <p class="axis-title">Biodiversidade, sustento e bioeconomia</p>
-      <p class="axis-detail">Investigar PANC, segurança alimentar, nutrientes, metais pesados e usos potenciais de espécies vegetais em diálogo com conhecimentos e demandas locais.</p>
+      <p class="axis-detail">Investigar PANC, seguranÃ§a alimentar, nutrientes, metais pesados e usos potenciais de espÃ©cies vegetais em diÃ¡logo com conhecimentos e demandas locais.</p>
     </article>
 
-    <article class="feature-photo" data-label="Atividade de campo com colaboração local">
-      <img src="figures/objetivos/campo.jpg" alt="Atividade de campo com colaboração local" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+    <article class="feature-photo" data-label="Atividade de campo com colaboraÃ§Ã£o local">
+      <img src="figures/objetivos/campo.jpg" alt="Atividade de campo com colaboraÃ§Ã£o local" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
     </article>
 
     <article class="feature-panel feature-panel-ochre">
       <h3>Eixo 3</h3>
       <p class="axis-title">Campo e tecnologias emergentes</p>
-      <p class="axis-detail">Integrar vouchers, coleções, DNA, metabarcoding, biomonitoramento, bancos de dados e comunicação pública para transformar coletas em conhecimento acessível.</p>
+      <p class="axis-detail">Integrar vouchers, coleÃ§Ãµes, DNA, metabarcoding, biomonitoramento, bancos de dados e comunicaÃ§Ã£o pÃºblica para transformar coletas em conhecimento acessÃ­vel.</p>
     </article>
   </div>
 </section>
@@ -3102,55 +3102,55 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
 
     <p>
-      Cada etapa conecta pesquisa de campo, coleções científicas, análises moleculares, formação de pessoas e comunicação. Assim, os dados coletados durante as expedições retornam como acervo, catálogo, material educativo, exposição e memória pública sobre o Alto Rio Negro.
+      Cada etapa conecta pesquisa de campo, coleÃ§Ãµes cientÃ­ficas, anÃ¡lises moleculares, formaÃ§Ã£o de pessoas e comunicaÃ§Ã£o. Assim, os dados coletados durante as expediÃ§Ãµes retornam como acervo, catÃ¡logo, material educativo, exposiÃ§Ã£o e memÃ³ria pÃºblica sobre o Alto Rio Negro.
     </p>
   </div>
 
   <div class="method-river" aria-label="Fluxo integrado de trabalho">
     <article class="method-step">
       <span class="method-number">01</span>
-      <h3>Campo e território</h3>
-      <p>Expedições em diferentes habitats do Alto Rio Negro, articuladas com atores locais e comunidades indígenas, para registrar plantas, fungos e contextos ecológicos.</p>
+      <h3>Campo e territÃ³rio</h3>
+      <p>ExpediÃ§Ãµes em diferentes habitats do Alto Rio Negro, articuladas com atores locais e comunidades indÃ­genas, para registrar plantas, fungos e contextos ecolÃ³gicos.</p>
     </article>
 
     <article class="method-step">
       <span class="method-number">02</span>
-      <h3>Coleções e amostras</h3>
-      <p>Herborização, vouchers, fotografias, tecidos em sílica-gel e incorporação prioritária aos acervos amazônicos, fortalecendo INPA, MG e coleções parceiras.</p>
+      <h3>ColeÃ§Ãµes e amostras</h3>
+      <p>HerborizaÃ§Ã£o, vouchers, fotografias, tecidos em sÃ­lica-gel e incorporaÃ§Ã£o prioritÃ¡ria aos acervos amazÃ´nicos, fortalecendo INPA, MG e coleÃ§Ãµes parceiras.</p>
     </article>
 
     <article class="method-step">
       <span class="method-number">03</span>
-      <h3>Dados e validação</h3>
-      <p>Revisão taxonômica, mineração de bases, HerbariumBlitz, sequenciamento, metabarcoding e análises para reduzir lacunas Linneanas, Wallaceanas e Darwinianas.</p>
+      <h3>Dados e validaÃ§Ã£o</h3>
+      <p>RevisÃ£o taxonÃ´mica, mineraÃ§Ã£o de bases, HerbariumBlitz, sequenciamento, metabarcoding e anÃ¡lises para reduzir lacunas Linneanas, Wallaceanas e Darwinianas.</p>
     </article>
 
     <article class="method-step">
       <span class="method-number">04</span>
-      <h3>Retorno e circulação</h3>
-      <p>Catálogo verificado, oficinas botânicas, materiais em múltiplas línguas, exposições, fotografia, ilustração científica, redes sociais e curta documental.</p>
+      <h3>Retorno e circulaÃ§Ã£o</h3>
+      <p>CatÃ¡logo verificado, oficinas botÃ¢nicas, materiais em mÃºltiplas lÃ­nguas, exposiÃ§Ãµes, fotografia, ilustraÃ§Ã£o cientÃ­fica, redes sociais e curta documental.</p>
     </article>
   </div>
 
   <div class="impact-grid" aria-label="Produtos e impactos previstos">
     <article class="impact-card">
-      <h3>Catálogo</h3>
-      <p>Primeira síntese taxonomicamente verificada da flora e funga da Cabeça do Cachorro.</p>
+      <h3>CatÃ¡logo</h3>
+      <p>Primeira sÃ­ntese taxonomicamente verificada da flora e funga da CabeÃ§a do Cachorro.</p>
     </article>
 
     <article class="impact-card">
       <h3>AmaTreeDNA</h3>
-      <p>Banco de tecidos e DNA associado a vouchers de herbário para pesquisas futuras.</p>
+      <p>Banco de tecidos e DNA associado a vouchers de herbÃ¡rio para pesquisas futuras.</p>
     </article>
 
     <article class="impact-card">
       <h3>Bioeconomia</h3>
-      <p>PANC, segurança alimentar, nutrientes e metais analisados com foco em espécies locais.</p>
+      <p>PANC, seguranÃ§a alimentar, nutrientes e metais analisados com foco em espÃ©cies locais.</p>
     </article>
 
     <article class="impact-card">
-      <h3>Memória pública</h3>
-      <p>Exposições, audiovisual e comunicação em português, inglês, Baniwa, Tukano e Nheengatu.</p>
+      <h3>MemÃ³ria pÃºblica</h3>
+      <p>ExposiÃ§Ãµes, audiovisual e comunicaÃ§Ã£o em portuguÃªs, inglÃªs, Baniwa, Tukano e Nheengatu.</p>
     </article>
   </div>
 </section>
@@ -3162,10 +3162,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide active">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 01 · Campo</div>
-        <h2>Expedições nos rios Negro, Curicuriari, Içana e Vaupés</h2>
+        <div class="objective-kicker">Objetivo 01 Â· Campo</div>
+        <h2>ExpediÃ§Ãµes nos rios Negro, Curicuriari, IÃ§ana e VaupÃ©s</h2>
         <p>
-          As campanhas de campo irão amostrar diferentes habitats da Cabeça do Cachorro, incluindo campinaranas, florestas de terra-firme, igapós, serras e afloramentos rochosos, com foco em plantas vasculares, criptógamas e fungos.
+          As campanhas de campo irÃ£o amostrar diferentes habitats da CabeÃ§a do Cachorro, incluindo campinaranas, florestas de terra-firme, igapÃ³s, serras e afloramentos rochosos, com foco em plantas vasculares, criptÃ³gamas e fungos.
         </p>
       </div>
 
@@ -3174,8 +3174,8 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="objective-photo-slide active"><img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Levantamento de flora e funga em campo"></div>
           <div class="objective-photo-slide"><img src="figures/objetivos/levantamento_flora_funga_02.png" alt="Registro de campo de flora e funga"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3187,20 +3187,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 02 · Diversidade críptica</div>
-        <h2>Metabarcoding para detectar biodiversidade invisível aos inventários tradicionais</h2>
+        <div class="objective-kicker">Objetivo 02 Â· Diversidade crÃ­ptica</div>
+        <h2>Metabarcoding para detectar biodiversidade invisÃ­vel aos inventÃ¡rios tradicionais</h2>
         <p>
-          Amostras ambientais de solo, água, sedimentos e tapetes de musgos serão analisadas para revelar linhagens crípticas, organismos raros e componentes pouco detectados por identificação morfológica convencional.
+          Amostras ambientais de solo, Ã¡gua, sedimentos e tapetes de musgos serÃ£o analisadas para revelar linhagens crÃ­pticas, organismos raros e componentes pouco detectados por identificaÃ§Ã£o morfolÃ³gica convencional.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenômicas de ponta"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenÃ´micas de ponta"></div>
           <div class="objective-photo-slide"><img src="figures/objetivos/metagenomica_02.jpg" alt="Leitura molecular da biodiversidade"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3212,20 +3212,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 03 · Taxonomia integrativa</div>
-        <h2>Linhagens raras, negligenciadas e filogeneticamente enigmáticas</h2>
+        <div class="objective-kicker">Objetivo 03 Â· Taxonomia integrativa</div>
+        <h2>Linhagens raras, negligenciadas e filogeneticamente enigmÃ¡ticas</h2>
         <p>
-          O projeto combina morfologia, moléculas, coleções históricas e novas coletas para revisar grupos pouco estudados, posicionar espécies na árvore da vida e apoiar descrições taxonômicas robustas.
+          O projeto combina morfologia, molÃ©culas, coleÃ§Ãµes histÃ³ricas e novas coletas para revisar grupos pouco estudados, posicionar espÃ©cies na Ã¡rvore da vida e apoiar descriÃ§Ãµes taxonÃ´micas robustas.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
           <div class="objective-photo-slide active"><img src="figures/objetivos/linhagens_raras_01.png" alt="Linhagens raras ou pouco conhecidas"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/linhagens_raras_02.jpg" alt="Identificação taxonômica em campo"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/linhagens_raras_02.jpg" alt="IdentificaÃ§Ã£o taxonÃ´mica em campo"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3237,20 +3237,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 04 · Interações ecológicas</div>
-        <h2>Fungos, hospedeiros e relações ecológicas complexas</h2>
+        <div class="objective-kicker">Objetivo 04 Â· InteraÃ§Ãµes ecolÃ³gicas</div>
+        <h2>Fungos, hospedeiros e relaÃ§Ãµes ecolÃ³gicas complexas</h2>
         <p>
-          Uma das frentes investiga a diversidade e a evolução de fungos associados a insetos, ampliando o conhecimento sobre interações biológicas amazônicas ainda pouco documentadas.
+          Uma das frentes investiga a diversidade e a evoluÃ§Ã£o de fungos associados a insetos, ampliando o conhecimento sobre interaÃ§Ãµes biolÃ³gicas amazÃ´nicas ainda pouco documentadas.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/fungo.jpg" alt="Material taxonômico para coleções científicas"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/fungo_2.jpg" alt="Preparação de material biológico"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/fungo.jpg" alt="Material taxonÃ´mico para coleÃ§Ãµes cientÃ­ficas"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/fungo_2.jpg" alt="PreparaÃ§Ã£o de material biolÃ³gico"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3262,20 +3262,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 05 · Bioeconomia e segurança alimentar</div>
-        <h2>PANC, nutrientes e metais em espécies de interesse local</h2>
+        <div class="objective-kicker">Objetivo 05 Â· Bioeconomia e seguranÃ§a alimentar</div>
+        <h2>PANC, nutrientes e metais em espÃ©cies de interesse local</h2>
         <p>
-          Plantas alimentícias não convencionais, análise de macro e micronutrientes e avaliação de metais, conectando biodiversidade, alimentação, saúde ambiental e possíveis caminhos de bioeconomia.
+          Plantas alimentÃ­cias nÃ£o convencionais, anÃ¡lise de macro e micronutrientes e avaliaÃ§Ã£o de metais, conectando biodiversidade, alimentaÃ§Ã£o, saÃºde ambiental e possÃ­veis caminhos de bioeconomia.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/taxonomia_molecular_01.jpg" alt="Taxonomia, sistemática molecular e biomonitoramento"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_02.jpg" alt="Análises taxonômicas e moleculares"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Taxonomia, sistemÃ¡tica molecular e biomonitoramento"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_02.jpg" alt="AnÃ¡lises taxonÃ´micas e moleculares"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3287,45 +3287,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 06 · Biomonitoramento</div>
+        <div class="objective-kicker">Objetivo 06 Â· Biomonitoramento</div>
         <h2>Bioindicadores para acompanhar qualidade ambiental</h2>
         <p>
-          Musgos e outros grupos sensíveis serão utilizados para investigar padrões de acumulação de contaminantes e estabelecer uma base de referência para o monitoramento ambiental em áreas indígenas.
+          Musgos e outros grupos sensÃ­veis serÃ£o utilizados para investigar padrÃµes de acumulaÃ§Ã£o de contaminantes e estabelecer uma base de referÃªncia para o monitoramento ambiental em Ã¡reas indÃ­genas.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
           <div class="objective-photo-slide active"><img src="figures/objetivos/briofita.jpeg" alt="Amostragem de organismos em campo"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/briofita_2.jpeg" alt="Biomonitoramento e análises científicas"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/briofita_2.jpeg" alt="Biomonitoramento e anÃ¡lises cientÃ­ficas"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 07 · Acervos e dados públicos</div>
-        <h2>Catálogo verificado, herbários e banco AmaTreeDNA</h2>
-        <p>
-          As coletas irão fortalecer herbários amazônicos, apoiar a digitalização de espécimes, criar um banco de tecidos e DNA associado a vouchers e consolidar o primeiro catálogo da flora e funga da região.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_01.jpg" alt="Catálogo da flora e funga da Cabeça do Cachorro"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Dados taxonômicos verificados"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3337,20 +3312,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 08 · Formação e comunicação</div>
-        <h2>Oficinas, estudantes, parataxonomistas e comunicação multilíngue</h2>
+        <div class="objective-kicker">Objetivo 07 Â· Acervos e dados pÃºblicos</div>
+        <h2>CatÃ¡logo verificado, herbÃ¡rios e banco AmaTreeDNA</h2>
         <p>
-          A formação de recursos humanos, as Oficinas Botânicas, a participação de parataxonomistas e a tradução de resultados para Baniwa, Tukano e Nheengatu fazem parte da estratégia de retorno social do projeto.
+          As coletas irÃ£o fortalecer herbÃ¡rios amazÃ´nicos, apoiar a digitalizaÃ§Ã£o de espÃ©cimes, criar um banco de tecidos e DNA associado a vouchers e consolidar o primeiro catÃ¡logo da flora e funga da regiÃ£o.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Trabalho de campo com comunidades indígenas locais"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/comunidades_indigenas_02.jpg" alt="Colaboração territorial e conhecimento local"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_01.jpg" alt="CatÃ¡logo da flora e funga da CabeÃ§a do Cachorro"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Dados taxonÃ´micos verificados"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 08 Â· FormaÃ§Ã£o e comunicaÃ§Ã£o</div>
+        <h2>Oficinas, estudantes, parataxonomistas e comunicaÃ§Ã£o multilÃ­ngue</h2>
+        <p>
+          A formaÃ§Ã£o de recursos humanos, as Oficinas BotÃ¢nicas, a participaÃ§Ã£o de parataxonomistas e a traduÃ§Ã£o de resultados para Baniwa, Tukano e Nheengatu fazem parte da estratÃ©gia de retorno social do projeto.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Trabalho de campo com comunidades indÃ­genas locais"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/comunidades_indigenas_02.jpg" alt="ColaboraÃ§Ã£o territorial e conhecimento local"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3361,11 +3361,11 @@ document.addEventListener("DOMContentLoaded", function () {
     </article>
 
     <div class="objective-nav" aria-hidden="false">
-      <button class="objective-arrow objective-prev" type="button" aria-label="Objetivo anterior">‹</button>
-      <button class="objective-arrow objective-next" type="button" aria-label="Próximo objetivo">›</button>
+      <button class="objective-arrow objective-prev" type="button" aria-label="Objetivo anterior">â€¹</button>
+      <button class="objective-arrow objective-next" type="button" aria-label="PrÃ³ximo objetivo">â€º</button>
     </div>
 
-    <div class="objective-dots" aria-label="Navegação dos objetivos">
+    <div class="objective-dots" aria-label="NavegaÃ§Ã£o dos objetivos">
       <button class="objective-dot active" type="button" aria-label="Objetivo 1"></button>
       <button class="objective-dot" type="button" aria-label="Objetivo 2"></button>
       <button class="objective-dot" type="button" aria-label="Objetivo 3"></button>
@@ -3384,11 +3384,11 @@ document.addEventListener("DOMContentLoaded", function () {
 ```{=html}
 <section id="expedicoes-recentes" class="content-card">
   <div class="section-title">
-    <h2>Expedições recentes</h2>
+    <h2>ExpediÃ§Ãµes recentes</h2>
   </div>
 
   <p class="lead">
-    As expedições são a unidade viva do Tsiino Hiiwiida: cada campanha articula logística, comunidades, pontos de coleta, registros fotográficos, vouchers, amostras de DNA e observações ecológicas.
+    As expediÃ§Ãµes sÃ£o a unidade viva do Tsiino Hiiwiida: cada campanha articula logÃ­stica, comunidades, pontos de coleta, registros fotogrÃ¡ficos, vouchers, amostras de DNA e observaÃ§Ãµes ecolÃ³gicas.
   </p>
 ```
 
@@ -3398,10 +3398,10 @@ library(htmltools)
 expedicoes_home <- read_optional_csv(file.path("_input_data", "expedicoes_tsiino.csv"))
 
 if (nrow(expedicoes_home) > 0) {
-  expedicoes_home$expedicao <- col_or(expedicoes_home, c("expedicao", "expedição", "nome", "name"), "Expedição")
+  expedicoes_home$expedicao <- col_or(expedicoes_home, c("expedicao", "expediÃ§Ã£o", "nome", "name"), "ExpediÃ§Ã£o")
   expedicoes_home$localidade <- col_or(expedicoes_home, c("localidade", "local", "ponto", "site"), "")
-  expedicoes_home$data <- col_or(expedicoes_home, c("data", "date", "periodo", "período"), "")
-  expedicoes_home$resumo <- col_or(expedicoes_home, c("resumo", "descricao", "descrição", "observacoes", "observações"), "")
+  expedicoes_home$data <- col_or(expedicoes_home, c("data", "date", "periodo", "perÃ­odo"), "")
+  expedicoes_home$resumo <- col_or(expedicoes_home, c("resumo", "descricao", "descriÃ§Ã£o", "observacoes", "observaÃ§Ãµes"), "")
 
   expedicoes_home <- utils::tail(expedicoes_home, 3)
 
@@ -3420,19 +3420,19 @@ if (nrow(expedicoes_home) > 0) {
     tags$div(
       class = "hero-actions",
       style = "margin-top: 1rem;",
-      tags$a(class = "btn-main", href = "expedicoes.html", "Mapa e fotos das expedições")
+      tags$a(class = "btn-main", href = "expedicoes.html", "Mapa e fotos das expediÃ§Ãµes")
     )
   )
 } else {
   tagList(
     tags$div(
       class = "empty-media",
-      "Nenhuma expedição foi encontrada em _input_data/expedicoes_tsiino.csv. Quando o arquivo existir, as expedições recentes aparecerão automaticamente aqui."
+      "Nenhuma expediÃ§Ã£o foi encontrada em _input_data/expedicoes_tsiino.csv. Quando o arquivo existir, as expediÃ§Ãµes recentes aparecerÃ£o automaticamente aqui."
     ),
     tags$div(
       class = "hero-actions",
       style = "margin-top: 1rem;",
-      tags$a(class = "btn-main", href = "expedicoes.html", "Abrir página de expedições")
+      tags$a(class = "btn-main", href = "expedicoes.html", "Abrir pÃ¡gina de expediÃ§Ãµes")
     )
   )
 }
@@ -3442,7 +3442,7 @@ if (nrow(expedicoes_home) > 0) {
 </section>
 
 <style>
-/* ===== Divulgação: layout fixo, proporcional e sem cards cortados ===== */
+/* ===== DivulgaÃ§Ã£o: layout fixo, proporcional e sem cards cortados ===== */
 
 #divulgacao {
   scroll-margin-top: 90px;
@@ -3617,7 +3617,7 @@ if (nrow(expedicoes_home) > 0) {
 ```{=html}
 
 <style>
-/* Refinamento final das seções dinâmicas: menos aparência de aviso e mais unidade editorial */
+/* Refinamento final das seÃ§Ãµes dinÃ¢micas: menos aparÃªncia de aviso e mais unidade editorial */
 #expedicoes-recentes .lead,
 #divulgacao .lead {
   max-width: 66rem;
@@ -3659,7 +3659,7 @@ if (nrow(expedicoes_home) > 0) {
 }
 
 
-/* ===== Ajuste final: três eixos da proposta, sem barrinhas decorativas, e foto lateral maior ===== */
+/* ===== Ajuste final: trÃªs eixos da proposta, sem barrinhas decorativas, e foto lateral maior ===== */
 .feature-title::before {
   display: none !important;
   content: none !important;
@@ -3937,7 +3937,7 @@ if (nrow(expedicoes_home) > 0) {
   line-height: 1.38 !important;
 }
 
-/* Mantém os três eixos na paleta da identidade, sem a barrinha decorativa anterior. */
+/* MantÃ©m os trÃªs eixos na paleta da identidade, sem a barrinha decorativa anterior. */
 .feature-title::before,
 .feature-panel h3::before {
   display: none !important;
@@ -4096,7 +4096,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <style>
-/* ===== Divulgação full-width com prévias horizontais ===== */
+/* ===== DivulgaÃ§Ã£o full-width com prÃ©vias horizontais ===== */
 #divulgacao.content-card {
   width: min(1520px, calc(100vw - clamp(1rem, 3.8vw, 4rem))) !important;
   max-width: none !important;
@@ -4150,7 +4150,7 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
 #divulgacao .media-panel-header::after {
-  content: "prévia atualizada";
+  content: "prÃ©via atualizada";
   color: rgba(255,253,247,0.62);
   font-family: 'Space Mono', monospace;
   font-size: 0.62rem;
@@ -4352,11 +4352,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <section id="divulgacao" class="content-card">
   <div class="section-title">
-    <h2>Divulgação</h2>
+    <h2>DivulgaÃ§Ã£o</h2>
   </div>
 
   <p class="lead">
-    Acompanhe a circulação pública do projeto Tsiino Hiiwiida.
+    Acompanhe a circulaÃ§Ã£o pÃºblica do projeto Tsiino Hiiwiida.
   </p>
 ```
 
@@ -4453,7 +4453,7 @@ make_media_items <- function(data, kind = c("instagram", "reportagem")) {
     return(
       tags$div(
         class = "empty-media",
-        paste0("Nenhum item encontrado em ", arquivo, ". Ao adicionar linhas nesse CSV e renderizar o site novamente, os cards aparecerão automaticamente aqui.")
+        paste0("Nenhum item encontrado em ", arquivo, ". Ao adicionar linhas nesse CSV e renderizar o site novamente, os cards aparecerÃ£o automaticamente aqui.")
       )
     )
   }
@@ -4463,17 +4463,17 @@ make_media_items <- function(data, kind = c("instagram", "reportagem")) {
 }
 data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
 
-  titulo <- col_or(data, c("titulo", "título", "title", "post"), "Sem título")
+  titulo <- col_or(data, c("titulo", "tÃ­tulo", "title", "post"), "Sem tÃ­tulo")
   url <- col_or(data, c("url", "link", "href"), "#")
   data_item <- col_or(data, c("data", "date", "ano"), "")
   imagem <- col_or(data, c("imagem", "image", "thumb", "thumbnail", "capa"), "")
-  descricao <- col_or(data, c("descricao", "descrição", "resumo", "caption", "texto"), "")
-  veiculo <- col_or(data, c("veiculo", "veículo", "fonte", "source"), "")
+  descricao <- col_or(data, c("descricao", "descriÃ§Ã£o", "resumo", "caption", "texto"), "")
+  veiculo <- col_or(data, c("veiculo", "veÃ­culo", "fonte", "source"), "")
 
   for (i in seq_len(nrow(data))) {
   preview <- fetch_link_preview(url[i])
 
-  if (!nz(titulo[i]) || titulo[i] == "Sem título") {
+  if (!nz(titulo[i]) || titulo[i] == "Sem tÃ­tulo") {
     titulo[i] <- preview$titulo
   }
 
@@ -4500,7 +4500,7 @@ data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
       } else if (nz(veiculo[i])) {
         veiculo[i]
       } else {
-        "Matéria"
+        "MatÃ©ria"
       }
 
       tags$article(
@@ -4508,7 +4508,7 @@ data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
         thumb,
         tags$div(
           class = "media-body",
-          tags$div(class = "media-date", paste(label, ifelse(nz(data_item[i]), paste("·", data_item[i]), ""))),
+          tags$div(class = "media-date", paste(label, ifelse(nz(data_item[i]), paste("Â·", data_item[i]), ""))),
           tags$h4(titulo[i]),
           if (nz(descricao[i])) tags$p(descricao[i]),
           tags$a(
@@ -4516,7 +4516,7 @@ data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
             href = url[i],
             target = "_blank",
             rel = "noopener",
-            ifelse(kind == "instagram", "Ver no Instagram →", "Ler reportagem →")
+            ifelse(kind == "instagram", "Ver no Instagram â†’", "Ler reportagem â†’")
           )
         )
       )
@@ -4540,7 +4540,7 @@ tagList(
       class = "media-panel",
       tags$div(
         class = "media-panel-header",
-        tags$h3("Reportagens e notícias"),
+        tags$h3("Reportagens e notÃ­cias"),
         tags$span(class = "media-panel-label", "Imprensa")
       ),
       make_media_items(news, "reportagem")
@@ -4556,30 +4556,30 @@ tagList(
 ```{=html}
 <section id="pesquisadores-responsaveis" class="content-card researchers-section">
   <div class="section-title">
-    <h2>Rede de coordenação científica</h2>
+    <h2>Rede de coordenaÃ§Ã£o cientÃ­fica</h2>
   </div>
 
   <div class="researchers-layout">
     <div class="researchers-copy">
-      <div class="researchers-kicker">Rede de coordenação científica</div>
+      <div class="researchers-kicker">Rede de coordenaÃ§Ã£o cientÃ­fica</div>
 
       <p class="lead researchers-lead">
-        O projeto é coordenado por uma rede multidisciplinar vinculada a instituições amazônicas, centros de pesquisa de outros estados brasileiros e parceiros do Reino Unido.
+        O projeto Ã© coordenado por uma rede multidisciplinar vinculada a instituiÃ§Ãµes amazÃ´nicas, centros de pesquisa de outros estados brasileiros e parceiros do Reino Unido.
       </p>
 
       <p>
-        A rede combina taxonomia, sistemática, bioinformática, micologia, briologia, florística, química de solos, comunicação científica, audiovisual e colaboração com parataxonomistas e representantes indígenas.
+        A rede combina taxonomia, sistemÃ¡tica, bioinformÃ¡tica, micologia, briologia, florÃ­stica, quÃ­mica de solos, comunicaÃ§Ã£o cientÃ­fica, audiovisual e colaboraÃ§Ã£o com parataxonomistas e representantes indÃ­genas.
       </p>
 
       <div class="researchers-summary">
         <div>
           <span class="researchers-number">30</span>
-          <span class="researchers-label">instituições articuladas</span>
+          <span class="researchers-label">instituiÃ§Ãµes articuladas</span>
         </div>
 
         <div>
           <span class="researchers-number">66</span>
-          <span class="researchers-label">pesquisadores, estudantes e equipe técnica</span>
+          <span class="researchers-label">pesquisadores, estudantes e equipe tÃ©cnica</span>
         </div>
       </div>
 
@@ -4597,13 +4597,13 @@ tagList(
         <article class="researcher-card">
           <span class="agency-pill">FAPEAM</span>
           <h4>Charles Eugene Zartman</h4>
-          <p>Instituto Nacional de Pesquisas da Amazônia — INPA</p>
+          <p>Instituto Nacional de Pesquisas da AmazÃ´nia â€” INPA</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPERJ</span>
           <h4>Domingos Benicio Oliveira Silva Cardoso</h4>
-          <p>Jardim Botânico do Rio de Janeiro — JBRJ</p>
+          <p>Jardim BotÃ¢nico do Rio de Janeiro â€” JBRJ</p>
         </article>
 
         <article class="researcher-card">
@@ -4615,37 +4615,37 @@ tagList(
         <article class="researcher-card">
           <span class="agency-pill">FAPESPA</span>
           <h4>Anna Luiza Ilkiu-Borges</h4>
-          <p>Museu Paraense Emílio Goeldi — MPEG</p>
+          <p>Museu Paraense EmÃ­lio Goeldi â€” MPEG</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FACEPE</span>
-          <h4>Clistenes Williams Araújo do Nascimento</h4>
-          <p>Universidade Federal Rural de Pernambuco — UFRPE</p>
+          <h4>Clistenes Williams AraÃºjo do Nascimento</h4>
+          <p>Universidade Federal Rural de Pernambuco â€” UFRPE</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPEMA</span>
           <h4>Dirce Komura</h4>
-          <p>Instituto Federal do Maranhão — IFMA</p>
+          <p>Instituto Federal do MaranhÃ£o â€” IFMA</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPESP</span>
           <h4>Denilson Fernandes Peralta</h4>
-          <p>Instituto de Pesquisas Ambientais — IPA</p>
+          <p>Instituto de Pesquisas Ambientais â€” IPA</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPESQ</span>
           <h4>Felipe Wartchow</h4>
-          <p>Universidade Federal da Paraíba — UFPB</p>
+          <p>Universidade Federal da ParaÃ­ba â€” UFPB</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPDF</span>
           <h4>Micheline Carvalho-Silva</h4>
-          <p>Universidade de Brasília — UnB</p>
+          <p>Universidade de BrasÃ­lia â€” UnB</p>
         </article>
       </div>
     </div>
@@ -4655,7 +4655,7 @@ tagList(
 
 ```{=html}
 <style>
-/* ===== Ajuste responsivo final — abertura O projeto e eixos ===== */
+/* ===== Ajuste responsivo final â€” abertura O projeto e eixos ===== */
 #o-projeto.content-card,
 #o-projeto.about-section {
   container-type: inline-size;
@@ -4917,7 +4917,7 @@ tagList(
   }
 }
 
-/* Três eixos: melhora leitura em desktop, tablet e mobile */
+/* TrÃªs eixos: melhora leitura em desktop, tablet e mobile */
 #frentes-integradas .feature-title-wrap {
   display: flex !important;
   align-items: center !important;
@@ -4984,7 +4984,7 @@ tagList(
 
 ```{=html}
 <style>
-/* ===== Ajuste fino da abertura: evita que o título invada a foto ===== */
+/* ===== Ajuste fino da abertura: evita que o tÃ­tulo invada a foto ===== */
 #o-projeto .about-hero-grid {
   grid-template-columns: minmax(0, 1.06fr) minmax(430px, 0.64fr) !important;
   gap: clamp(2.1rem, 4.5vw, 4.2rem) !important;
@@ -5083,7 +5083,7 @@ tagList(
 
 ```{=html}
 <style>
-/* ===== Ajuste final: Divulgação ocupando a largura total da página ===== */
+/* ===== Ajuste final: DivulgaÃ§Ã£o ocupando a largura total da pÃ¡gina ===== */
 #divulgacao.content-card {
   width: 100vw !important;
   max-width: 100vw !important;
@@ -5118,7 +5118,7 @@ tagList(
 
 ```{=html}
 <style>
-/* ===== Correção responsiva para desktop estreito / meia tela ===== */
+/* ===== CorreÃ§Ã£o responsiva para desktop estreito / meia tela ===== */
 @media (max-width: 1180px) {
   #o-projeto.content-card,
   #o-projeto.about-section {
@@ -5283,9 +5283,9 @@ tagList(
 
 ```{=html}
 <style>
-/* ===== CORREÇÃO FINAL DE OVERFLOW HORIZONTAL — HOME / SOBRE =====
-   Mantém hero e faixa "Três eixos" em largura total, mas trava as demais
-   seções dentro da largura real da tela. */
+/* ===== CORREÃ‡ÃƒO FINAL DE OVERFLOW HORIZONTAL â€” HOME / SOBRE =====
+   MantÃ©m hero e faixa "TrÃªs eixos" em largura total, mas trava as demais
+   seÃ§Ãµes dentro da largura real da tela. */
 
 html,
 body {
@@ -5350,7 +5350,7 @@ canvas {
   max-width: min(940px, calc(100vw - 4rem)) !important;
 }
 
-/* Preserva a animação da faixa full-bleed sem perder o translateX(-50%). */
+/* Preserva a animaÃ§Ã£o da faixa full-bleed sem perder o translateX(-50%). */
 .full-bleed-feature.reveal-ready {
   transform: translateX(-50%) translateY(44px) !important;
 }
@@ -5366,7 +5366,7 @@ canvas {
   }
 }
 
-/* Seções centrais: não usam 100vw direto; ficam contidas e centralizadas. */
+/* SeÃ§Ãµes centrais: nÃ£o usam 100vw direto; ficam contidas e centralizadas. */
 .content-card,
 .objectives-section,
 .about-section,
@@ -5393,7 +5393,7 @@ canvas {
   max-width: calc(100vw - 1rem) !important;
 }
 
-/* Divulgação: larga, mas sem criar rolagem lateral. */
+/* DivulgaÃ§Ã£o: larga, mas sem criar rolagem lateral. */
 #divulgacao.content-card {
   width: min(1520px, calc(100vw - 2rem)) !important;
   max-width: calc(100vw - 2rem) !important;
@@ -5414,7 +5414,7 @@ canvas {
   margin-right: auto !important;
 }
 
-/* Grids: remove mínimos rígidos que empurram a página para a direita. */
+/* Grids: remove mÃ­nimos rÃ­gidos que empurram a pÃ¡gina para a direita. */
 .two-col,
 .about-intro-grid,
 #o-projeto .about-hero-grid,
@@ -5463,7 +5463,7 @@ canvas {
   max-width: 100% !important;
 }
 
-/* Três eixos: a faixa é full-bleed, e o conteúdo interno ocupa toda a largura dela. */
+/* TrÃªs eixos: a faixa Ã© full-bleed, e o conteÃºdo interno ocupa toda a largura dela. */
 #frentes-integradas .feature-title-wrap {
   width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
   max-width: calc(100vw - 1rem) !important;
@@ -5476,7 +5476,7 @@ canvas {
   max-width: 100% !important;
 }
 
-/* Divulgação: cards horizontais quando couber, empilhados antes de estourar. */
+/* DivulgaÃ§Ã£o: cards horizontais quando couber, empilhados antes de estourar. */
 #divulgacao .media-panel {
   grid-template-columns: minmax(0, 0.23fr) minmax(0, 1fr) !important;
 }
@@ -5485,7 +5485,7 @@ canvas {
   grid-template-columns: minmax(0, 42%) minmax(0, 1fr) !important;
 }
 
-/* Títulos longos não podem criar largura extra. */
+/* TÃ­tulos longos nÃ£o podem criar largura extra. */
 .section-title,
 .section-title h2,
 .about-display-title,
@@ -5502,13 +5502,13 @@ canvas {
   overflow-wrap: break-word !important;
 }
 
-/* Navegação do carrossel não pode empurrar a página. */
+/* NavegaÃ§Ã£o do carrossel nÃ£o pode empurrar a pÃ¡gina. */
 .objective-nav,
 .objective-dots {
   max-width: calc(100% - 2rem) !important;
 }
 
-/* Notebooks e tablets: empilha blocos que antes tinham mínimos de 400–520px. */
+/* Notebooks e tablets: empilha blocos que antes tinham mÃ­nimos de 400â€“520px. */
 @media (max-width: 1180px) {
   .content-card,
   .about-section,
@@ -5618,9 +5618,9 @@ canvas {
 
 ```{=html}
 <style>
-/* ===== Correção definitiva de overflow horizontal — seção Divulgação =====
-   A seção deixa de usar 100vw/full-bleed e passa a respeitar o contêiner real
-   do Quarto. Isso evita o escape à direita em notebook, meia tela e telas com
+/* ===== CorreÃ§Ã£o definitiva de overflow horizontal â€” seÃ§Ã£o DivulgaÃ§Ã£o =====
+   A seÃ§Ã£o deixa de usar 100vw/full-bleed e passa a respeitar o contÃªiner real
+   do Quarto. Isso evita o escape Ã  direita em notebook, meia tela e telas com
    barra de rolagem vertical. */
 #divulgacao.content-card {
   width: min(1320px, 100%, calc(100vw - 1rem)) !important;
@@ -5749,9 +5749,9 @@ canvas {
 
 ```{=html}
 <style>
-/* ===== BLOCO FINAL — Divulgação sem escape + Coordenação 3 x 3 ===== */
+/* ===== BLOCO FINAL â€” DivulgaÃ§Ã£o sem escape + CoordenaÃ§Ã£o 3 x 3 ===== */
 
-/* Divulgação: largura contida e estável em notebook, meia tela, tablet e mobile. */
+/* DivulgaÃ§Ã£o: largura contida e estÃ¡vel em notebook, meia tela, tablet e mobile. */
 #divulgacao.content-card {
   width: min(1320px, calc(100vw - 1rem)) !important;
   max-width: calc(100vw - 1rem) !important;
@@ -5857,7 +5857,7 @@ canvas {
   }
 }
 
-/* Rede de coordenação científica: 9 responsáveis em 3 x 3 no desktop. */
+/* Rede de coordenaÃ§Ã£o cientÃ­fica: 9 responsÃ¡veis em 3 x 3 no desktop. */
 #pesquisadores-responsaveis.content-card.researchers-section,
 section#pesquisadores-responsaveis.researchers-section {
   width: min(1460px, calc(100vw - 2rem)) !important;
@@ -5945,10 +5945,10 @@ section#pesquisadores-responsaveis.researchers-section {
 ```{=html}
 <style>
 /* ======================================================================
-   CORREÇÃO DEFINITIVA — NOTEBOOK LENOVO V14 / TELAS ESTREITAS
+   CORREÃ‡ÃƒO DEFINITIVA â€” NOTEBOOK LENOVO V14 / TELAS ESTREITAS
    ----------------------------------------------------------------------
-   Objetivo: impedir qualquer vazamento horizontal nas seções centrais
-   sem mexer na lógica visual geral da home. Esta camada precisa ficar
+   Objetivo: impedir qualquer vazamento horizontal nas seÃ§Ãµes centrais
+   sem mexer na lÃ³gica visual geral da home. Esta camada precisa ficar
    no FINAL do arquivo para sobrescrever regras anteriores com 100vw.
    ====================================================================== */
 
@@ -6015,7 +6015,7 @@ iframe {
   transform: none !important;
 }
 
-/* Seções centrais: usa 100%, não 100vw. 100vw é a origem mais comum do escape. */
+/* SeÃ§Ãµes centrais: usa 100%, nÃ£o 100vw. 100vw Ã© a origem mais comum do escape. */
 #metodo-integrado.content-card,
 #objetivos.objectives-section,
 #expedicoes-recentes.content-card,
@@ -6047,7 +6047,7 @@ iframe {
   border-radius: 0 !important;
 }
 
-/* A rede pode ser mais larga, mas ainda presa à largura real da tela. */
+/* A rede pode ser mais larga, mas ainda presa Ã  largura real da tela. */
 #pesquisadores-responsaveis.content-card,
 #pesquisadores-responsaveis.researchers-section {
   width: min(1460px, calc(100% - 1.25rem)) !important;
@@ -6087,7 +6087,7 @@ iframe {
   overflow: hidden !important;
 }
 
-/* COMO O PROJETO ATUA — evita 4 cards apertados no Lenovo V14. */
+/* COMO O PROJETO ATUA â€” evita 4 cards apertados no Lenovo V14. */
 #metodo-integrado .method-intro-grid {
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
   gap: clamp(1rem, 2vw, 1.8rem) !important;
@@ -6110,7 +6110,7 @@ iframe {
   }
 }
 
-/* OBJETIVOS — reduz o círculo e o espaçamento em notebook menor. */
+/* OBJETIVOS â€” reduz o cÃ­rculo e o espaÃ§amento em notebook menor. */
 #objetivos .objectives-carousel {
   overflow: hidden !important;
 }
@@ -6177,7 +6177,7 @@ iframe {
   }
 }
 
-/* EXPEDIÇÕES RECENTES */
+/* EXPEDIÃ‡Ã•ES RECENTES */
 #expedicoes-recentes .expedition-preview-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -6196,7 +6196,7 @@ iframe {
   }
 }
 
-/* DIVULGAÇÃO — contida, sem 100vw e sem grid que empurre para fora. */
+/* DIVULGAÃ‡ÃƒO â€” contida, sem 100vw e sem grid que empurre para fora. */
 #divulgacao .media-layout {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) !important;
@@ -6246,7 +6246,7 @@ iframe {
   }
 }
 
-/* REDE DE COORDENAÇÃO — 3 x 3 no desktop, sem escape no V14. */
+/* REDE DE COORDENAÃ‡ÃƒO â€” 3 x 3 no desktop, sem escape no V14. */
 #pesquisadores-responsaveis .researchers-layout {
   display: grid !important;
   grid-template-columns: minmax(280px, 0.68fr) minmax(0, 1.32fr) !important;
@@ -6327,12 +6327,12 @@ iframe {
 ```{=html}
 <style>
 /* ======================================================================
-   CORREÇÃO FINAL DA HERO — FULL WIDTH REAL
+   CORREÃ‡ÃƒO FINAL DA HERO â€” FULL WIDTH REAL
    ----------------------------------------------------------------------
-   A camada anterior corrigiu o escape das seções internas, mas acabou
-   prendendo a faixa inicial ao contêiner central. Esta regra devolve
+   A camada anterior corrigiu o escape das seÃ§Ãµes internas, mas acabou
+   prendendo a faixa inicial ao contÃªiner central. Esta regra devolve
    apenas a hero/faixa inicial ao modo full-bleed, ocupando toda a largura
-   da janela, sem alterar as seções centrais abaixo.
+   da janela, sem alterar as seÃ§Ãµes centrais abaixo.
    ====================================================================== */
 .hero-strip {
   position: relative !important;
@@ -6358,7 +6358,7 @@ iframe {
   max-width: min(940px, calc(100vw - 4rem)) !important;
 }
 
-/* Mantém a faixa dos três eixos em largura total, mas sem mexer nos cards internos. */
+/* MantÃ©m a faixa dos trÃªs eixos em largura total, mas sem mexer nos cards internos. */
 .full-bleed-feature,
 #frentes-integradas {
   position: relative !important;
@@ -6400,13 +6400,13 @@ iframe {
 ```{=html}
 <style>
 /* ======================================================================
-   CORREÇÃO FINAL — REDE DE COORDENAÇÃO CIENTÍFICA
+   CORREÃ‡ÃƒO FINAL â€” REDE DE COORDENAÃ‡ÃƒO CIENTÃFICA
    ----------------------------------------------------------------------
-   Esta camada precisa ficar no final do arquivo. Ela corrige o escape à
-   direita da seção "Rede de coordenação científica" em notebooks pequenos.
+   Esta camada precisa ficar no final do arquivo. Ela corrige o escape Ã 
+   direita da seÃ§Ã£o "Rede de coordenaÃ§Ã£o cientÃ­fica" em notebooks pequenos.
    ====================================================================== */
 
-/* Centraliza a seção pela janela real do navegador, não pelo container interno do Quarto. */
+/* Centraliza a seÃ§Ã£o pela janela real do navegador, nÃ£o pelo container interno do Quarto. */
 #pesquisadores-responsaveis.content-card,
 #pesquisadores-responsaveis.researchers-section,
 section#pesquisadores-responsaveis {
@@ -6430,7 +6430,7 @@ section#pesquisadores-responsaveis {
   box-sizing: border-box !important;
 }
 
-/* Preserva a animação de entrada sem perder a centralização por translateX. */
+/* Preserva a animaÃ§Ã£o de entrada sem perder a centralizaÃ§Ã£o por translateX. */
 #pesquisadores-responsaveis.reveal-ready {
   transform: translateX(-50%) translateY(44px) !important;
 }
@@ -6439,7 +6439,7 @@ section#pesquisadores-responsaveis {
   transform: translateX(-50%) translateY(0) !important;
 }
 
-/* Nada dentro da seção pode forçar largura extra. */
+/* Nada dentro da seÃ§Ã£o pode forÃ§ar largura extra. */
 #pesquisadores-responsaveis,
 #pesquisadores-responsaveis * {
   box-sizing: border-box !important;
@@ -6470,7 +6470,7 @@ section#pesquisadores-responsaveis {
   min-width: 0 !important;
 }
 
-/* Os dois cards de números ficam sempre dentro da caixa. */
+/* Os dois cards de nÃºmeros ficam sempre dentro da caixa. */
 #pesquisadores-responsaveis .researchers-summary {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -6542,14 +6542,14 @@ section#pesquisadores-responsaveis {
 ```{=html}
 <style>
 /* Remove as setas internas das fotos dos objetivos.
-   Mantém os pontinhos funcionando. */
+   MantÃ©m os pontinhos funcionando. */
 #objetivos .objective-photo-arrow,
 #objetivos .objective-photo-prev,
 #objetivos .objective-photo-next {
   display: none !important;
 }
 
-/* Garante que os pontinhos internos da imagem continuem clicáveis */
+/* Garante que os pontinhos internos da imagem continuem clicÃ¡veis */
 #objetivos .objective-photo-dots {
   z-index: 20 !important;
   pointer-events: auto !important;

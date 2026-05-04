@@ -1,14 +1,20 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "tsiino-language";
   const DEFAULT_LANGUAGE = "pt";
-  const SYSTEM_LANGUAGES = ["pt"];
+  const STORAGE_KEYS = ["tsiino-language", "site-language"];
+  const SYSTEM_LANGUAGES = ["pt", "pt-BR"];
+
+  const EXCLUDE_SELECTOR = [
+    "script", "style", "noscript", "template", "canvas", "iframe",
+    "pre", "code", "kbd", "samp",
+    ".leaflet-container", ".leaflet-control", ".leaflet-pane",
+    ".quarto-code-tools-source", ".sourceCode"
+  ].join(",");
 
   const BLOCK_SELECTOR = [
     "h1", "h2", "h3", "h4", "h5", "h6",
-    "p", "figcaption", "blockquote", "li",
-    "button", "a", "span", "strong", "em",
+    "p", "figcaption", "blockquote", "li", "button", "a",
     ".hero-kicker", ".hero-subtitle", ".hero-description",
     ".about-eyebrow", ".method-eyebrow", ".feature-eyebrow",
     ".about-display-title", ".about-pullquote",
@@ -18,29 +24,19 @@
     ".about-stat span", ".feature-title", ".feature-panel h3", ".feature-panel p",
     ".method-step h3", ".method-step p", ".impact-card h3", ".impact-card p",
     ".empty-media", ".btn-main", ".btn-ghost", ".media-link",
-    ".metric-label", ".metric-sub", ".panel-title", ".chart-title", ".dashboard-title"
+    ".metric-label", ".metric-sub", ".panel-title", ".chart-title", ".dashboard-title",
+    ".card-title", ".card-subtitle", ".card-text", ".section-title h2"
   ].join(",");
 
-  const ATTRIBUTE_MAP = [
-    ["alt", "alt"],
-    ["title", "title"],
-    ["placeholder", "placeholder"],
-    ["aria-label", "aria-label"],
-    ["data-label", "data-label"],
-    ["data-tip", "data-tip"]
+  const ATTRIBUTE_NAMES = [
+    "alt", "title", "placeholder", "aria-label", "data-label", "data-tip"
   ];
-
-  const EXCLUDE_SELECTOR = [
-    "script", "style", "noscript", "template", "canvas", "iframe",
-    "pre", "code", "kbd", "samp",
-    ".leaflet-container", ".leaflet-control", ".leaflet-pane",
-    ".quarto-code-tools-source", ".sourceCode"
-  ].join(",");
 
   let isApplying = false;
   let observer = null;
-  let observerTimer = null;
-  const mapsCache = new Map();
+  let mutationTimer = null;
+  const mapCache = new Map();
+  const originalTextNodes = new WeakMap();
 
   function cfg() {
     return window.TRANSLATIONS || {};
@@ -54,158 +50,263 @@
       .trim();
   }
 
+  function escapeRegExp(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
   function getSupportedLanguages() {
     const c = cfg();
-    return Array.isArray(c.supportedLanguages) && c.supportedLanguages.length
-      ? c.supportedLanguages
-      : ["pt", "en"];
+    if (Array.isArray(c.supportedLanguages) && c.supportedLanguages.length) {
+      return c.supportedLanguages;
+    }
+    if (c.languages && typeof c.languages === "object") {
+      const keys = Object.keys(c.languages);
+      if (keys.length) return keys;
+    }
+    return ["pt", "en"];
+  }
+
+  function getSavedLanguage() {
+    for (const key of STORAGE_KEYS) {
+      const value = localStorage.getItem(key);
+      if (value) return value;
+    }
+    return null;
   }
 
   function getCurrentLanguage() {
-    const saved = localStorage.getItem(STORAGE_KEY);
     const supported = getSupportedLanguages();
+    const saved = getSavedLanguage();
     if (saved && supported.includes(saved)) return saved;
     return cfg().defaultLanguage || DEFAULT_LANGUAGE;
   }
 
   function setCurrentLanguage(language) {
-    localStorage.setItem(STORAGE_KEY, language);
+    STORAGE_KEYS.forEach(function (key) {
+      localStorage.setItem(key, language);
+    });
   }
 
   function nextLanguage(language) {
     const supported = getSupportedLanguages();
     if (supported.length <= 1) return language;
-    const index = Math.max(0, supported.indexOf(language));
-    return supported[(index + 1) % supported.length];
+    const index = supported.indexOf(language);
+    const safeIndex = index >= 0 ? index : 0;
+    return supported[(safeIndex + 1) % supported.length];
   }
 
-  function isSystemLanguage(language) {
-    return language === DEFAULT_LANGUAGE || SYSTEM_LANGUAGES.includes(language);
+  function isDefaultLanguage(language) {
+    return language === (cfg().defaultLanguage || DEFAULT_LANGUAGE) || SYSTEM_LANGUAGES.includes(language);
   }
 
   function isExcluded(nodeOrElement) {
-    const element = nodeOrElement.nodeType === Node.ELEMENT_NODE
+    const element = nodeOrElement && nodeOrElement.nodeType === Node.ELEMENT_NODE
       ? nodeOrElement
-      : nodeOrElement.parentElement;
+      : nodeOrElement && nodeOrElement.parentElement;
     if (!element) return true;
     return Boolean(element.closest(EXCLUDE_SELECTOR));
   }
 
-  function getAllDictionarySections() {
-    const dict = cfg().dictionary || {};
-    const sections = [];
-    Object.keys(dict).forEach(function (sectionName) {
-      const section = dict[sectionName];
-      if (section && typeof section === "object") sections.push(section);
-    });
-    return sections;
+  function getDictionarySections() {
+    const dictionary = cfg().dictionary || {};
+    return Object.keys(dictionary)
+      .map(function (key) { return dictionary[key]; })
+      .filter(function (section) { return section && typeof section === "object"; });
   }
 
   function buildMaps(targetLanguage) {
-    if (mapsCache.has(targetLanguage)) return mapsCache.get(targetLanguage);
+    if (mapCache.has(targetLanguage)) return mapCache.get(targetLanguage);
 
     const exact = new Map();
-    const reverse = new Map();
     const phrases = [];
-    const reversePhrases = [];
 
-    getAllDictionarySections().forEach(function (section) {
-      Object.keys(section).forEach(function (ptText) {
-        const entry = section[ptText];
+    getDictionarySections().forEach(function (section) {
+      Object.keys(section).forEach(function (sourceText) {
+        const entry = section[sourceText];
         if (!entry || typeof entry !== "object") return;
         const translated = entry[targetLanguage];
         if (!translated || typeof translated !== "string") return;
 
-        const ptKey = normalize(ptText);
-        const targetValue = normalize(translated);
-        if (!ptKey || !targetValue) return;
+        const key = normalize(sourceText);
+        const value = String(translated);
+        if (!key || !normalize(value)) return;
 
-        exact.set(ptKey, translated);
-        reverse.set(targetValue, ptText);
-
-        if (ptKey.length >= 12) {
-          phrases.push({ from: ptText, fromNorm: ptKey, to: translated });
-          reversePhrases.push({ from: translated, fromNorm: targetValue, to: ptText });
+        exact.set(key, value);
+        if (key.length >= 8) {
+          phrases.push({ from: String(sourceText), fromNorm: key, to: value });
         }
       });
     });
 
-    phrases.sort((a, b) => b.fromNorm.length - a.fromNorm.length);
-    reversePhrases.sort((a, b) => b.fromNorm.length - a.fromNorm.length);
+    phrases.sort(function (a, b) {
+      return b.fromNorm.length - a.fromNorm.length;
+    });
 
-    const maps = { exact, reverse, phrases, reversePhrases };
-    mapsCache.set(targetLanguage, maps);
+    const maps = { exact: exact, phrases: phrases };
+    mapCache.set(targetLanguage, maps);
     return maps;
   }
 
-  function replaceNormalizedWholeText(originalText, maps, targetLanguage) {
-    const normalized = normalize(originalText);
-    if (!normalized) return null;
-    if (isSystemLanguage(targetLanguage)) {
-      return maps.reverse.get(normalized) || null;
-    }
-    return maps.exact.get(normalized) || null;
+  function structuredLookup(path, language) {
+    const root = cfg()[language];
+    if (!root) return undefined;
+    return String(path || "").split(".").reduce(function (obj, part) {
+      return obj && obj[part];
+    }, root);
   }
 
-  function replacePhrasesInText(originalText, maps, targetLanguage) {
-    if (!originalText || !normalize(originalText)) return originalText;
+  function saveOriginalHtml(element) {
+    if (!element.dataset.tsiinoOriginalHtml) {
+      element.dataset.tsiinoOriginalHtml = element.innerHTML;
+    }
+  }
 
-    let output = String(originalText);
-    const phraseList = isSystemLanguage(targetLanguage) ? maps.reversePhrases : maps.phrases;
+  function saveOriginalAttribute(element, attr) {
+    const key = "tsiinoOriginal" + attr.replace(/[^a-z0-9]/gi, "_");
+    if (!element.dataset[key] && element.hasAttribute(attr)) {
+      element.dataset[key] = element.getAttribute(attr) || "";
+    }
+    return key;
+  }
 
-    phraseList.forEach(function (item) {
-      if (output.includes(item.from)) {
-        output = output.split(item.from).join(item.to);
-        return;
-      }
+  function restoreOriginals() {
+    document.querySelectorAll("[data-tsiino-original-html]").forEach(function (element) {
+      element.innerHTML = element.dataset.tsiinoOriginalHtml;
+      delete element.dataset.tsiinoOriginalHtml;
+    });
 
-      const escaped = item.from
-        .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-        .replace(/\s+/g, "\\s+");
-      try {
-        output = output.replace(new RegExp(escaped, "g"), item.to);
-      } catch (error) {
-        // Keep the original if a browser rejects the regex.
+    ATTRIBUTE_NAMES.forEach(function (attr) {
+      const key = "tsiinoOriginal" + attr.replace(/[^a-z0-9]/gi, "_");
+      document.querySelectorAll("[data-" + key.replace(/[A-Z]/g, function (m) { return "-" + m.toLowerCase(); }) + "]").forEach(function (element) {
+        if (element.dataset[key] !== undefined) {
+          element.setAttribute(attr, element.dataset[key]);
+          delete element.dataset[key];
+        }
+      });
+    });
+
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (isExcluded(node)) return NodeFilter.FILTER_REJECT;
+        return originalTextNodes.has(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
       }
     });
 
-    return output;
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function (node) {
+      const original = originalTextNodes.get(node);
+      if (original !== undefined) node.nodeValue = original;
+      originalTextNodes.delete(node);
+    });
   }
 
-  function getStructuredTranslation(path, targetLanguage) {
-    const langObject = cfg()[targetLanguage];
-    if (!langObject) return undefined;
-    return String(path || "").split(".").reduce(function (obj, part) {
-      return obj && obj[part];
-    }, langObject);
+  function translateWholeBlock(element, maps) {
+    if (!element || isExcluded(element)) return;
+    if (element.id === "language-toggle" || element.closest("#language-toggle")) return;
+    if (element.closest(".navbar") && !element.matches(".navbar a, .navbar span, .navbar button")) return;
+    if (element.querySelector("img, video, iframe, canvas, input, select, textarea")) return;
+
+    const sourceText = element.dataset.tsiinoOriginalHtml
+      ? normalize(element.dataset.tsiinoOriginalHtml.replace(/<[^>]+>/g, " "))
+      : normalize(element.textContent);
+
+    if (!sourceText) return;
+    const translated = maps.exact.get(sourceText);
+    if (!translated) return;
+
+    saveOriginalHtml(element);
+    if (element.textContent !== translated) {
+      element.textContent = translated;
+    }
   }
 
-  function setTextIfChanged(element, value) {
-    const next = String(value).trim();
-    if (element.textContent !== next) element.textContent = next;
+  function translateTextNode(node, maps) {
+    if (!node || isExcluded(node)) return;
+    const parent = node.parentElement;
+    if (!parent) return;
+    if (parent.closest("#language-toggle")) return;
+
+    const original = originalTextNodes.get(node) || node.nodeValue;
+    const normalized = normalize(original);
+    if (!normalized) return;
+
+    let translated = maps.exact.get(normalized);
+
+    if (!translated) {
+      translated = String(original);
+      maps.phrases.forEach(function (item) {
+        if (translated.includes(item.from)) {
+          translated = translated.split(item.from).join(item.to);
+          return;
+        }
+        try {
+          const pattern = new RegExp(escapeRegExp(item.from).replace(/\s+/g, "\\s+"), "g");
+          translated = translated.replace(pattern, item.to);
+        } catch (error) {
+          // Keep original fragment if regex fails.
+        }
+      });
+      if (translated === original) return;
+    }
+
+    if (!originalTextNodes.has(node)) originalTextNodes.set(node, original);
+    node.nodeValue = translated;
   }
 
-  function setHtmlIfChanged(element, value) {
-    const next = String(value).trim();
-    if (element.innerHTML !== next) element.innerHTML = next;
+  function translateTextNodes(root, maps) {
+    const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (isExcluded(node)) return NodeFilter.FILTER_REJECT;
+        if (!normalize(node.nodeValue)) return NodeFilter.FILTER_SKIP;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function (node) { translateTextNode(node, maps); });
   }
 
-  function setAttributeIfChanged(element, attr, value) {
-    const next = String(value).trim();
-    if (element.getAttribute(attr) !== next) element.setAttribute(attr, next);
+  function translateAttributes(root, maps) {
+    ATTRIBUTE_NAMES.forEach(function (attr) {
+      (root || document).querySelectorAll("[" + attr + "]").forEach(function (element) {
+        if (isExcluded(element)) return;
+        const originalKey = saveOriginalAttribute(element, attr);
+        const original = element.dataset[originalKey] || element.getAttribute(attr) || "";
+        const normalized = normalize(original);
+        if (!normalized) return;
+
+        let translated = maps.exact.get(normalized);
+        if (!translated) {
+          translated = String(original);
+          maps.phrases.forEach(function (item) {
+            if (translated.includes(item.from)) translated = translated.split(item.from).join(item.to);
+          });
+          if (translated === original) return;
+        }
+        element.setAttribute(attr, translated);
+      });
+    });
   }
 
-  function translateDataI18n(targetLanguage) {
+  function translateDataI18n(language) {
     document.querySelectorAll("[data-i18n]").forEach(function (element) {
       if (isExcluded(element)) return;
-      const value = getStructuredTranslation(element.getAttribute("data-i18n"), targetLanguage);
-      if (value !== undefined) setTextIfChanged(element, value);
+      const value = structuredLookup(element.getAttribute("data-i18n"), language);
+      if (value !== undefined) {
+        saveOriginalHtml(element);
+        element.textContent = String(value).trim();
+      }
     });
 
     document.querySelectorAll("[data-i18n-html]").forEach(function (element) {
       if (isExcluded(element)) return;
-      const value = getStructuredTranslation(element.getAttribute("data-i18n-html"), targetLanguage);
-      if (value !== undefined) setHtmlIfChanged(element, value);
+      const value = structuredLookup(element.getAttribute("data-i18n-html"), language);
+      if (value !== undefined) {
+        saveOriginalHtml(element);
+        element.innerHTML = String(value).trim();
+      }
     });
 
     [
@@ -217,101 +318,101 @@
     ].forEach(function (pair) {
       document.querySelectorAll("[" + pair[0] + "]").forEach(function (element) {
         if (isExcluded(element)) return;
-        const value = getStructuredTranslation(element.getAttribute(pair[0]), targetLanguage);
-        if (value !== undefined) setAttributeIfChanged(element, pair[1], value);
+        const value = structuredLookup(element.getAttribute(pair[0]), language);
+        if (value !== undefined) {
+          saveOriginalAttribute(element, pair[1]);
+          element.setAttribute(pair[1], String(value).trim());
+        }
       });
     });
   }
 
-  function translateBlocks(targetLanguage, maps, root) {
+  function translateBlocks(root, maps) {
     (root || document).querySelectorAll(BLOCK_SELECTOR).forEach(function (element) {
+      translateWholeBlock(element, maps);
+    });
+  }
+
+  function translateQuartoUI(language, maps) {
+    const langCfg = cfg().languages && cfg().languages[language];
+    const searchText = language === "en" ? "Search" : "Buscar";
+
+    document.querySelectorAll("input[type='search'], .aa-Input").forEach(function (input) {
+      if (!input.dataset.tsiinoOriginalPlaceholder && input.hasAttribute("placeholder")) {
+        input.dataset.tsiinoOriginalPlaceholder = input.getAttribute("placeholder") || "";
+      }
+      input.setAttribute("placeholder", searchText);
+      input.setAttribute("aria-label", searchText);
+    });
+
+    if (langCfg && langCfg.htmlLang) {
+      document.documentElement.lang = langCfg.htmlLang;
+    } else {
+      document.documentElement.lang = language === "en" ? "en" : "pt-BR";
+    }
+  }
+
+  function translateSvgAndCharts(root, maps) {
+    (root || document).querySelectorAll("svg text, .js-plotly-plot text, .legendtext, .gtitle, .xtitle, .ytitle").forEach(function (element) {
       if (isExcluded(element)) return;
-      if (element.id === "language-toggle" || element.closest("#language-toggle")) return;
-      if (element.closest(".navbar") && !element.matches(".navbar a, .navbar span, .navbar button")) return;
-      if (element.querySelector("img, video, iframe, canvas, svg, input, select, textarea")) return;
-
-      const whole = replaceNormalizedWholeText(element.textContent, maps, targetLanguage);
-      if (whole !== null) setTextIfChanged(element, whole);
-    });
-  }
-
-  function translateTextNodes(targetLanguage, maps, root) {
-    const walker = document.createTreeWalker(
-      root || document.body,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: function (node) {
-          if (!node.nodeValue || !normalize(node.nodeValue)) return NodeFilter.FILTER_REJECT;
-          if (isExcluded(node)) return NodeFilter.FILTER_REJECT;
-          if (node.parentElement && node.parentElement.closest("#language-toggle")) return NodeFilter.FILTER_REJECT;
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      }
-    );
-
-    const nodes = [];
-    while (walker.nextNode()) nodes.push(walker.currentNode);
-
-    nodes.forEach(function (node) {
-      const exact = replaceNormalizedWholeText(node.nodeValue, maps, targetLanguage);
-      if (exact !== null) {
-        if (node.nodeValue !== exact) node.nodeValue = exact;
-        return;
-      }
-      const replaced = replacePhrasesInText(node.nodeValue, maps, targetLanguage);
-      if (replaced !== node.nodeValue) node.nodeValue = replaced;
-    });
-  }
-
-  function translateSvgAndChartText(targetLanguage, maps, root) {
-    const chartTextSelector = [
-      "svg text",
-      ".plotly text",
-      ".svg-container text",
-      ".legend text",
-      ".gtitle",
-      ".xtitle",
-      ".ytitle",
-      ".annotation-text",
-      ".hovertext text",
-      "svg title",
-      "svg desc"
-    ].join(",");
-
-    (root || document).querySelectorAll(chartTextSelector).forEach(function (element) {
-      if (!element || element.closest("#language-toggle")) return;
-      const current = element.textContent;
-      if (!current || !normalize(current)) return;
-
-      const exact = replaceNormalizedWholeText(current, maps, targetLanguage);
-      if (exact !== null) {
-        setTextIfChanged(element, exact);
-        return;
-      }
-
-      const replaced = replacePhrasesInText(current, maps, targetLanguage);
-      if (replaced !== current) element.textContent = replaced;
-    });
-  }
-
-  function translateAttributes(targetLanguage, maps, root) {
-    ATTRIBUTE_MAP.forEach(function (pair) {
-      const attr = pair[0];
-      (root || document).querySelectorAll("[" + attr + "]").forEach(function (element) {
-        if (isExcluded(element)) return;
-        if (element.id === "language-toggle") return;
-        const current = element.getAttribute(attr);
-        if (!current) return;
-
-        const exact = replaceNormalizedWholeText(current, maps, targetLanguage);
-        if (exact !== null) {
-          setAttributeIfChanged(element, attr, exact);
-          return;
-        }
-
-        const replaced = replacePhrasesInText(current, maps, targetLanguage);
-        if (replaced !== current) element.setAttribute(attr, replaced);
+      translateWholeBlock(element, maps);
+      element.childNodes.forEach(function (node) {
+        if (node.nodeType === Node.TEXT_NODE) translateTextNode(node, maps);
       });
+    });
+  }
+
+  function getScriptBasePath() {
+    const scripts = Array.from(document.querySelectorAll("script[src]"));
+    const script = scripts.find(function (s) {
+      return /(^|\/)js\/language\.js(\?|#|$)/.test(s.getAttribute("src") || "");
+    });
+
+    if (!script) return "/";
+
+    try {
+      const url = new URL(script.getAttribute("src"), window.location.href);
+      return url.pathname.replace(/js\/language\.js.*$/, "");
+    } catch (error) {
+      return "/";
+    }
+  }
+
+  function getPathInsideSite() {
+    let path = window.location.pathname;
+    const base = getScriptBasePath();
+
+    if (base && base !== "/" && path.startsWith(base.replace(/\/$/, "") + "/")) {
+      path = path.slice(base.replace(/\/$/, "").length);
+    }
+
+    if (!path || path === "/") path = "/index.html";
+    if (path.endsWith("/")) path += "index.html";
+    return path;
+  }
+
+  function getRelativePrefix() {
+    const parts = getPathInsideSite().split("/").filter(Boolean);
+    if (parts.length <= 1) return "";
+    return "../".repeat(parts.length - 1);
+  }
+
+  function fixFooterImagePaths() {
+    const footer = document.querySelector(".tsiino-site-footer");
+    if (footer && footer.parentElement !== document.body) {
+      document.body.appendChild(footer);
+    }
+
+    const prefix = getRelativePrefix();
+
+    document.querySelectorAll(".tsiino-site-footer img[data-src], .tsiino-site-footer img[data-tsiino-src]").forEach(function (img) {
+      const source = img.getAttribute("data-tsiino-src") || img.getAttribute("data-src");
+      if (!source) return;
+      img.setAttribute("src", prefix + source.replace(/^\/+/, ""));
+    });
+
+    document.querySelectorAll(".tsiino-footer-home").forEach(function (link) {
+      link.setAttribute("href", prefix + "index.html");
     });
   }
 
@@ -323,190 +424,129 @@
     button.id = "language-toggle";
     button.className = "language-toggle";
     button.type = "button";
-    button.innerHTML = '<span class="language-toggle-label"></span>';
+    button.innerHTML = "<span class=\"language-toggle-label\"></span>";
 
-    const tools = document.querySelector("#quarto-header .quarto-navbar-tools") ||
-      document.querySelector(".quarto-navbar-tools");
+    const item = document.createElement("li");
+    item.className = "nav-item language-toggle-item";
+    item.appendChild(button);
 
+    const tools = document.querySelector(".quarto-navbar-tools");
     if (tools) {
-      tools.insertBefore(button, tools.firstChild);
+      tools.appendChild(button);
       return button;
     }
 
-    let rightNavbar = document.querySelector("#quarto-header .navbar-nav.ms-auto") ||
-      document.querySelector(".navbar .navbar-nav.ms-auto");
-
+    let rightNavbar = document.querySelector(".navbar .navbar-nav.ms-auto");
     if (!rightNavbar) {
-      const collapse = document.querySelector("#quarto-header .navbar-collapse") ||
-        document.querySelector(".navbar .navbar-collapse");
+      const navbarCollapse = document.querySelector(".navbar .navbar-collapse");
       rightNavbar = document.createElement("ul");
       rightNavbar.className = "navbar-nav ms-auto";
-      if (collapse) collapse.appendChild(rightNavbar);
+      if (navbarCollapse) navbarCollapse.appendChild(rightNavbar);
     }
-
-    if (rightNavbar) {
-      const item = document.createElement("li");
-      item.className = "nav-item language-toggle-item";
-      item.appendChild(button);
-      rightNavbar.appendChild(item);
-    }
-
+    if (rightNavbar) rightNavbar.appendChild(item);
     return button;
   }
 
-  function updateButton(targetLanguage) {
-    const langInfo = (cfg().languages || {})[targetLanguage] || {};
+  function updateButton(language) {
     const button = ensureLanguageButton();
-    const label = button.querySelector(".language-toggle-label") || button;
-    label.textContent = langInfo.buttonLabel || (targetLanguage === "pt" ? "EN" : "PT");
-    button.setAttribute("aria-label", langInfo.buttonAria || "Switch language");
-    button.setAttribute("title", langInfo.buttonAria || "Switch language");
-  }
+    const next = nextLanguage(language);
+    const langCfg = cfg().languages && cfg().languages[language];
+    const label = (langCfg && langCfg.buttonLabel) || next.toUpperCase();
+    const title = language === "en" ? "Switch language to Portuguese" : "Mudar idioma para inglês";
 
-  function updateHtmlLang(targetLanguage) {
-    const langInfo = (cfg().languages || {})[targetLanguage] || {};
-    document.documentElement.lang = langInfo.htmlLang || targetLanguage;
-  }
-
-  function idle(callback, timeout) {
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(callback, { timeout: timeout || 800 });
-    } else {
-      window.setTimeout(callback, Math.min(timeout || 250, 250));
-    }
+    const span = button.querySelector(".language-toggle-label") || button;
+    span.textContent = label;
+    button.setAttribute("aria-label", title);
+    button.setAttribute("title", title);
   }
 
   function applyTranslations(options) {
-    options = options || {};
-    if (isApplying || !window.TRANSLATIONS || !document.body) return;
+    const opts = options || {};
+    const language = getCurrentLanguage();
 
-    const targetLanguage = getCurrentLanguage();
-    const root = options.root || document;
-    const maps = buildMaps(targetLanguage);
-
-    // In initial Portuguese view, avoid scanning the whole page. This preserves
-    // reveal/scroll animations and prevents unnecessary layout work.
-    if (!options.force && isSystemLanguage(targetLanguage) && options.reason === "init") {
-      updateButton(targetLanguage);
-      updateHtmlLang(targetLanguage);
-      return;
-    }
-
+    if (isApplying) return;
     isApplying = true;
-    if (observer) observer.disconnect();
 
     try {
-      translateDataI18n(targetLanguage);
-      translateBlocks(targetLanguage, maps, root);
-      translateTextNodes(targetLanguage, maps, root === document ? document.body : root);
-      translateAttributes(targetLanguage, maps, root);
-      updateButton(targetLanguage);
-      updateHtmlLang(targetLanguage);
+      fixFooterImagePaths();
+
+      if (isDefaultLanguage(language)) {
+        restoreOriginals();
+        translateQuartoUI(language, null);
+        updateButton(language);
+        return;
+      }
+
+      const maps = buildMaps(language);
+      translateDataI18n(language);
+      translateBlocks(document, maps);
+      translateTextNodes(document.body, maps);
+      translateAttributes(document, maps);
+      translateQuartoUI(language, maps);
+
+      if (opts.includeCharts) {
+        window.setTimeout(function () {
+          const current = getCurrentLanguage();
+          if (!isDefaultLanguage(current)) {
+            translateSvgAndCharts(document, buildMaps(current));
+          }
+        }, 250);
+      }
+
+      updateButton(language);
     } finally {
       isApplying = false;
-      if (observer) startObserver(true);
-    }
-
-    if (options.includeCharts !== false) {
-      idle(function () {
-        if (isApplying || !window.TRANSLATIONS) return;
-        const current = getCurrentLanguage();
-        const chartMaps = buildMaps(current);
-        isApplying = true;
-        if (observer) observer.disconnect();
-        try {
-          translateSvgAndChartText(current, chartMaps, root);
-          updateButton(current);
-        } finally {
-          isApplying = false;
-          if (observer) startObserver(true);
-        }
-      }, 900);
-    }
-
-    // Let existing scroll/IntersectionObserver animation code re-evaluate after
-    // text height changes, without forcing repeated translations.
-    window.requestAnimationFrame(function () {
-      window.dispatchEvent(new Event("scroll"));
       window.dispatchEvent(new Event("resize"));
-    });
-  }
-
-  function scheduleTranslate(reason, root) {
-    window.clearTimeout(observerTimer);
-    observerTimer = window.setTimeout(function () {
-      applyTranslations({ reason: reason || "mutation", root: root || document, includeCharts: true });
-    }, 450);
-  }
-
-  function startObserver(restart) {
-    if (restart && observer) observer.disconnect();
-    if (!document.body) return;
-
-    if (!observer) {
-      observer = new MutationObserver(function (mutations) {
-        if (isApplying) return;
-
-        // Ignore class/style changes from scroll reveal animations. The previous
-        // runtime watched attributes/characterData and kept re-translating during
-        // animations, which delayed the reveal effects in English.
-        let root = null;
-        for (const mutation of mutations) {
-          if (mutation.type === "childList" && mutation.addedNodes.length) {
-            for (const node of mutation.addedNodes) {
-              if (node.nodeType === Node.ELEMENT_NODE && !isExcluded(node)) {
-                root = node;
-                break;
-              }
-            }
-          }
-          if (root) break;
-        }
-
-        if (!root) return;
-        scheduleTranslate("mutation", root);
-      });
+      window.dispatchEvent(new Event("scroll"));
     }
+  }
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
+  function scheduleApply(root) {
+    if (mutationTimer) window.clearTimeout(mutationTimer);
+    mutationTimer = window.setTimeout(function () {
+      if (!isDefaultLanguage(getCurrentLanguage())) {
+        applyTranslations({ reason: "mutation", includeCharts: true, root: root });
+      } else {
+        fixFooterImagePaths();
+      }
+    }, 150);
+  }
+
+  function startObserver() {
+    if (!document.body || observer) return;
+    observer = new MutationObserver(function (mutations) {
+      if (isApplying) return;
+      const hasAddedNodes = mutations.some(function (mutation) {
+        return mutation.type === "childList" && mutation.addedNodes && mutation.addedNodes.length;
+      });
+      if (hasAddedNodes) scheduleApply(document.body);
     });
+
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   function bindButton() {
     const button = ensureLanguageButton();
-    if (button.dataset.i18nBound) return;
+    if (button.dataset.tsiinoBound) return;
 
     button.addEventListener("click", function () {
       const current = getCurrentLanguage();
       setCurrentLanguage(nextLanguage(current));
       applyTranslations({ reason: "toggle", force: true, includeCharts: true });
-
-      // Plotly/htmlwidgets can redraw after the button click; translate chart
-      // labels once more later, but do not keep hammering the page.
       window.setTimeout(function () {
-        const currentLanguage = getCurrentLanguage();
-        const maps = buildMaps(currentLanguage);
-        translateSvgAndChartText(currentLanguage, maps, document);
-      }, 1200);
+        applyTranslations({ reason: "toggle-late", force: true, includeCharts: true });
+      }, 800);
     });
 
-    button.dataset.i18nBound = "true";
+    button.dataset.tsiinoBound = "true";
   }
 
   function init() {
     bindButton();
-    applyTranslations({ reason: "init", includeCharts: getCurrentLanguage() !== DEFAULT_LANGUAGE });
-    startObserver(false);
-
-    // One delayed pass for widgets loaded after Quarto, only when already in a
-    // non-default language.
-    if (getCurrentLanguage() !== DEFAULT_LANGUAGE) {
-      idle(function () {
-        applyTranslations({ reason: "idle", force: true, includeCharts: true });
-      }, 1200);
-    }
+    applyTranslations({ reason: "init", includeCharts: true });
+    startObserver();
+    window.setTimeout(fixFooterImagePaths, 500);
+    window.setTimeout(fixFooterImagePaths, 1500);
   }
 
   window.TSIINO_TRANSLATE_NOW = function () {
