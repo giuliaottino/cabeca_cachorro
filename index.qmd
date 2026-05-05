@@ -1,6 +1,6 @@
-﻿---
+---
 title: "Tsiino Hiiwiida"
-subtitle: "DimensÃµes da biodiversidade de plantas e fungos no Alto Rio Negro"
+subtitle: "Dimensões da biodiversidade de plantas e fungos no Alto Rio Negro"
 format:
   html:
     toc: false
@@ -61,7 +61,7 @@ nz <- function(x) !is.na(x) & nzchar(trimws(as.character(x)))
 
 safe <- function(x) {
   x <- as.character(x)
-  x[is.na(x) | trimws(x) == ""] <- "â€”"
+  x[is.na(x) | trimws(x) == ""] <- "—"
   htmltools::htmlEscape(x)
 }
 ```
@@ -151,7 +151,7 @@ safe <- function(x) {
   
 /* NAVBAR FLUTUANTE NA HOME */
 
-/* Remove qualquer espaÃ§o reservado pelo Quarto acima do conteÃºdo */
+/* Remove qualquer espaço reservado pelo Quarto acima do conteúdo */
 html,
 body{
   margin-top: 0 !important;
@@ -170,7 +170,7 @@ main.content{
   padding-top: 0 !important;
 }
 
-/* Header transparente, sem faixa prÃ³pria */
+/* Header transparente, sem faixa própria */
 #quarto-header{
   position: absolute !important;
   top: 0 !important;
@@ -182,7 +182,7 @@ main.content{
   box-shadow: none !important;
 }
 
-/* Navbar sobre o vÃ­deo, sem caixa cinza e sem linha */
+/* Navbar sobre o vídeo, sem caixa cinza e sem linha */
 #quarto-header .navbar{
   position: relative !important;
   top: 0 !important;
@@ -196,7 +196,7 @@ main.content{
   -webkit-backdrop-filter: none !important;
 }
 
-/* DegradÃª sutil por cima do vÃ­deo, sem virar faixa sÃ³lida */
+/* Degradê sutil por cima do vídeo, sem virar faixa sólida */
 #quarto-header::before{
   content: "";
   position: absolute;
@@ -212,12 +212,12 @@ main.content{
   z-index: -1;
 }
 
-/* Esconde o nome textual da navbar na home; a marca jÃ¡ aparece na hero */
+/* Esconde o nome textual da navbar na home; a marca já aparece na hero */
 #quarto-header .navbar-brand{
   display: none !important;
 }
 
-/* Links e Ã­cones brancos */
+/* Links e ícones brancos */
 #quarto-header .navbar .nav-link,
 #quarto-header .navbar .nav-link:visited{
   color: #fff !important;
@@ -242,8 +242,8 @@ main.content{
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.55));
 }
 
-  /* HERO inspirado na lÃ³gica visual Oxford:
-     vÃ­deo visÃ­vel + degradÃª + texto sobreposto, sem card gigante */
+  /* HERO inspirado na lógica visual Oxford:
+     vídeo visível + degradê + texto sobreposto, sem card gigante */
 .hero-strip{
   position: relative;
   left: 50%;
@@ -423,7 +423,43 @@ main.content{
     box-shadow: 0 8px 20px rgba(0,0,0,0.22);
   }
 
-  /* SEÃ‡Ã•ES */
+  .hero-video-toggle .icon-pause{
+    width: 20px;
+    height: 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 6px);
+    gap: 6px;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .hero-video-toggle .icon-pause::before,
+  .hero-video-toggle .icon-pause::after{
+    content: "";
+    display: block;
+    background: currentColor;
+    border-radius: 2px;
+  }
+
+  .hero-video-toggle .icon-play{
+    display: none;
+    width: 0;
+    height: 0;
+    margin-left: 4px;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 19px solid currentColor;
+  }
+
+  .hero-video-toggle.is-paused .icon-pause{
+    display: none;
+  }
+
+  .hero-video-toggle.is-paused .icon-play{
+    display: block;
+  }
+
+  /* SEÇÕES */
   .content-card{
     width: min(1120px, calc(100vw - 2rem));
     margin: 2.6rem auto 0 auto;
@@ -629,7 +665,7 @@ main.content{
   background: rgba(246,241,232,0.88);
 }
 
-/* ===== Ajuste editorial da seÃ§Ã£o O projeto ===== */
+/* ===== Ajuste editorial da seção O projeto ===== */
 
 #o-projeto.content-card {
   width: min(1180px, calc(100vw - 2rem));
@@ -1194,7 +1230,7 @@ main.content{
   display: block;
 }
 
-/* Setas internas do carrossel de fotos â€” discretas dentro da imagem circular */
+/* Setas internas do carrossel de fotos — discretas dentro da imagem circular */
 
 .objective-photo-arrow {
   width: 32px;
@@ -1243,7 +1279,7 @@ main.content{
   background: #fff;
 }
 
-/* NavegaÃ§Ã£o principal do carrossel de objetivos â€” controle inferior */
+/* Navegação principal do carrossel de objetivos — controle inferior */
 
 .objective-nav {
   position: absolute;
@@ -1429,7 +1465,7 @@ main.content{
     
   }
   
- /* Ajustes para tela intermediÃ¡ria: notebook meia tela / tablet horizontal */
+ /* Ajustes para tela intermediária: notebook meia tela / tablet horizontal */
 @media (max-width: 991.98px) {
   .hero-logo-badge {
     top: 4.9rem;
@@ -1443,7 +1479,7 @@ main.content{
     width: calc(100% - 1.5rem);
   }
 
-  /* Menu colapsado mais legÃ­vel sobre o vÃ­deo */
+  /* Menu colapsado mais legível sobre o vídeo */
   #quarto-header .navbar-collapse.show,
   #quarto-header .navbar-collapse.collapsing {
     margin-top: 0.6rem;
@@ -1471,7 +1507,7 @@ main.content{
   }
 }
 
-/* ===== Pesquisadores responsÃ¡veis ===== */
+/* ===== Pesquisadores responsáveis ===== */
 
 .researchers-section {
   width: min(1180px, calc(100vw - 2rem));
@@ -1686,7 +1722,7 @@ main.content{
   }
 }
 
-/* ===== Redesenho editorial da pÃ¡gina inicial / about ===== */
+/* ===== Redesenho editorial da página inicial / about ===== */
 
 .reveal-ready {
   opacity: 0;
@@ -2222,7 +2258,7 @@ main.content{
 }
 
 
-/* ===== Refinamentos de layout solicitados: cards mais legÃ­veis e paleta unificada ===== */
+/* ===== Refinamentos de layout solicitados: cards mais legíveis e paleta unificada ===== */
 
 .about-section,
 .method-section,
@@ -2277,7 +2313,7 @@ main.content{
   hyphens: none;
 }
 
-/* SeÃ§Ã£o em largura cheia: mantÃ©m a dinÃ¢mica fluida, mas volta para a paleta da identidade */
+/* Seção em largura cheia: mantém a dinâmica fluida, mas volta para a paleta da identidade */
 .full-bleed-feature {
   background:
     linear-gradient(180deg, rgba(246,241,232,0.94), rgba(246,241,232,0.78)),
@@ -2397,7 +2433,7 @@ main.content{
   hyphens: auto;
 }
 
-/* Demais seÃ§Ãµes na mesma linguagem visual */
+/* Demais seções na mesma linguagem visual */
 .method-river {
   border: 1px solid rgba(98,106,56,0.20);
 }
@@ -2480,7 +2516,7 @@ main.content{
 }
 
 
-/* ===== ExpansÃ£o da foto lateral da seÃ§Ã£o O projeto ===== */
+/* ===== Expansão da foto lateral da seção O projeto ===== */
 #o-projeto.about-section {
   width: min(1280px, calc(100vw - 1.25rem));
 }
@@ -2635,7 +2671,7 @@ main.content{
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  /* Destaque automÃ¡tico da navbar */
+  /* Destaque automático da navbar */
   const sections = document.querySelectorAll("section[id]");
   const navLinks = document.querySelectorAll(".navbar a[href*='#']");
 
@@ -2666,22 +2702,64 @@ document.addEventListener("DOMContentLoaded", function () {
     if (section.id) observer.observe(section);
   });
 
-  /* BotÃ£o play/pause do vÃ­deo da hero */
+  /* Vídeo da hero: autoplay robusto + botão play/pause sem caracteres quebrados */
   const video = document.querySelector(".hero-video");
   const toggle = document.querySelector(".hero-video-toggle");
 
-  if (video && toggle) {
-    toggle.addEventListener("click", function () {
-      if (video.paused) {
-        video.play();
-        toggle.textContent = "â…¡";
-        toggle.setAttribute("aria-label", "Pausar vÃ­deo");
-      } else {
-        video.pause();
-        toggle.textContent = "â–¶";
-        toggle.setAttribute("aria-label", "Reproduzir vÃ­deo");
+  if (video) {
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("autoplay", "");
+
+    const updateHeroVideoButton = function () {
+      if (!toggle) return;
+      const isPaused = video.paused || video.ended;
+      toggle.classList.toggle("is-paused", isPaused);
+      toggle.setAttribute("aria-label", isPaused ? "Reproduzir vídeo" : "Pausar vídeo");
+      toggle.setAttribute("aria-pressed", isPaused ? "true" : "false");
+    };
+
+    const startHeroVideo = function () {
+      if (video.dataset.userPaused === "1") {
+        updateHeroVideoButton();
+        return;
       }
+
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.then === "function") {
+        playPromise.then(updateHeroVideoButton).catch(updateHeroVideoButton);
+      } else {
+        updateHeroVideoButton();
+      }
+    };
+
+    startHeroVideo();
+    window.addEventListener("load", startHeroVideo, { once: true });
+    window.addEventListener("pageshow", startHeroVideo);
+
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) startHeroVideo();
     });
+
+    video.addEventListener("play", updateHeroVideoButton);
+    video.addEventListener("pause", updateHeroVideoButton);
+
+    if (toggle) {
+      updateHeroVideoButton();
+      toggle.addEventListener("click", function () {
+        if (video.paused) {
+          delete video.dataset.userPaused;
+          startHeroVideo();
+        } else {
+          video.dataset.userPaused = "1";
+          video.pause();
+          updateHeroVideoButton();
+        }
+      });
+    }
   }
 
   /* Carrossel principal dos objetivos */
@@ -2846,7 +2924,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const current = Number(activeSlide.dataset.photoIndex || 0);
     showObjectivePhoto(activeSlide, current + 1);
   }, 3500);
-  /* Mapa do municÃ­pio de SÃ£o Gabriel da Cachoeira na seÃ§Ã£o O projeto */
+  /* Mapa do município de São Gabriel da Cachoeira na seção O projeto */
   const projectMapEl = document.getElementById("project-sgc-map");
 
   if (projectMapEl && typeof L !== "undefined") {
@@ -2867,7 +2945,7 @@ L.tileLayer(
     fetch("_input_data/limites/sao_gabriel_da_cachoeira.geojson")
       .then(response => {
         if (!response.ok) {
-          throw new Error("GeoJSON nÃ£o encontrado");
+          throw new Error("GeoJSON não encontrado");
         }
         return response.json();
       })
@@ -2892,7 +2970,7 @@ L.tileLayer(
       })
       .catch(error => {
         projectMapEl.innerHTML =
-          '<div style="padding:1rem;font-family:Montserrat,Arial,sans-serif;font-size:0.85rem;color:#2E3B24;">NÃ£o foi possÃ­vel carregar o limite municipal. Confira se o arquivo <strong>_input_data/limites/sao_gabriel_da_cachoeira.geojson</strong> existe.</div>';
+          '<div style="padding:1rem;font-family:Montserrat,Arial,sans-serif;font-size:0.85rem;color:#2E3B24;">Não foi possível carregar o limite municipal. Confira se o arquivo <strong>_input_data/limites/sao_gabriel_da_cachoeira.geojson</strong> existe.</div>';
       });
   }
 });
@@ -2934,6 +3012,1868 @@ document.addEventListener("DOMContentLoaded", function () {
 ```
 
 ```{=html}
+<style>
+/* ===== Ajuste responsivo final — abertura O projeto e eixos ===== */
+#o-projeto.content-card,
+#o-projeto.about-section {
+  container-type: inline-size;
+  container-name: projetoAbout;
+  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
+  max-width: 1320px !important;
+  margin-inline: auto !important;
+  padding-inline: clamp(1.05rem, 3vw, 3rem) !important;
+  overflow: hidden !important;
+}
+
+#o-projeto .about-hero-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) !important;
+  grid-template-areas: "copy visual" !important;
+  gap: clamp(1.35rem, 3.2vw, 3.2rem) !important;
+  align-items: start !important;
+  width: 100% !important;
+}
+
+#o-projeto .about-copy-editorial {
+  grid-area: copy !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-self: stretch !important;
+}
+
+#o-projeto .about-copy-editorial > * {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#o-projeto .about-display-title {
+  max-width: 900px !important;
+  font-size: clamp(3.1rem, 6.2vw, 6.35rem) !important;
+  line-height: 0.89 !important;
+  letter-spacing: -0.082em !important;
+  text-wrap: balance;
+}
+
+#o-projeto .lead,
+#o-projeto .about-copy-columns,
+#o-projeto .about-pullquote {
+  width: 100% !important;
+  max-width: 900px !important;
+}
+
+#o-projeto .about-copy-columns {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(1rem, 2.2vw, 1.8rem) !important;
+}
+
+#o-projeto .about-visual-module {
+  grid-area: visual !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  gap: 1rem !important;
+  align-self: stretch !important;
+}
+
+#o-projeto .about-photo-expanded {
+  width: 100% !important;
+  min-height: clamp(560px, 52vw, 760px) !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: clamp(22px, 2vw, 32px) !important;
+  overflow: hidden !important;
+}
+
+#o-projeto .about-photo-expanded img {
+  width: 100% !important;
+  min-height: clamp(560px, 52vw, 760px) !important;
+  height: clamp(560px, 52vw, 760px) !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+#o-projeto .about-stat-overlay {
+  position: absolute !important;
+  top: clamp(0.7rem, 1.3vw, 1.1rem) !important;
+  left: clamp(0.7rem, 1.3vw, 1.1rem) !important;
+  right: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  width: min(310px, calc(100% - 1.4rem)) !important;
+  max-width: 310px !important;
+  gap: clamp(0.45rem, 0.9vw, 0.68rem) !important;
+  margin: 0 !important;
+}
+
+#o-projeto .about-stat-overlay .about-stat {
+  min-height: clamp(92px, 9vw, 112px) !important;
+  padding: clamp(0.55rem, 1vw, 0.75rem) !important;
+  border-radius: 17px !important;
+}
+
+#o-projeto .about-stat-overlay .about-stat strong {
+  font-size: clamp(1.9rem, 3.2vw, 2.85rem) !important;
+}
+
+#o-projeto .about-stat-overlay .about-stat span {
+  font-size: clamp(0.48rem, 0.62vw, 0.62rem) !important;
+  line-height: 1.22 !important;
+  overflow-wrap: anywhere !important;
+}
+
+#o-projeto .about-map-compact {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+#o-projeto .about-map-compact #project-sgc-map {
+  height: clamp(210px, 24vw, 285px) !important;
+  min-height: 210px !important;
+}
+
+@container projetoAbout (max-width: 1040px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "copy"
+      "visual" !important;
+  }
+
+  #o-projeto .about-copy-editorial,
+  #o-projeto .about-visual-module,
+  #o-projeto .lead,
+  #o-projeto .about-copy-columns,
+  #o-projeto .about-pullquote {
+    max-width: none !important;
+  }
+
+  #o-projeto .about-display-title {
+    max-width: 760px !important;
+    font-size: clamp(2.85rem, 9vw, 5.4rem) !important;
+  }
+
+  #o-projeto .about-visual-module {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.58fr) !important;
+    grid-template-rows: none !important;
+    align-items: stretch !important;
+  }
+
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(460px, 58vw, 620px) !important;
+    height: clamp(460px, 58vw, 620px) !important;
+  }
+
+  #o-projeto .about-map-compact {
+    height: 100% !important;
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    height: calc(100% - 112px) !important;
+    min-height: 300px !important;
+  }
+}
+
+@container projetoAbout (max-width: 760px) {
+  #o-projeto.content-card,
+  #o-projeto.about-section {
+    width: min(100%, calc(100vw - 1rem)) !important;
+    padding: 1.2rem 1rem 1.35rem !important;
+  }
+
+  #o-projeto .section-title {
+    grid-template-columns: 42px 1fr !important;
+    gap: 0.55rem !important;
+  }
+
+  #o-projeto .about-display-title {
+    font-size: clamp(2.55rem, 13vw, 4.2rem) !important;
+    line-height: 0.91 !important;
+  }
+
+  #o-projeto .about-copy-columns {
+    grid-template-columns: 1fr !important;
+  }
+
+  #o-projeto .about-visual-module {
+    grid-template-columns: 1fr !important;
+  }
+
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(430px, 88vw, 560px) !important;
+    height: clamp(430px, 88vw, 560px) !important;
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    height: 255px !important;
+    min-height: 255px !important;
+  }
+}
+
+@container projetoAbout (max-width: 520px) {
+  #o-projeto .about-pullquote {
+    font-size: clamp(1.08rem, 5.4vw, 1.35rem) !important;
+    line-height: 1.34 !important;
+  }
+
+  #o-projeto .about-photo-expanded {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+
+  #o-projeto .about-photo-expanded img {
+    min-height: 390px !important;
+    height: 390px !important;
+  }
+
+  #o-projeto .about-stat-overlay {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: -0.85rem 0.75rem 0.75rem !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #o-projeto .about-stat-overlay .about-stat {
+    min-height: 88px !important;
+  }
+
+  #o-projeto .about-photo-expanded figcaption {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    max-width: none !important;
+    margin: 0 0.75rem 0.75rem !important;
+  }
+}
+
+/* Fallback para navegadores sem container queries */
+@media (max-width: 1040px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "copy"
+      "visual" !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #o-projeto .about-visual-module,
+  #o-projeto .about-copy-columns {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Três eixos: melhora leitura em desktop, tablet e mobile */
+#frentes-integradas .feature-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.7rem !important;
+  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
+}
+
+#frentes-integradas .feature-title {
+  max-width: 100% !important;
+  white-space: normal !important;
+  font-size: clamp(1.65rem, 4.4vw, 3.15rem) !important;
+  line-height: 0.98 !important;
+}
+
+#frentes-integradas .feature-band {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+#frentes-integradas .feature-photo,
+#frentes-integradas .feature-panel {
+  min-height: clamp(390px, 36vw, 560px) !important;
+}
+
+#frentes-integradas .feature-panel p.axis-title {
+  font-size: clamp(1.1rem, 1.55vw, 1.55rem) !important;
+  line-height: 1.05 !important;
+  overflow-wrap: anywhere !important;
+}
+
+#frentes-integradas .feature-panel p.axis-detail {
+  font-size: clamp(0.76rem, 0.85vw, 0.92rem) !important;
+}
+
+@media (max-width: 1220px) {
+  #frentes-integradas .feature-band {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #frentes-integradas .feature-title-wrap {
+    display: grid !important;
+    gap: 0.65rem !important;
+  }
+
+  #frentes-integradas .feature-band {
+    grid-template-columns: 1fr !important;
+  }
+
+  #frentes-integradas .feature-photo,
+  #frentes-integradas .feature-panel {
+    min-height: 310px !important;
+  }
+
+  #frentes-integradas .feature-panel p.axis-title,
+  #frentes-integradas .feature-panel p.axis-detail {
+    max-width: 100% !important;
+  }
+}
+
+/* ===== Ajuste fino da abertura: evita que o título invada a foto ===== */
+#o-projeto .about-hero-grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(430px, 0.64fr) !important;
+  gap: clamp(2.1rem, 4.5vw, 4.2rem) !important;
+}
+
+#o-projeto .about-copy-editorial {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+#o-projeto .about-visual-module {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+#o-projeto .about-display-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: min(720px, 100%) !important;
+  font-size: clamp(3.15rem, 4.25vw, 4.85rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: -0.076em !important;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+#o-projeto .about-display-title span {
+  display: block;
+  max-width: 100%;
+}
+
+#o-projeto .about-display-title span:nth-child(2) {
+  margin-left: 0 !important;
+}
+
+#o-projeto .about-display-title span:nth-child(3) {
+  margin-left: 0 !important;
+}
+
+#o-projeto .about-photo-expanded {
+  min-height: clamp(600px, 54vw, 780px) !important;
+}
+
+#o-projeto .about-photo-expanded img {
+  min-height: clamp(600px, 54vw, 780px) !important;
+}
+
+@media (max-width: 1320px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: minmax(0, 1.02fr) minmax(410px, 0.62fr) !important;
+    gap: clamp(1.8rem, 3.6vw, 3.2rem) !important;
+  }
+
+  #o-projeto .about-display-title {
+    font-size: clamp(3rem, 4.05vw, 4.35rem) !important;
+    max-width: 660px !important;
+  }
+}
+
+@media (max-width: 1160px) {
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #o-projeto .about-display-title {
+    font-size: clamp(3rem, 7vw, 4.8rem) !important;
+    max-width: 760px !important;
+  }
+}
+
+@media (max-width: 860px) {
+  #o-projeto .about-display-title {
+    font-size: clamp(2.45rem, 10vw, 4.25rem) !important;
+    max-width: 100% !important;
+  }
+
+  #o-projeto .about-display-title span:nth-child(2),
+  #o-projeto .about-display-title span:nth-child(3) {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  #o-projeto .about-display-title {
+    font-size: clamp(2.2rem, 11vw, 3.35rem) !important;
+    line-height: 0.94 !important;
+    letter-spacing: -0.064em !important;
+  }
+}
+
+/* ===== Ajuste final: Divulgação ocupando a largura total da página ===== */
+#divulgacao.content-card {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  border-radius: 0 !important;
+  padding-left: max(1rem, calc((100vw - 1500px) / 2 + 2rem)) !important;
+  padding-right: max(1rem, calc((100vw - 1500px) / 2 + 2rem)) !important;
+}
+
+#divulgacao .section-title,
+#divulgacao .lead,
+#divulgacao .media-layout {
+  width: min(1500px, 100%) !important;
+  max-width: 1500px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (max-width: 760px) {
+  #divulgacao.content-card {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* ===== Correção responsiva para desktop estreito / meia tela ===== */
+@media (max-width: 1180px) {
+  #o-projeto.content-card,
+  #o-projeto.about-section {
+    width: min(100%, calc(100vw - 1rem)) !important;
+    max-width: calc(100vw - 1rem) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: clamp(1rem, 3vw, 1.8rem) !important;
+    padding-right: clamp(1rem, 3vw, 1.8rem) !important;
+    overflow: hidden !important;
+  }
+
+  #o-projeto .about-hero-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "copy" "visual" !important;
+    gap: clamp(1.35rem, 3.2vw, 2.2rem) !important;
+  }
+
+  #o-projeto .about-copy-editorial,
+  #o-projeto .about-visual-module,
+  #o-projeto .lead,
+  #o-projeto .about-copy-columns,
+  #o-projeto .about-pullquote {
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  #o-projeto .about-display-title {
+    max-width: 900px !important;
+    font-size: clamp(3rem, 8.6vw, 5.15rem) !important;
+    line-height: 0.9 !important;
+  }
+
+  #o-projeto .about-visual-module {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 1rem !important;
+    overflow: hidden !important;
+  }
+
+  #o-projeto .about-photo-expanded {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: clamp(470px, 62vw, 640px) !important;
+    height: auto !important;
+    border-radius: clamp(20px, 2.4vw, 28px) !important;
+  }
+
+  #o-projeto .about-photo-expanded img {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: clamp(470px, 62vw, 640px) !important;
+    height: clamp(470px, 62vw, 640px) !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  #o-projeto .about-map-compact {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+
+  #o-projeto .about-map-compact #project-sgc-map {
+    width: 100% !important;
+    height: clamp(260px, 42vw, 360px) !important;
+    min-height: 260px !important;
+  }
+
+  #o-projeto .about-stat-overlay {
+    width: min(330px, calc(100% - 1.4rem)) !important;
+    max-width: 330px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #o-projeto .about-copy-columns { grid-template-columns: 1fr !important; }
+  #o-projeto .about-display-title {
+    max-width: 100% !important;
+    font-size: clamp(2.5rem, 10.5vw, 4.45rem) !important;
+  }
+  #o-projeto .about-display-title span:nth-child(2),
+  #o-projeto .about-display-title span:nth-child(3) { margin-left: 0 !important; }
+  #o-projeto .about-photo-expanded,
+  #o-projeto .about-photo-expanded img {
+    min-height: clamp(420px, 82vw, 560px) !important;
+    height: clamp(420px, 82vw, 560px) !important;
+  }
+}
+
+@media (max-width: 620px) {
+  #o-projeto.content-card,
+  #o-projeto.about-section {
+    width: calc(100vw - 0.65rem) !important;
+    max-width: calc(100vw - 0.65rem) !important;
+    padding-left: 0.95rem !important;
+    padding-right: 0.95rem !important;
+  }
+  #o-projeto .about-display-title {
+    font-size: clamp(2.15rem, 11.6vw, 3.35rem) !important;
+    letter-spacing: -0.064em !important;
+  }
+  #o-projeto .about-stat-overlay {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: -0.85rem 0.75rem 0.75rem !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #o-projeto .about-photo-expanded {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  #o-projeto .about-photo-expanded img {
+    min-height: 390px !important;
+    height: 390px !important;
+  }
+  #o-projeto .about-photo-expanded figcaption {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 0.75rem 0.75rem !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .objectives-section {
+    width: min(100%, calc(100vw - 1rem)) !important;
+    max-width: calc(100vw - 1rem) !important;
+    overflow: hidden !important;
+  }
+  .objective-slide {
+    grid-template-columns: 1fr !important;
+    gap: 1.6rem !important;
+    min-height: auto !important;
+    padding: clamp(1.5rem, 4vw, 2.6rem) clamp(1rem, 3vw, 2rem) 4.5rem !important;
+  }
+  .objective-text { max-width: 100% !important; }
+  .objective-text h2 {
+    max-width: 920px !important;
+    font-size: clamp(1.9rem, 5.2vw, 3.05rem) !important;
+  }
+  .objective-text p { max-width: 820px !important; }
+  .objective-image { width: min(390px, 76vw) !important; }
+}
+
+@media (min-width: 761px) and (max-width: 1080px) {
+  #frentes-integradas .feature-band { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #frentes-integradas .feature-photo,
+  #frentes-integradas .feature-panel { min-height: 360px !important; }
+}
+
+/* ===== CORREÇÃO FINAL DE OVERFLOW HORIZONTAL — HOME / SOBRE =====
+   Mantém hero e faixa "Três eixos" em largura total, mas trava as demais
+   seções dentro da largura real da tela. */
+
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  position: relative;
+}
+
+#quarto-content,
+.page-columns,
+.page-layout-full,
+main,
+main.content,
+.content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow-x: visible !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img,
+video,
+iframe,
+svg,
+canvas {
+  max-width: 100% !important;
+}
+
+/* Full-bleed real: ocupa a largura inteira da janela, sem limitar ao corpo do Quarto. */
+.hero-strip,
+.full-bleed-feature,
+#frentes-integradas {
+  position: relative !important;
+  left: 50% !important;
+  right: auto !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(-50%) !important;
+  overflow: hidden !important;
+}
+
+.hero-video,
+.hero-overlay {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.hero-title-panel {
+  max-width: min(940px, calc(100vw - 4rem)) !important;
+}
+
+/* Preserva a animação da faixa full-bleed sem perder o translateX(-50%). */
+.full-bleed-feature.reveal-ready {
+  transform: translateX(-50%) translateY(44px) !important;
+}
+
+.full-bleed-feature.reveal-ready.is-visible {
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .full-bleed-feature.reveal-ready,
+  .full-bleed-feature.reveal-ready.is-visible {
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* Seções centrais: não usam 100vw direto; ficam contidas e centralizadas. */
+.content-card,
+.objectives-section,
+.about-section,
+.method-section,
+.researchers-section,
+#expedicoes-recentes,
+#o-projeto.content-card,
+#o-projeto.about-section {
+  width: min(1260px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow: hidden !important;
+}
+
+#o-projeto.content-card,
+#o-projeto.about-section {
+  width: min(1320px, calc(100vw - 1.5rem)) !important;
+  max-width: calc(100vw - 1.5rem) !important;
+}
+
+.objectives-section {
+  width: min(1280px, calc(100vw - 1rem)) !important;
+  max-width: calc(100vw - 1rem) !important;
+}
+
+/* Divulgação: larga, mas sem criar rolagem lateral. */
+#divulgacao.content-card {
+  width: min(1520px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border-radius: 0 !important;
+  padding-left: clamp(1rem, 3vw, 3rem) !important;
+  padding-right: clamp(1rem, 3vw, 3rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .section-title,
+#divulgacao .lead,
+#divulgacao .media-layout {
+  width: min(1500px, 100%) !important;
+  max-width: 1500px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Grids: remove mínimos rígidos que empurram a página para a direita. */
+.two-col,
+.about-intro-grid,
+#o-projeto .about-hero-grid,
+.researchers-layout,
+.method-intro-grid,
+.objective-slide,
+.media-layout,
+#divulgacao .media-layout,
+#divulgacao .media-panel,
+#divulgacao .media-grid,
+#divulgacao .media-item,
+.expedition-preview-grid,
+.info-grid,
+.info-grid-three,
+.contact-grid,
+.impact-grid,
+.method-river,
+.feature-band,
+#frentes-integradas .feature-band {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+#o-projeto .about-hero-grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.64fr) !important;
+}
+
+#o-projeto .about-copy-editorial,
+#o-projeto .about-visual-module,
+#o-projeto .about-photo-expanded,
+#o-projeto .about-map-compact,
+#o-projeto .lead,
+#o-projeto .about-copy-columns,
+#o-projeto .about-pullquote,
+.researchers-copy,
+.researchers-panel,
+.media-panel,
+.media-grid,
+.media-item,
+.media-body,
+.feature-photo,
+.feature-panel,
+.objective-text,
+.objective-image-wrap {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Três eixos: a faixa é full-bleed, e o conteúdo interno ocupa toda a largura dela. */
+#frentes-integradas .feature-title-wrap {
+  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
+  max-width: calc(100vw - 1rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#frentes-integradas .feature-band {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Divulgação: cards horizontais quando couber, empilhados antes de estourar. */
+#divulgacao .media-panel {
+  grid-template-columns: minmax(0, 0.23fr) minmax(0, 1fr) !important;
+}
+
+#divulgacao .media-item {
+  grid-template-columns: minmax(0, 42%) minmax(0, 1fr) !important;
+}
+
+/* Títulos longos não podem criar largura extra. */
+.section-title,
+.section-title h2,
+.about-display-title,
+.objective-text h2,
+.feature-title,
+.feature-panel p,
+.media-body h4,
+.media-body p,
+.researcher-card h4,
+.researcher-card p,
+.expedition-preview-card h3,
+.expedition-preview-card p {
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Navegação do carrossel não pode empurrar a página. */
+.objective-nav,
+.objective-dots {
+  max-width: calc(100% - 2rem) !important;
+}
+
+/* Notebooks e tablets: empilha blocos que antes tinham mínimos de 400–520px. */
+@media (max-width: 1180px) {
+  .content-card,
+  .about-section,
+  .method-section,
+  .researchers-section,
+  #expedicoes-recentes,
+  #o-projeto.content-card,
+  #o-projeto.about-section,
+  .objectives-section {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  #o-projeto .about-hero-grid,
+  .about-intro-grid,
+  .method-intro-grid,
+  .objective-slide,
+  .researchers-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: none !important;
+  }
+
+  #o-projeto .about-copy-editorial,
+  #o-projeto .about-visual-module {
+    grid-area: auto !important;
+  }
+
+  #divulgacao .media-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-panel-header {
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .expedition-preview-grid,
+  .info-grid,
+  .info-grid-three,
+  .contact-grid,
+  .impact-grid,
+  .method-river,
+  #divulgacao .media-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-item {
+    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .content-card,
+  .about-section,
+  .method-section,
+  .researchers-section,
+  #expedicoes-recentes,
+  #o-projeto.content-card,
+  #o-projeto.about-section,
+  .objectives-section {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+  }
+
+  .hero-strip,
+  .full-bleed-feature,
+  #frentes-integradas {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  #divulgacao.content-card {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+  }
+
+  #divulgacao .media-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-thumb {
+    height: 230px !important;
+    min-height: 230px !important;
+  }
+
+  .feature-band,
+  #frentes-integradas .feature-band {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-title-panel {
+    left: 1rem !important;
+    width: calc(100vw - 2rem) !important;
+  }
+
+  .section-title {
+    grid-template-columns: 42px 1fr !important;
+  }
+}
+
+/* ===== Correção definitiva de overflow horizontal — seção Divulgação =====
+   A seção deixa de usar 100vw/full-bleed e passa a respeitar o contêiner real
+   do Quarto. Isso evita o escape à direita em notebook, meia tela e telas com
+   barra de rolagem vertical. */
+#divulgacao.content-card {
+  width: min(1320px, 100%, calc(100vw - 1rem)) !important;
+  max-width: min(1320px, calc(100vw - 1rem)) !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
+  left: auto !important;
+  right: auto !important;
+  padding-left: clamp(0.95rem, 2.4vw, 2rem) !important;
+  padding-right: clamp(0.95rem, 2.4vw, 2rem) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+#divulgacao,
+#divulgacao * {
+  box-sizing: border-box !important;
+}
+
+#divulgacao .section-title,
+#divulgacao .lead,
+#divulgacao .media-layout,
+#divulgacao .media-panel,
+#divulgacao .media-grid,
+#divulgacao .media-item,
+#divulgacao .media-body,
+#divulgacao .media-thumb {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+#divulgacao .media-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: clamp(0.9rem, 1.8vw, 1.25rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-panel {
+  display: grid !important;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr) !important;
+  gap: clamp(0.85rem, 1.6vw, 1.25rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-panel-header {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(0.75rem, 1.4vw, 1rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-thumb,
+#divulgacao .media-thumb img {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+#divulgacao .media-body h4,
+#divulgacao .media-body p,
+#divulgacao .media-date,
+#divulgacao .media-link,
+#divulgacao .media-panel h3 {
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+@media (max-width: 1180px) {
+  #divulgacao.content-card {
+    width: min(100%, calc(100vw - 1rem)) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  #divulgacao .media-panel {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  #divulgacao .media-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #divulgacao .media-item {
+    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  #divulgacao.content-card {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+    padding-left: 0.9rem !important;
+    padding-right: 0.9rem !important;
+  }
+
+  #divulgacao .media-panel,
+  #divulgacao .media-item {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #divulgacao .media-thumb {
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+/* ===== BLOCO FINAL — Divulgação sem escape + Coordenação 3 x 3 ===== */
+
+/* Divulgação: largura contida e estável em notebook, meia tela, tablet e mobile. */
+#divulgacao.content-card {
+  width: min(1320px, calc(100vw - 1rem)) !important;
+  max-width: calc(100vw - 1rem) !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  padding-left: clamp(0.95rem, 2.4vw, 2rem) !important;
+  padding-right: clamp(0.95rem, 2.4vw, 2rem) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+#divulgacao,
+#divulgacao * {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+}
+
+#divulgacao .section-title,
+#divulgacao .lead,
+#divulgacao .media-layout,
+#divulgacao .media-panel,
+#divulgacao .media-grid,
+#divulgacao .media-item,
+#divulgacao .media-body,
+#divulgacao .media-thumb {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#divulgacao .media-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: clamp(0.9rem, 1.8vw, 1.25rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-panel {
+  display: grid !important;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr) !important;
+  gap: clamp(0.85rem, 1.6vw, 1.25rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(0.75rem, 1.4vw, 1rem) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
+  overflow: hidden !important;
+}
+
+#divulgacao .media-body h4,
+#divulgacao .media-body p,
+#divulgacao .media-date,
+#divulgacao .media-link,
+#divulgacao .media-panel h3 {
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+@media (max-width: 1180px) {
+  #divulgacao .media-panel {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  #divulgacao .media-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #divulgacao .media-item {
+    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  #divulgacao.content-card {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+    padding-left: 0.9rem !important;
+    padding-right: 0.9rem !important;
+  }
+
+  #divulgacao .media-panel,
+  #divulgacao .media-item {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #divulgacao .media-thumb {
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+/* Rede de coordenação científica: 9 responsáveis em 3 x 3 no desktop. */
+#pesquisadores-responsaveis.content-card.researchers-section,
+section#pesquisadores-responsaveis.researchers-section {
+  width: min(1460px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow: hidden !important;
+}
+
+#pesquisadores-responsaveis .researchers-layout {
+  display: grid !important;
+  grid-template-columns: minmax(300px, 0.66fr) minmax(0, 1.34fr) !important;
+  gap: clamp(1.35rem, 2.6vw, 2.6rem) !important;
+  align-items: start !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+#pesquisadores-responsaveis .researchers-copy,
+#pesquisadores-responsaveis .researchers-panel,
+#pesquisadores-responsaveis .researchers-list,
+#pesquisadores-responsaveis .researcher-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+#pesquisadores-responsaveis .researchers-copy p:not(.lead),
+#pesquisadores-responsaveis .researchers-summary {
+  max-width: 100% !important;
+}
+
+#pesquisadores-responsaveis .researchers-panel {
+  padding: clamp(1rem, 1.7vw, 1.35rem) !important;
+}
+
+#pesquisadores-responsaveis .researchers-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0.85rem !important;
+}
+
+#pesquisadores-responsaveis .researcher-card {
+  height: 100% !important;
+}
+
+@media (max-width: 1220px) {
+  #pesquisadores-responsaveis.content-card.researchers-section,
+  section#pesquisadores-responsaveis.researchers-section {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  #pesquisadores-responsaveis .researchers-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  #pesquisadores-responsaveis .researchers-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #pesquisadores-responsaveis .researchers-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 620px) {
+  #pesquisadores-responsaveis.content-card.researchers-section,
+  section#pesquisadores-responsaveis.researchers-section {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+  }
+
+  #pesquisadores-responsaveis .researchers-list,
+  #pesquisadores-responsaveis .researchers-summary {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ======================================================================
+   CORREÇÃO DEFINITIVA — NOTEBOOK LENOVO V14 / TELAS ESTREITAS
+   ----------------------------------------------------------------------
+   Objetivo: impedir qualquer vazamento horizontal nas seções centrais
+   sem mexer na lógica visual geral da home. Esta camada precisa ficar
+   no FINAL do arquivo para sobrescrever regras anteriores com 100vw.
+   ====================================================================== */
+
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+@supports (overflow-x: clip) {
+  html,
+  body {
+    overflow-x: clip !important;
+  }
+}
+
+body,
+#quarto-content,
+.page-layout-full,
+.page-columns,
+main,
+main.content,
+.content,
+.column-page,
+.column-screen,
+.quarto-container,
+#quarto-document-content {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box !important;
+}
+
+img,
+video,
+svg,
+canvas,
+iframe {
+  max-width: 100% !important;
+}
+
+/* Full-bleed sem criar rolagem horizontal por causa da barra de rolagem. */
+.hero-strip,
+.full-bleed-feature,
+#frentes-integradas {
+  width: 100% !important;
+  max-width: 100% !important;
+  left: auto !important;
+  right: auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: none !important;
+  overflow: hidden !important;
+}
+
+.full-bleed-feature.reveal-ready,
+.full-bleed-feature.reveal-ready.is-visible {
+  transform: none !important;
+}
+
+/* Seções centrais: usa 100%, não 100vw. 100vw é a origem mais comum do escape. */
+#metodo-integrado.content-card,
+#objetivos.objectives-section,
+#expedicoes-recentes.content-card,
+#divulgacao.content-card,
+#pesquisadores-responsaveis.content-card,
+#pesquisadores-responsaveis.researchers-section {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: min(1260px, calc(100% - 1.25rem)) !important;
+  max-width: calc(100% - 1.25rem) !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow: hidden !important;
+  padding-left: clamp(0.95rem, 2vw, 1.8rem) !important;
+  padding-right: clamp(0.95rem, 2vw, 1.8rem) !important;
+}
+
+#objetivos.objectives-section {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#divulgacao.content-card {
+  width: min(1320px, calc(100% - 1.25rem)) !important;
+  max-width: calc(100% - 1.25rem) !important;
+  border-radius: 0 !important;
+}
+
+/* A rede pode ser mais larga, mas ainda presa à largura real da tela. */
+#pesquisadores-responsaveis.content-card,
+#pesquisadores-responsaveis.researchers-section {
+  width: min(1460px, calc(100% - 1.25rem)) !important;
+  max-width: calc(100% - 1.25rem) !important;
+}
+
+/* Todos os filhos diretos e grids internos respeitam a caixa do pai. */
+#metodo-integrado *,
+#objetivos *,
+#expedicoes-recentes *,
+#divulgacao *,
+#pesquisadores-responsaveis * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.method-intro-grid,
+.method-river,
+.impact-grid,
+.objectives-carousel,
+.objective-slide,
+.objective-text,
+.objective-image-wrap,
+.expedition-preview-grid,
+#divulgacao .media-layout,
+#divulgacao .media-panel,
+#divulgacao .media-grid,
+#divulgacao .media-item,
+#divulgacao .media-body,
+#pesquisadores-responsaveis .researchers-layout,
+#pesquisadores-responsaveis .researchers-panel,
+#pesquisadores-responsaveis .researchers-list,
+#pesquisadores-responsaveis .researcher-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* COMO O PROJETO ATUA — evita 4 cards apertados no Lenovo V14. */
+#metodo-integrado .method-intro-grid {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
+  gap: clamp(1rem, 2vw, 1.8rem) !important;
+}
+
+#metodo-integrado .method-river,
+#metodo-integrado .impact-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 1368px) {
+  #metodo-integrado .method-river,
+  #metodo-integrado .impact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #metodo-integrado .method-step {
+    min-height: 210px !important;
+  }
+}
+
+/* OBJETIVOS — reduz o círculo e o espaçamento em notebook menor. */
+#objetivos .objectives-carousel {
+  overflow: hidden !important;
+}
+
+#objetivos .objective-slide.active {
+  display: grid !important;
+}
+
+#objetivos .objective-slide {
+  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.55fr) !important;
+  gap: clamp(1rem, 2.2vw, 2rem) !important;
+  padding: clamp(1.4rem, 3vw, 2.8rem) clamp(1rem, 2.5vw, 2.2rem) 4.4rem !important;
+}
+
+#objetivos .objective-image {
+  width: min(330px, 27vw) !important;
+  max-width: 100% !important;
+}
+
+#objetivos .objective-text h2 {
+  font-size: clamp(1.65rem, 3.5vw, 3rem) !important;
+  line-height: 1.08 !important;
+}
+
+#objetivos .objective-text p {
+  font-size: clamp(0.95rem, 1.35vw, 1.12rem) !important;
+  line-height: 1.55 !important;
+}
+
+#objetivos .objective-nav,
+#objetivos .objective-dots,
+#objetivos .objective-photo-dots {
+  max-width: calc(100% - 1rem) !important;
+}
+
+@media (max-width: 1180px) {
+  #objetivos .objective-slide {
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 0.42fr) !important;
+    gap: 1rem !important;
+    padding: 1.3rem 1rem 4.2rem !important;
+  }
+
+  #objetivos .objective-image {
+    width: min(250px, 28vw) !important;
+  }
+
+  #objetivos .objective-text h2 {
+    font-size: clamp(1.45rem, 3.8vw, 2.4rem) !important;
+  }
+
+  #objetivos .objective-text p {
+    font-size: 0.94rem !important;
+    line-height: 1.48 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #objetivos .objective-slide {
+    grid-template-columns: 1fr !important;
+  }
+
+  #objetivos .objective-image {
+    width: min(260px, 62vw) !important;
+  }
+}
+
+/* EXPEDIÇÕES RECENTES */
+#expedicoes-recentes .expedition-preview-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(0.8rem, 1.5vw, 1rem) !important;
+}
+
+#expedicoes-recentes .expedition-preview-card,
+#expedicoes-recentes .expedition-preview-card h3,
+#expedicoes-recentes .expedition-preview-card p {
+  overflow-wrap: anywhere !important;
+}
+
+@media (max-width: 1180px) {
+  #expedicoes-recentes .expedition-preview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* DIVULGAÇÃO — contida, sem 100vw e sem grid que empurre para fora. */
+#divulgacao .media-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: clamp(0.9rem, 1.7vw, 1.25rem) !important;
+}
+
+#divulgacao .media-panel {
+  display: grid !important;
+  grid-template-columns: minmax(0, 210px) minmax(0, 1fr) !important;
+  gap: clamp(0.85rem, 1.5vw, 1.2rem) !important;
+}
+
+#divulgacao .media-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(0.75rem, 1.2vw, 1rem) !important;
+}
+
+#divulgacao .media-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
+}
+
+#divulgacao .media-body h4,
+#divulgacao .media-body p,
+#divulgacao .media-panel h3,
+#divulgacao .media-date,
+#divulgacao .media-link {
+  overflow-wrap: anywhere !important;
+}
+
+@media (max-width: 1368px) {
+  #divulgacao .media-panel {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #divulgacao .media-panel-header {
+    min-height: auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 980px) {
+  #divulgacao .media-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* REDE DE COORDENAÇÃO — 3 x 3 no desktop, sem escape no V14. */
+#pesquisadores-responsaveis .researchers-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 0.68fr) minmax(0, 1.32fr) !important;
+  gap: clamp(1rem, 2vw, 2rem) !important;
+  align-items: start !important;
+}
+
+#pesquisadores-responsaveis .researchers-panel {
+  padding: clamp(0.9rem, 1.4vw, 1.2rem) !important;
+}
+
+#pesquisadores-responsaveis .researchers-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(0.65rem, 1vw, 0.85rem) !important;
+}
+
+#pesquisadores-responsaveis .researcher-card {
+  height: 100% !important;
+  padding: clamp(0.72rem, 1vw, 0.95rem) !important;
+}
+
+#pesquisadores-responsaveis .researcher-card h4,
+#pesquisadores-responsaveis .researcher-card p,
+#pesquisadores-responsaveis .researchers-label {
+  overflow-wrap: anywhere !important;
+}
+
+@media (max-width: 1280px) {
+  #pesquisadores-responsaveis .researchers-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  #pesquisadores-responsaveis .researchers-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #metodo-integrado.content-card,
+  #objetivos.objectives-section,
+  #expedicoes-recentes.content-card,
+  #divulgacao.content-card,
+  #pesquisadores-responsaveis.content-card,
+  #pesquisadores-responsaveis.researchers-section {
+    width: calc(100% - 0.75rem) !important;
+    max-width: calc(100% - 0.75rem) !important;
+    padding-left: 0.9rem !important;
+    padding-right: 0.9rem !important;
+  }
+
+  #objetivos.objectives-section {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #metodo-integrado .method-intro-grid,
+  #metodo-integrado .method-river,
+  #metodo-integrado .impact-grid,
+  #expedicoes-recentes .expedition-preview-grid,
+  #pesquisadores-responsaveis .researchers-list,
+  #pesquisadores-responsaveis .researchers-summary,
+  #divulgacao .media-panel,
+  #divulgacao .media-grid,
+  #divulgacao .media-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  #divulgacao .media-thumb {
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+/* ======================================================================
+   CORREÇÃO FINAL DA HERO — FULL WIDTH REAL
+   ----------------------------------------------------------------------
+   A camada anterior corrigiu o escape das seções internas, mas acabou
+   prendendo a faixa inicial ao contêiner central. Esta regra devolve
+   apenas a hero/faixa inicial ao modo full-bleed, ocupando toda a largura
+   da janela, sem alterar as seções centrais abaixo.
+   ====================================================================== */
+.hero-strip {
+  position: relative !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-height: 100vh !important;
+  left: 50% !important;
+  right: auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(-50%) !important;
+  overflow: hidden !important;
+}
+
+.hero-strip .hero-video,
+.hero-strip .hero-overlay {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 100% !important;
+}
+
+.hero-strip .hero-title-panel {
+  max-width: min(940px, calc(100vw - 4rem)) !important;
+}
+
+/* Mantém a faixa dos três eixos em largura total, mas sem mexer nos cards internos. */
+.full-bleed-feature,
+#frentes-integradas {
+  position: relative !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  left: 50% !important;
+  right: auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(-50%) !important;
+  overflow: hidden !important;
+}
+
+.full-bleed-feature.reveal-ready {
+  transform: translateX(-50%) translateY(44px) !important;
+}
+
+.full-bleed-feature.reveal-ready.is-visible {
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+@media (max-width: 820px) {
+  .hero-strip {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .hero-strip .hero-title-panel {
+    left: 1rem !important;
+    width: calc(100vw - 2rem) !important;
+    max-width: calc(100vw - 2rem) !important;
+  }
+}
+
+/* ======================================================================
+   CORREÇÃO FINAL — REDE DE COORDENAÇÃO CIENTÍFICA
+   ----------------------------------------------------------------------
+   Esta camada precisa ficar no final do arquivo. Ela corrige o escape à
+   direita da seção "Rede de coordenação científica" em notebooks pequenos.
+   ====================================================================== */
+
+/* Centraliza a seção pela janela real do navegador, não pelo container interno do Quarto. */
+#pesquisadores-responsaveis.content-card,
+#pesquisadores-responsaveis.researchers-section,
+section#pesquisadores-responsaveis {
+  position: relative !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+
+  width: min(1180px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  min-width: 0 !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 2.6rem !important;
+
+  padding-left: clamp(1rem, 2.4vw, 2rem) !important;
+  padding-right: clamp(1rem, 2.4vw, 2rem) !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Preserva a animação de entrada sem perder a centralização por translateX. */
+#pesquisadores-responsaveis.reveal-ready {
+  transform: translateX(-50%) translateY(44px) !important;
+}
+
+#pesquisadores-responsaveis.reveal-ready.is-visible {
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+/* Nada dentro da seção pode forçar largura extra. */
+#pesquisadores-responsaveis,
+#pesquisadores-responsaveis * {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* No notebook pequeno: texto em cima, painel dos pesquisadores embaixo. */
+#pesquisadores-responsaveis .researchers-layout {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1.35rem !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+#pesquisadores-responsaveis .researchers-copy,
+#pesquisadores-responsaveis .researchers-panel,
+#pesquisadores-responsaveis .researchers-list,
+#pesquisadores-responsaveis .researcher-card,
+#pesquisadores-responsaveis .researchers-summary,
+#pesquisadores-responsaveis .researchers-actions {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Os dois cards de números ficam sempre dentro da caixa. */
+#pesquisadores-responsaveis .researchers-summary {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.8rem !important;
+}
+
+/* Pesquisadores: 3 por linha quando couber. */
+#pesquisadores-responsaveis .researchers-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0.85rem !important;
+  overflow: hidden !important;
+}
+
+/* Cards seguros para telas estreitas. */
+#pesquisadores-responsaveis .researcher-card {
+  height: 100% !important;
+  padding: 0.85rem 0.9rem !important;
+  overflow: hidden !important;
+}
+
+/* Textos longos quebram linha em vez de empurrar o layout. */
+#pesquisadores-responsaveis .researchers-lead,
+#pesquisadores-responsaveis .researchers-copy p,
+#pesquisadores-responsaveis .researcher-card h4,
+#pesquisadores-responsaveis .researcher-card p,
+#pesquisadores-responsaveis .researchers-label,
+#pesquisadores-responsaveis .section-title h2 {
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  white-space: normal !important;
+}
+
+/* Notebook em meia tela / tablet. */
+@media (max-width: 1020px) {
+  #pesquisadores-responsaveis.content-card,
+  #pesquisadores-responsaveis.researchers-section,
+  section#pesquisadores-responsaveis {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  #pesquisadores-responsaveis .researchers-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Celular. */
+@media (max-width: 640px) {
+  #pesquisadores-responsaveis.content-card,
+  #pesquisadores-responsaveis.researchers-section,
+  section#pesquisadores-responsaveis {
+    width: calc(100vw - 0.75rem) !important;
+    max-width: calc(100vw - 0.75rem) !important;
+    padding-left: 0.95rem !important;
+    padding-right: 0.95rem !important;
+  }
+
+  #pesquisadores-responsaveis .researchers-list,
+  #pesquisadores-responsaveis .researchers-summary {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Remove as setas internas das fotos dos objetivos.
+   Mantém os pontinhos funcionando. */
+#objetivos .objective-photo-arrow,
+#objetivos .objective-photo-prev,
+#objetivos .objective-photo-next {
+  display: none !important;
+}
+
+/* Garante que os pontinhos internos da imagem continuem clicáveis */
+#objetivos .objective-photo-dots {
+  z-index: 20 !important;
+  pointer-events: auto !important;
+}
+
+</style>
+```
+
+```{=html}
 <section class="hero-strip" aria-label="Abertura do projeto Tsiino Hiiwiida">
   <video
     class="hero-video"
@@ -2941,8 +4881,7 @@ document.addEventListener("DOMContentLoaded", function () {
     muted
     loop
     playsinline
-    preload="metadata"
-
+    preload="auto"
     aria-hidden="true"
   >
     <source src="figures/video/tsiino_hero.mp4" type="video/mp4">
@@ -2959,13 +4898,16 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 
   <div class="hero-title-panel">
-    <div class="hero-kicker">Â· Chamada ExpediÃ§Ãµes Â· Iniciativa AmazÃ´nia+10 Â·</div>
+    <div class="hero-kicker">Chamada Expedições · Iniciativa Amazônia+10 · Brasil + Reino Unido</div>
     <h1>Tsiino Hiiwiida</h1>
-    <p class="hero-subtitle">DimensÃµes da biodiversidade de plantas e fungos no Alto Rio Negro</p>
+    <p class="hero-subtitle">Dimensões da biodiversidade de plantas e fungos no Alto Rio Negro</p>
     <p class="hero-description"></p>
   </div>
 
-  <button class="hero-video-toggle" type="button" aria-label="Pausar vÃ­deo">â…¡</button>
+  <button class="hero-video-toggle" type="button" aria-label="Pausar vídeo" aria-pressed="false">
+    <span class="icon-pause" aria-hidden="true"></span>
+    <span class="icon-play" aria-hidden="true"></span>
+  </button>
 </section>
 ```
 
@@ -2977,41 +4919,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
   <div class="about-intro-grid about-hero-grid">
     <div class="about-copy about-copy-editorial">
-      <div class="about-eyebrow">SÃ­ntese</div>
+      <div class="about-eyebrow">Síntese</div>
 
       <h3 class="about-display-title">
-        <span>Revelar mÃºltiplas dimensÃµes da</span>
+        <span>Revelar múltiplas dimensões da</span>
         <span>biodiversidade</span>
         <span>no Alto Rio Negro.</span>
       </h3>
 
       <p class="lead">
-        <strong>Tsiino Hiiwiida</strong>, nome Baniwa da regiÃ£o conhecida como CabeÃ§a do Cachorro, Ã© uma das Ãºltimas grandes fronteiras de conhecimento sobre a biodiversidade amazÃ´nica. O projeto foi aprovada na <strong>Chamada ExpediÃ§Ãµes da Iniciativa AmazÃ´nia+10</strong> e articula instituiÃ§Ãµes do Brasil e do Reino Unido para revelar mÃºltiplas dimensÃµes da flora e da funga no Alto Rio Negro.
+        <strong>Tsiino Hiiwiida</strong>, nome Baniwa da região conhecida como Cabeça do Cachorro, é uma das últimas grandes fronteiras de conhecimento sobre a biodiversidade amazônica. O projeto foi aprovada na <strong>Chamada Expedições da Iniciativa Amazônia+10</strong> e articula instituições do Brasil e do Reino Unido para revelar múltiplas dimensões da flora e da funga no Alto Rio Negro.
       </p>
 
       <div class="about-copy-columns">
         <p>
-          Campinaranas, florestas de terra-firme, igapÃ³s, serras e formaÃ§Ãµes aluviais na fronteira entre Brasil, ColÃ´mbia e Venezuela. A heterogeneidade ambiental e a longa histÃ³ria geolÃ³gica da Bacia AmazÃ´nica fazem da regiÃ£o um grande cenÃ¡rio para entender evoluÃ§Ã£o, distribuiÃ§Ã£o e endemismos.
+          Campinaranas, florestas de terra-firme, igapós, serras e formações aluviais na fronteira entre Brasil, Colômbia e Venezuela. A heterogeneidade ambiental e a longa história geológica da Bacia Amazônica fazem da região um grande cenário para entender evolução, distribuição e endemismos.
         </p>
 
         <p>
-          O objetivo Ã© acelerar a documentaÃ§Ã£o de plantas e fungos, preencher lacunas taxonÃ´micas, biogeogrÃ¡ficas e evolutivas, e formar novas redes de pesquisa com participaÃ§Ã£o local. A expediÃ§Ãµes de campo, identificaÃ§Ã£o taxonÃ´mica, coleÃ§Ãµes cientÃ­ficas, sistemÃ¡tica molecular, metagenÃ´mica, biomonitoramento e comunicaÃ§Ã£o pÃºblica.
+          O objetivo é acelerar a documentação de plantas e fungos, preencher lacunas taxonômicas, biogeográficas e evolutivas, e formar novas redes de pesquisa com participação local. A expedições de campo, identificação taxonômica, coleções científicas, sistemática molecular, metagenômica, biomonitoramento e comunicação pública.
         </p>
       </div>
 
       <div class="about-pullquote">
-        Da coleta em rios e serras ao catÃ¡logo pÃºblico: o projeto transforma registros de campo, coleÃ§Ãµes biolÃ³gicas em conhecimento acessÃ­vel sobre a flora e a funga da CabeÃ§a do Cachorro.
+        Da coleta em rios e serras ao catálogo público: o projeto transforma registros de campo, coleções biológicas em conhecimento acessível sobre a flora e a funga da Cabeça do Cachorro.
       </div>
     </div>
 
     <aside class="about-visual-module" aria-label="Resumo territorial e institucional">
       <figure class="about-photo-quote about-photo-expanded">
-        <img src="figures/projeto_rio_bela_adormecida.png" alt="Vista aÃ©rea do Alto Rio Negro com a formaÃ§Ã£o da Bela Adormecida ao fundo">
+        <img src="figures/projeto_rio_bela_adormecida.png" alt="Vista aérea do Alto Rio Negro com a formação da Bela Adormecida ao fundo">
 
-        <div class="about-stat-grid about-stat-overlay" aria-label="NÃºmeros-chave do projeto">
+        <div class="about-stat-grid about-stat-overlay" aria-label="Números-chave do projeto">
           <div class="about-stat">
             <strong>36</strong>
-            <span>meses de duraÃ§Ã£o</span>
+            <span>meses de duração</span>
           </div>
 
           <div class="about-stat">
@@ -3021,7 +4963,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           <div class="about-stat">
             <strong>30</strong>
-            <span>instituiÃ§Ãµes Brasil + Reino Unido</span>
+            <span>instituições Brasil + Reino Unido</span>
           </div>
 
           <div class="about-stat">
@@ -3030,16 +4972,16 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
         </div>
 
-        <figcaption>Alto Rio Negro Â· territÃ³rio, ciÃªncia e colaboraÃ§Ã£o</figcaption>
+        <figcaption>Alto Rio Negro · território, ciência e colaboração</figcaption>
       </figure>
 
       <div class="project-map-card about-map-compact">
         <div class="project-map-header">
-          <h3>SÃ£o Gabriel da Cachoeira</h3>
-          <p>MunicÃ­pio de atuaÃ§Ã£o do projeto na regiÃ£o da CabeÃ§a do Cachorro, Alto Rio Negro.</p>
+          <h3>São Gabriel da Cachoeira</h3>
+          <p>Município de atuação do projeto na região da Cabeça do Cachorro, Alto Rio Negro.</p>
         </div>
 
-        <div id="project-sgc-map" aria-label="Mapa do municÃ­pio de SÃ£o Gabriel da Cachoeira"></div>
+        <div id="project-sgc-map" aria-label="Mapa do município de São Gabriel da Cachoeira"></div>
       </div>
     </aside>
   </div>
@@ -3048,41 +4990,41 @@ document.addEventListener("DOMContentLoaded", function () {
 ```
 
 ```{=html}
-<section id="frentes-integradas" class="full-bleed-feature" aria-label="TrÃªs eixos do projeto de pesquisa">
+<section id="frentes-integradas" class="full-bleed-feature" aria-label="Três eixos do projeto de pesquisa">
   <div class="feature-title-wrap">
     <div class="feature-eyebrow"></div>
-    <div class="feature-title">TrÃªs eixos do Projeto</div>
+    <div class="feature-title">Três eixos do Projeto</div>
   </div>
 
   <div class="feature-band">
     <article class="feature-photo" data-label="Equipe em atividade de levantamento de flora e funga em campo">
-      <img src="figures/objetivos/rio.png" alt="Equipe em atividade de levantamento de flora e funga em campo" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+      <img src="figures/rio.png" alt="Equipe em atividade de levantamento de flora e funga em campo" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
     </article>
 
     <article class="feature-panel feature-panel-green">
       <h3>Eixo 1</h3>
-      <p class="axis-title">Habitats e espÃ©cies</p>
-      <p class="axis-detail">Compreender campinaranas, florestas de terra-firme, igapÃ³s, serras e formaÃ§Ãµes aluviais como mosaicos vivos da flora e da funga do Alto Rio Negro.</p>
+      <p class="axis-title">Habitats e espécies</p>
+      <p class="axis-detail">Compreender campinaranas, florestas de terra-firme, igapós, serras e formações aluviais como mosaicos vivos da flora e da funga do Alto Rio Negro.</p>
     </article>
 
-    <article class="feature-photo" data-label="Registro cientÃ­fico e taxonÃ´mico de plantas e fungos">
-      <img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Registro cientÃ­fico e taxonÃ´mico de plantas e fungos" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+    <article class="feature-photo" data-label="Registro científico e taxonômico de plantas e fungos">
+      <img src="figures/paisagem.jpg" alt="Registro científico e taxonômico de plantas e fungos" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
     </article>
 
     <article class="feature-panel feature-panel-deep">
       <h3>Eixo 2</h3>
       <p class="axis-title">Biodiversidade, sustento e bioeconomia</p>
-      <p class="axis-detail">Investigar PANC, seguranÃ§a alimentar, nutrientes, metais pesados e usos potenciais de espÃ©cies vegetais em diÃ¡logo com conhecimentos e demandas locais.</p>
+      <p class="axis-detail">Investigar PANC, segurança alimentar, nutrientes, metais pesados e usos potenciais de espécies vegetais em diálogo com conhecimentos e demandas locais.</p>
     </article>
 
-    <article class="feature-photo" data-label="Atividade de campo com colaboraÃ§Ã£o local">
-      <img src="figures/objetivos/campo.jpg" alt="Atividade de campo com colaboraÃ§Ã£o local" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+    <article class="feature-photo" data-label="Atividade de campo com colaboração local">
+      <img src="figures/campo.jpg" alt="Atividade de campo com colaboração local" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
     </article>
 
     <article class="feature-panel feature-panel-ochre">
       <h3>Eixo 3</h3>
       <p class="axis-title">Campo e tecnologias emergentes</p>
-      <p class="axis-detail">Integrar vouchers, coleÃ§Ãµes, DNA, metabarcoding, biomonitoramento, bancos de dados e comunicaÃ§Ã£o pÃºblica para transformar coletas em conhecimento acessÃ­vel.</p>
+      <p class="axis-detail">Integrar vouchers, coleções, DNA, metabarcoding, biomonitoramento, bancos de dados e comunicação pública para transformar coletas em conhecimento acessível.</p>
     </article>
   </div>
 </section>
@@ -3102,55 +5044,55 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
 
     <p>
-      Cada etapa conecta pesquisa de campo, coleÃ§Ãµes cientÃ­ficas, anÃ¡lises moleculares, formaÃ§Ã£o de pessoas e comunicaÃ§Ã£o. Assim, os dados coletados durante as expediÃ§Ãµes retornam como acervo, catÃ¡logo, material educativo, exposiÃ§Ã£o e memÃ³ria pÃºblica sobre o Alto Rio Negro.
+      Cada etapa conecta pesquisa de campo, coleções científicas, análises moleculares, formação de pessoas e comunicação. Assim, os dados coletados durante as expedições retornam como acervo, catálogo, material educativo, exposição e memória pública sobre o Alto Rio Negro.
     </p>
   </div>
 
   <div class="method-river" aria-label="Fluxo integrado de trabalho">
     <article class="method-step">
       <span class="method-number">01</span>
-      <h3>Campo e territÃ³rio</h3>
-      <p>ExpediÃ§Ãµes em diferentes habitats do Alto Rio Negro, articuladas com atores locais e comunidades indÃ­genas, para registrar plantas, fungos e contextos ecolÃ³gicos.</p>
+      <h3>Campo e território</h3>
+      <p>Expedições em diferentes habitats do Alto Rio Negro, articuladas com atores locais e comunidades indígenas, para registrar plantas, fungos e contextos ecológicos.</p>
     </article>
 
     <article class="method-step">
       <span class="method-number">02</span>
-      <h3>ColeÃ§Ãµes e amostras</h3>
-      <p>HerborizaÃ§Ã£o, vouchers, fotografias, tecidos em sÃ­lica-gel e incorporaÃ§Ã£o prioritÃ¡ria aos acervos amazÃ´nicos, fortalecendo INPA, MG e coleÃ§Ãµes parceiras.</p>
+      <h3>Coleções e amostras</h3>
+      <p>Herborização, vouchers, fotografias, tecidos em sílica-gel e incorporação prioritária aos acervos amazônicos, fortalecendo INPA, MG e coleções parceiras.</p>
     </article>
 
     <article class="method-step">
       <span class="method-number">03</span>
-      <h3>Dados e validaÃ§Ã£o</h3>
-      <p>RevisÃ£o taxonÃ´mica, mineraÃ§Ã£o de bases, HerbariumBlitz, sequenciamento, metabarcoding e anÃ¡lises para reduzir lacunas Linneanas, Wallaceanas e Darwinianas.</p>
+      <h3>Dados e validação</h3>
+      <p>Revisão taxonômica, mineração de bases, HerbariumBlitz, sequenciamento, metabarcoding e análises para reduzir lacunas Linneanas, Wallaceanas e Darwinianas.</p>
     </article>
 
     <article class="method-step">
       <span class="method-number">04</span>
-      <h3>Retorno e circulaÃ§Ã£o</h3>
-      <p>CatÃ¡logo verificado, oficinas botÃ¢nicas, materiais em mÃºltiplas lÃ­nguas, exposiÃ§Ãµes, fotografia, ilustraÃ§Ã£o cientÃ­fica, redes sociais e curta documental.</p>
+      <h3>Retorno e circulação</h3>
+      <p>Catálogo verificado, oficinas botânicas, materiais em múltiplas línguas, exposições, fotografia, ilustração científica, redes sociais e curta documental.</p>
     </article>
   </div>
 
   <div class="impact-grid" aria-label="Produtos e impactos previstos">
     <article class="impact-card">
-      <h3>CatÃ¡logo</h3>
-      <p>Primeira sÃ­ntese taxonomicamente verificada da flora e funga da CabeÃ§a do Cachorro.</p>
+      <h3>Catálogo</h3>
+      <p>Primeira síntese taxonomicamente verificada da flora e funga da Cabeça do Cachorro.</p>
     </article>
 
     <article class="impact-card">
       <h3>AmaTreeDNA</h3>
-      <p>Banco de tecidos e DNA associado a vouchers de herbÃ¡rio para pesquisas futuras.</p>
+      <p>Banco de tecidos e DNA associado a vouchers de herbário para pesquisas futuras.</p>
     </article>
 
     <article class="impact-card">
       <h3>Bioeconomia</h3>
-      <p>PANC, seguranÃ§a alimentar, nutrientes e metais analisados com foco em espÃ©cies locais.</p>
+      <p>PANC, segurança alimentar, nutrientes e metais analisados com foco em espécies locais.</p>
     </article>
 
     <article class="impact-card">
-      <h3>MemÃ³ria pÃºblica</h3>
-      <p>ExposiÃ§Ãµes, audiovisual e comunicaÃ§Ã£o em portuguÃªs, inglÃªs, Baniwa, Tukano e Nheengatu.</p>
+      <h3>Memória pública</h3>
+      <p>Exposições, audiovisual e comunicação em português, inglês, Baniwa, Tukano e Nheengatu.</p>
     </article>
   </div>
 </section>
@@ -3162,10 +5104,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide active">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 01 Â· Campo</div>
-        <h2>ExpediÃ§Ãµes nos rios Negro, Curicuriari, IÃ§ana e VaupÃ©s</h2>
+        <div class="objective-kicker">Objetivo 01 · Campo</div>
+        <h2>Expedições nos rios Negro, Curicuriari, Içana e Vaupés</h2>
         <p>
-          As campanhas de campo irÃ£o amostrar diferentes habitats da CabeÃ§a do Cachorro, incluindo campinaranas, florestas de terra-firme, igapÃ³s, serras e afloramentos rochosos, com foco em plantas vasculares, criptÃ³gamas e fungos.
+          As campanhas de campo irão amostrar diferentes habitats da Cabeça do Cachorro, incluindo campinaranas, florestas de terra-firme, igapós, serras e afloramentos rochosos, com foco em plantas vasculares, criptógamas e fungos.
         </p>
       </div>
 
@@ -3174,8 +5116,8 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="objective-photo-slide active"><img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Levantamento de flora e funga em campo"></div>
           <div class="objective-photo-slide"><img src="figures/objetivos/levantamento_flora_funga_02.png" alt="Registro de campo de flora e funga"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3187,20 +5129,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 02 Â· Diversidade crÃ­ptica</div>
-        <h2>Metabarcoding para detectar biodiversidade invisÃ­vel aos inventÃ¡rios tradicionais</h2>
+        <div class="objective-kicker">Objetivo 02 · Diversidade críptica</div>
+        <h2>Metabarcoding para detectar biodiversidade invisível aos inventários tradicionais</h2>
         <p>
-          Amostras ambientais de solo, Ã¡gua, sedimentos e tapetes de musgos serÃ£o analisadas para revelar linhagens crÃ­pticas, organismos raros e componentes pouco detectados por identificaÃ§Ã£o morfolÃ³gica convencional.
+          Amostras ambientais de solo, água, sedimentos e tapetes de musgos serão analisadas para revelar linhagens crípticas, organismos raros e componentes pouco detectados por identificação morfológica convencional.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenÃ´micas de ponta"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenômicas de ponta"></div>
           <div class="objective-photo-slide"><img src="figures/objetivos/metagenomica_02.jpg" alt="Leitura molecular da biodiversidade"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3212,20 +5154,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 03 Â· Taxonomia integrativa</div>
-        <h2>Linhagens raras, negligenciadas e filogeneticamente enigmÃ¡ticas</h2>
+        <div class="objective-kicker">Objetivo 03 · Taxonomia integrativa</div>
+        <h2>Linhagens raras, negligenciadas e filogeneticamente enigmáticas</h2>
         <p>
-          O projeto combina morfologia, molÃ©culas, coleÃ§Ãµes histÃ³ricas e novas coletas para revisar grupos pouco estudados, posicionar espÃ©cies na Ã¡rvore da vida e apoiar descriÃ§Ãµes taxonÃ´micas robustas.
+          O projeto combina morfologia, moléculas, coleções históricas e novas coletas para revisar grupos pouco estudados, posicionar espécies na árvore da vida e apoiar descrições taxonômicas robustas.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
           <div class="objective-photo-slide active"><img src="figures/objetivos/linhagens_raras_01.png" alt="Linhagens raras ou pouco conhecidas"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/linhagens_raras_02.jpg" alt="IdentificaÃ§Ã£o taxonÃ´mica em campo"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/linhagens_raras_02.jpg" alt="Identificação taxonômica em campo"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3237,20 +5179,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 04 Â· InteraÃ§Ãµes ecolÃ³gicas</div>
-        <h2>Fungos, hospedeiros e relaÃ§Ãµes ecolÃ³gicas complexas</h2>
+        <div class="objective-kicker">Objetivo 04 · Interações ecológicas</div>
+        <h2>Fungos, hospedeiros e relações ecológicas complexas</h2>
         <p>
-          Uma das frentes investiga a diversidade e a evoluÃ§Ã£o de fungos associados a insetos, ampliando o conhecimento sobre interaÃ§Ãµes biolÃ³gicas amazÃ´nicas ainda pouco documentadas.
+          Uma das frentes investiga a diversidade e a evolução de fungos associados a insetos, ampliando o conhecimento sobre interações biológicas amazônicas ainda pouco documentadas.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/fungo.jpg" alt="Material taxonÃ´mico para coleÃ§Ãµes cientÃ­ficas"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/fungo_2.jpg" alt="PreparaÃ§Ã£o de material biolÃ³gico"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/fungo.jpg" alt="Material taxonômico para coleções científicas"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/fungo_2.jpg" alt="Preparação de material biológico"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3262,20 +5204,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 05 Â· Bioeconomia e seguranÃ§a alimentar</div>
-        <h2>PANC, nutrientes e metais em espÃ©cies de interesse local</h2>
+        <div class="objective-kicker">Objetivo 05 · Bioeconomia e segurança alimentar</div>
+        <h2>PANC, nutrientes e metais em espécies de interesse local</h2>
         <p>
-          Plantas alimentÃ­cias nÃ£o convencionais, anÃ¡lise de macro e micronutrientes e avaliaÃ§Ã£o de metais, conectando biodiversidade, alimentaÃ§Ã£o, saÃºde ambiental e possÃ­veis caminhos de bioeconomia.
+          Plantas alimentícias não convencionais, análise de macro e micronutrientes e avaliação de metais, conectando biodiversidade, alimentação, saúde ambiental e possíveis caminhos de bioeconomia.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Taxonomia, sistemÃ¡tica molecular e biomonitoramento"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_02.jpg" alt="AnÃ¡lises taxonÃ´micas e moleculares"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Taxonomia, sistemática molecular e biomonitoramento"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_02.jpg" alt="Análises taxonômicas e moleculares"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3287,45 +5229,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 06 Â· Biomonitoramento</div>
+        <div class="objective-kicker">Objetivo 06 · Biomonitoramento</div>
         <h2>Bioindicadores para acompanhar qualidade ambiental</h2>
         <p>
-          Musgos e outros grupos sensÃ­veis serÃ£o utilizados para investigar padrÃµes de acumulaÃ§Ã£o de contaminantes e estabelecer uma base de referÃªncia para o monitoramento ambiental em Ã¡reas indÃ­genas.
+          Musgos e outros grupos sensíveis serão utilizados para investigar padrões de acumulação de contaminantes e estabelecer uma base de referência para o monitoramento ambiental em áreas indígenas.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
           <div class="objective-photo-slide active"><img src="figures/objetivos/briofita.jpeg" alt="Amostragem de organismos em campo"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/briofita_2.jpeg" alt="Biomonitoramento e anÃ¡lises cientÃ­ficas"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/briofita_2.jpeg" alt="Biomonitoramento e análises científicas"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 07 Â· Acervos e dados pÃºblicos</div>
-        <h2>CatÃ¡logo verificado, herbÃ¡rios e banco AmaTreeDNA</h2>
-        <p>
-          As coletas irÃ£o fortalecer herbÃ¡rios amazÃ´nicos, apoiar a digitalizaÃ§Ã£o de espÃ©cimes, criar um banco de tecidos e DNA associado a vouchers e consolidar o primeiro catÃ¡logo da flora e funga da regiÃ£o.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_01.jpg" alt="CatÃ¡logo da flora e funga da CabeÃ§a do Cachorro"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Dados taxonÃ´micos verificados"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3337,20 +5254,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <article class="objective-slide">
       <div class="objective-text">
-        <div class="objective-kicker">Objetivo 08 Â· FormaÃ§Ã£o e comunicaÃ§Ã£o</div>
-        <h2>Oficinas, estudantes, parataxonomistas e comunicaÃ§Ã£o multilÃ­ngue</h2>
+        <div class="objective-kicker">Objetivo 07 · Acervos e dados públicos</div>
+        <h2>Catálogo verificado, herbários e banco AmaTreeDNA</h2>
         <p>
-          A formaÃ§Ã£o de recursos humanos, as Oficinas BotÃ¢nicas, a participaÃ§Ã£o de parataxonomistas e a traduÃ§Ã£o de resultados para Baniwa, Tukano e Nheengatu fazem parte da estratÃ©gia de retorno social do projeto.
+          As coletas irão fortalecer herbários amazônicos, apoiar a digitalização de espécimes, criar um banco de tecidos e DNA associado a vouchers e consolidar o primeiro catálogo da flora e funga da região.
         </p>
       </div>
 
       <div class="objective-image-wrap">
         <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Trabalho de campo com comunidades indÃ­genas locais"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/comunidades_indigenas_02.jpg" alt="ColaboraÃ§Ã£o territorial e conhecimento local"></div>
+          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_01.jpg" alt="Catálogo da flora e funga da Cabeça do Cachorro"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Dados taxonômicos verificados"></div>
 
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">â€¹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="PrÃ³xima foto">â€º</button>
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
+
+          <div class="objective-photo-dots">
+            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
+            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="objective-slide">
+      <div class="objective-text">
+        <div class="objective-kicker">Objetivo 08 · Formação e comunicação</div>
+        <h2>Oficinas, estudantes, parataxonomistas e comunicação multilíngue</h2>
+        <p>
+          A formação de recursos humanos, as Oficinas Botânicas, a participação de parataxonomistas e a tradução de resultados para Baniwa, Tukano e Nheengatu fazem parte da estratégia de retorno social do projeto.
+        </p>
+      </div>
+
+      <div class="objective-image-wrap">
+        <div class="objective-image">
+          <div class="objective-photo-slide active"><img src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Trabalho de campo com comunidades indígenas locais"></div>
+          <div class="objective-photo-slide"><img src="figures/objetivos/comunidades_indigenas_02.jpg" alt="Colaboração territorial e conhecimento local"></div>
+
+          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
 
           <div class="objective-photo-dots">
             <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
@@ -3361,11 +5303,11 @@ document.addEventListener("DOMContentLoaded", function () {
     </article>
 
     <div class="objective-nav" aria-hidden="false">
-      <button class="objective-arrow objective-prev" type="button" aria-label="Objetivo anterior">â€¹</button>
-      <button class="objective-arrow objective-next" type="button" aria-label="PrÃ³ximo objetivo">â€º</button>
+      <button class="objective-arrow objective-prev" type="button" aria-label="Objetivo anterior">‹</button>
+      <button class="objective-arrow objective-next" type="button" aria-label="Próximo objetivo">›</button>
     </div>
 
-    <div class="objective-dots" aria-label="NavegaÃ§Ã£o dos objetivos">
+    <div class="objective-dots" aria-label="Navegação dos objetivos">
       <button class="objective-dot active" type="button" aria-label="Objetivo 1"></button>
       <button class="objective-dot" type="button" aria-label="Objetivo 2"></button>
       <button class="objective-dot" type="button" aria-label="Objetivo 3"></button>
@@ -3384,11 +5326,11 @@ document.addEventListener("DOMContentLoaded", function () {
 ```{=html}
 <section id="expedicoes-recentes" class="content-card">
   <div class="section-title">
-    <h2>ExpediÃ§Ãµes recentes</h2>
+    <h2>Expedições recentes</h2>
   </div>
 
   <p class="lead">
-    As expediÃ§Ãµes sÃ£o a unidade viva do Tsiino Hiiwiida: cada campanha articula logÃ­stica, comunidades, pontos de coleta, registros fotogrÃ¡ficos, vouchers, amostras de DNA e observaÃ§Ãµes ecolÃ³gicas.
+    As expedições são a unidade viva do Tsiino Hiiwiida: cada campanha articula logística, comunidades, pontos de coleta, registros fotográficos, vouchers, amostras de DNA e observações ecológicas.
   </p>
 ```
 
@@ -3398,10 +5340,10 @@ library(htmltools)
 expedicoes_home <- read_optional_csv(file.path("_input_data", "expedicoes_tsiino.csv"))
 
 if (nrow(expedicoes_home) > 0) {
-  expedicoes_home$expedicao <- col_or(expedicoes_home, c("expedicao", "expediÃ§Ã£o", "nome", "name"), "ExpediÃ§Ã£o")
+  expedicoes_home$expedicao <- col_or(expedicoes_home, c("expedicao", "expedição", "nome", "name"), "Expedição")
   expedicoes_home$localidade <- col_or(expedicoes_home, c("localidade", "local", "ponto", "site"), "")
-  expedicoes_home$data <- col_or(expedicoes_home, c("data", "date", "periodo", "perÃ­odo"), "")
-  expedicoes_home$resumo <- col_or(expedicoes_home, c("resumo", "descricao", "descriÃ§Ã£o", "observacoes", "observaÃ§Ãµes"), "")
+  expedicoes_home$data <- col_or(expedicoes_home, c("data", "date", "periodo", "período"), "")
+  expedicoes_home$resumo <- col_or(expedicoes_home, c("resumo", "descricao", "descrição", "observacoes", "observações"), "")
 
   expedicoes_home <- utils::tail(expedicoes_home, 3)
 
@@ -3420,19 +5362,19 @@ if (nrow(expedicoes_home) > 0) {
     tags$div(
       class = "hero-actions",
       style = "margin-top: 1rem;",
-      tags$a(class = "btn-main", href = "expedicoes.html", "Mapa e fotos das expediÃ§Ãµes")
+      tags$a(class = "btn-main", href = "expedicoes.html", "Mapa e fotos das expedições")
     )
   )
 } else {
   tagList(
     tags$div(
       class = "empty-media",
-      "Nenhuma expediÃ§Ã£o foi encontrada em _input_data/expedicoes_tsiino.csv. Quando o arquivo existir, as expediÃ§Ãµes recentes aparecerÃ£o automaticamente aqui."
+      "Nenhuma expedição foi encontrada em _input_data/expedicoes_tsiino.csv. Quando o arquivo existir, as expedições recentes aparecerão automaticamente aqui."
     ),
     tags$div(
       class = "hero-actions",
       style = "margin-top: 1rem;",
-      tags$a(class = "btn-main", href = "expedicoes.html", "Abrir pÃ¡gina de expediÃ§Ãµes")
+      tags$a(class = "btn-main", href = "expedicoes.html", "Abrir página de expedições")
     )
   )
 }
@@ -3442,7 +5384,7 @@ if (nrow(expedicoes_home) > 0) {
 </section>
 
 <style>
-/* ===== DivulgaÃ§Ã£o: layout fixo, proporcional e sem cards cortados ===== */
+/* ===== Divulgação: layout fixo, proporcional e sem cards cortados ===== */
 
 #divulgacao {
   scroll-margin-top: 90px;
@@ -3617,7 +5559,7 @@ if (nrow(expedicoes_home) > 0) {
 ```{=html}
 
 <style>
-/* Refinamento final das seÃ§Ãµes dinÃ¢micas: menos aparÃªncia de aviso e mais unidade editorial */
+/* Refinamento final das seções dinâmicas: menos aparência de aviso e mais unidade editorial */
 #expedicoes-recentes .lead,
 #divulgacao .lead {
   max-width: 66rem;
@@ -3659,7 +5601,7 @@ if (nrow(expedicoes_home) > 0) {
 }
 
 
-/* ===== Ajuste final: trÃªs eixos da proposta, sem barrinhas decorativas, e foto lateral maior ===== */
+/* ===== Ajuste final: três eixos da proposta, sem barrinhas decorativas, e foto lateral maior ===== */
 .feature-title::before {
   display: none !important;
   content: none !important;
@@ -3937,7 +5879,7 @@ if (nrow(expedicoes_home) > 0) {
   line-height: 1.38 !important;
 }
 
-/* MantÃ©m os trÃªs eixos na paleta da identidade, sem a barrinha decorativa anterior. */
+/* Mantém os três eixos na paleta da identidade, sem a barrinha decorativa anterior. */
 .feature-title::before,
 .feature-panel h3::before {
   display: none !important;
@@ -4096,7 +6038,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <style>
-/* ===== DivulgaÃ§Ã£o full-width com prÃ©vias horizontais ===== */
+/* ===== Divulgação full-width com prévias horizontais ===== */
 #divulgacao.content-card {
   width: min(1520px, calc(100vw - clamp(1rem, 3.8vw, 4rem))) !important;
   max-width: none !important;
@@ -4150,7 +6092,7 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
 #divulgacao .media-panel-header::after {
-  content: "prÃ©via atualizada";
+  content: "prévia atualizada";
   color: rgba(255,253,247,0.62);
   font-family: 'Space Mono', monospace;
   font-size: 0.62rem;
@@ -4352,11 +6294,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <section id="divulgacao" class="content-card">
   <div class="section-title">
-    <h2>DivulgaÃ§Ã£o</h2>
+    <h2>Divulgação</h2>
   </div>
 
   <p class="lead">
-    Acompanhe a circulaÃ§Ã£o pÃºblica do projeto Tsiino Hiiwiida.
+    Acompanhe a circulação pública do projeto Tsiino Hiiwiida.
   </p>
 ```
 
@@ -4453,7 +6395,7 @@ make_media_items <- function(data, kind = c("instagram", "reportagem")) {
     return(
       tags$div(
         class = "empty-media",
-        paste0("Nenhum item encontrado em ", arquivo, ". Ao adicionar linhas nesse CSV e renderizar o site novamente, os cards aparecerÃ£o automaticamente aqui.")
+        paste0("Nenhum item encontrado em ", arquivo, ". Ao adicionar linhas nesse CSV e renderizar o site novamente, os cards aparecerão automaticamente aqui.")
       )
     )
   }
@@ -4463,17 +6405,17 @@ make_media_items <- function(data, kind = c("instagram", "reportagem")) {
 }
 data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
 
-  titulo <- col_or(data, c("titulo", "tÃ­tulo", "title", "post"), "Sem tÃ­tulo")
+  titulo <- col_or(data, c("titulo", "título", "title", "post"), "Sem título")
   url <- col_or(data, c("url", "link", "href"), "#")
   data_item <- col_or(data, c("data", "date", "ano"), "")
   imagem <- col_or(data, c("imagem", "image", "thumb", "thumbnail", "capa"), "")
-  descricao <- col_or(data, c("descricao", "descriÃ§Ã£o", "resumo", "caption", "texto"), "")
-  veiculo <- col_or(data, c("veiculo", "veÃ­culo", "fonte", "source"), "")
+  descricao <- col_or(data, c("descricao", "descrição", "resumo", "caption", "texto"), "")
+  veiculo <- col_or(data, c("veiculo", "veículo", "fonte", "source"), "")
 
   for (i in seq_len(nrow(data))) {
   preview <- fetch_link_preview(url[i])
 
-  if (!nz(titulo[i]) || titulo[i] == "Sem tÃ­tulo") {
+  if (!nz(titulo[i]) || titulo[i] == "Sem título") {
     titulo[i] <- preview$titulo
   }
 
@@ -4500,7 +6442,7 @@ data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
       } else if (nz(veiculo[i])) {
         veiculo[i]
       } else {
-        "MatÃ©ria"
+        "Matéria"
       }
 
       tags$article(
@@ -4508,7 +6450,7 @@ data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
         thumb,
         tags$div(
           class = "media-body",
-          tags$div(class = "media-date", paste(label, ifelse(nz(data_item[i]), paste("Â·", data_item[i]), ""))),
+          tags$div(class = "media-date", paste(label, ifelse(nz(data_item[i]), paste("·", data_item[i]), ""))),
           tags$h4(titulo[i]),
           if (nz(descricao[i])) tags$p(descricao[i]),
           tags$a(
@@ -4516,7 +6458,7 @@ data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
             href = url[i],
             target = "_blank",
             rel = "noopener",
-            ifelse(kind == "instagram", "Ver no Instagram â†’", "Ler reportagem â†’")
+            ifelse(kind == "instagram", "Ver no Instagram →", "Ler reportagem →")
           )
         )
       )
@@ -4540,7 +6482,7 @@ tagList(
       class = "media-panel",
       tags$div(
         class = "media-panel-header",
-        tags$h3("Reportagens e notÃ­cias"),
+        tags$h3("Reportagens e notícias"),
         tags$span(class = "media-panel-label", "Imprensa")
       ),
       make_media_items(news, "reportagem")
@@ -4556,30 +6498,30 @@ tagList(
 ```{=html}
 <section id="pesquisadores-responsaveis" class="content-card researchers-section">
   <div class="section-title">
-    <h2>Rede de coordenaÃ§Ã£o cientÃ­fica</h2>
+    <h2>Rede de coordenação científica</h2>
   </div>
 
   <div class="researchers-layout">
     <div class="researchers-copy">
-      <div class="researchers-kicker">Rede de coordenaÃ§Ã£o cientÃ­fica</div>
+      <div class="researchers-kicker">Rede de coordenação científica</div>
 
       <p class="lead researchers-lead">
-        O projeto Ã© coordenado por uma rede multidisciplinar vinculada a instituiÃ§Ãµes amazÃ´nicas, centros de pesquisa de outros estados brasileiros e parceiros do Reino Unido.
+        O projeto é coordenado por uma rede multidisciplinar vinculada a instituições amazônicas, centros de pesquisa de outros estados brasileiros e parceiros do Reino Unido.
       </p>
 
       <p>
-        A rede combina taxonomia, sistemÃ¡tica, bioinformÃ¡tica, micologia, briologia, florÃ­stica, quÃ­mica de solos, comunicaÃ§Ã£o cientÃ­fica, audiovisual e colaboraÃ§Ã£o com parataxonomistas e representantes indÃ­genas.
+        A rede combina taxonomia, sistemática, bioinformática, micologia, briologia, florística, química de solos, comunicação científica, audiovisual e colaboração com parataxonomistas e representantes indígenas.
       </p>
 
       <div class="researchers-summary">
         <div>
           <span class="researchers-number">30</span>
-          <span class="researchers-label">instituiÃ§Ãµes articuladas</span>
+          <span class="researchers-label">instituições articuladas</span>
         </div>
 
         <div>
           <span class="researchers-number">66</span>
-          <span class="researchers-label">pesquisadores, estudantes e equipe tÃ©cnica</span>
+          <span class="researchers-label">pesquisadores, estudantes e equipe técnica</span>
         </div>
       </div>
 
@@ -4597,13 +6539,13 @@ tagList(
         <article class="researcher-card">
           <span class="agency-pill">FAPEAM</span>
           <h4>Charles Eugene Zartman</h4>
-          <p>Instituto Nacional de Pesquisas da AmazÃ´nia â€” INPA</p>
+          <p>Instituto Nacional de Pesquisas da Amazônia — INPA</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPERJ</span>
           <h4>Domingos Benicio Oliveira Silva Cardoso</h4>
-          <p>Jardim BotÃ¢nico do Rio de Janeiro â€” JBRJ</p>
+          <p>Jardim Botânico do Rio de Janeiro — JBRJ</p>
         </article>
 
         <article class="researcher-card">
@@ -4615,37 +6557,37 @@ tagList(
         <article class="researcher-card">
           <span class="agency-pill">FAPESPA</span>
           <h4>Anna Luiza Ilkiu-Borges</h4>
-          <p>Museu Paraense EmÃ­lio Goeldi â€” MPEG</p>
+          <p>Museu Paraense Emílio Goeldi — MPEG</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FACEPE</span>
-          <h4>Clistenes Williams AraÃºjo do Nascimento</h4>
-          <p>Universidade Federal Rural de Pernambuco â€” UFRPE</p>
+          <h4>Clistenes Williams Araújo do Nascimento</h4>
+          <p>Universidade Federal Rural de Pernambuco — UFRPE</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPEMA</span>
           <h4>Dirce Komura</h4>
-          <p>Instituto Federal do MaranhÃ£o â€” IFMA</p>
+          <p>Instituto Federal do Maranhão — IFMA</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPESP</span>
           <h4>Denilson Fernandes Peralta</h4>
-          <p>Instituto de Pesquisas Ambientais â€” IPA</p>
+          <p>Instituto de Pesquisas Ambientais — IPA</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPESQ</span>
           <h4>Felipe Wartchow</h4>
-          <p>Universidade Federal da ParaÃ­ba â€” UFPB</p>
+          <p>Universidade Federal da Paraíba — UFPB</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPDF</span>
           <h4>Micheline Carvalho-Silva</h4>
-          <p>Universidade de BrasÃ­lia â€” UnB</p>
+          <p>Universidade de Brasília — UnB</p>
         </article>
       </div>
     </div>
@@ -4655,1114 +6597,24 @@ tagList(
 
 ```{=html}
 <style>
-/* ===== Ajuste responsivo final â€” abertura O projeto e eixos ===== */
-#o-projeto.content-card,
-#o-projeto.about-section {
-  container-type: inline-size;
-  container-name: projetoAbout;
-  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
-  max-width: 1320px !important;
-  margin-inline: auto !important;
-  padding-inline: clamp(1.05rem, 3vw, 3rem) !important;
-  overflow: hidden !important;
-}
+/* ===== OVERRIDE FINAL — #divulgacao sem escape horizontal =====
+   Este bloco é o último style do documento e vence todos os conflitos
+   de cascata. Usa 100% (largura do contêiner pai) em vez de 100vw
+   (largura da viewport), evitando o escape causado pela barra de rolagem. */
 
-#o-projeto .about-hero-grid {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) !important;
-  grid-template-areas: "copy visual" !important;
-  gap: clamp(1.35rem, 3.2vw, 3.2rem) !important;
-  align-items: start !important;
-  width: 100% !important;
-}
-
-#o-projeto .about-copy-editorial {
-  grid-area: copy !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  justify-self: stretch !important;
-}
-
-#o-projeto .about-copy-editorial > * {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-#o-projeto .about-display-title {
-  max-width: 900px !important;
-  font-size: clamp(3.1rem, 6.2vw, 6.35rem) !important;
-  line-height: 0.89 !important;
-  letter-spacing: -0.082em !important;
-  text-wrap: balance;
-}
-
-#o-projeto .lead,
-#o-projeto .about-copy-columns,
-#o-projeto .about-pullquote {
-  width: 100% !important;
-  max-width: 900px !important;
-}
-
-#o-projeto .about-copy-columns {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(1rem, 2.2vw, 1.8rem) !important;
-}
-
-#o-projeto .about-visual-module {
-  grid-area: visual !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  display: grid !important;
-  grid-template-rows: auto auto !important;
-  gap: 1rem !important;
-  align-self: stretch !important;
-}
-
-#o-projeto .about-photo-expanded {
-  width: 100% !important;
-  min-height: clamp(560px, 52vw, 760px) !important;
-  height: auto !important;
-  margin: 0 !important;
-  border-radius: clamp(22px, 2vw, 32px) !important;
-  overflow: hidden !important;
-}
-
-#o-projeto .about-photo-expanded img {
-  width: 100% !important;
-  min-height: clamp(560px, 52vw, 760px) !important;
-  height: clamp(560px, 52vw, 760px) !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-}
-
-#o-projeto .about-stat-overlay {
-  position: absolute !important;
-  top: clamp(0.7rem, 1.3vw, 1.1rem) !important;
-  left: clamp(0.7rem, 1.3vw, 1.1rem) !important;
-  right: auto !important;
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  width: min(310px, calc(100% - 1.4rem)) !important;
-  max-width: 310px !important;
-  gap: clamp(0.45rem, 0.9vw, 0.68rem) !important;
-  margin: 0 !important;
-}
-
-#o-projeto .about-stat-overlay .about-stat {
-  min-height: clamp(92px, 9vw, 112px) !important;
-  padding: clamp(0.55rem, 1vw, 0.75rem) !important;
-  border-radius: 17px !important;
-}
-
-#o-projeto .about-stat-overlay .about-stat strong {
-  font-size: clamp(1.9rem, 3.2vw, 2.85rem) !important;
-}
-
-#o-projeto .about-stat-overlay .about-stat span {
-  font-size: clamp(0.48rem, 0.62vw, 0.62rem) !important;
-  line-height: 1.22 !important;
-  overflow-wrap: anywhere !important;
-}
-
-#o-projeto .about-map-compact {
-  width: 100% !important;
-  min-width: 0 !important;
-}
-
-#o-projeto .about-map-compact #project-sgc-map {
-  height: clamp(210px, 24vw, 285px) !important;
-  min-height: 210px !important;
-}
-
-@container projetoAbout (max-width: 1040px) {
-  #o-projeto .about-hero-grid {
-    grid-template-columns: 1fr !important;
-    grid-template-areas:
-      "copy"
-      "visual" !important;
-  }
-
-  #o-projeto .about-copy-editorial,
-  #o-projeto .about-visual-module,
-  #o-projeto .lead,
-  #o-projeto .about-copy-columns,
-  #o-projeto .about-pullquote {
-    max-width: none !important;
-  }
-
-  #o-projeto .about-display-title {
-    max-width: 760px !important;
-    font-size: clamp(2.85rem, 9vw, 5.4rem) !important;
-  }
-
-  #o-projeto .about-visual-module {
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.58fr) !important;
-    grid-template-rows: none !important;
-    align-items: stretch !important;
-  }
-
-  #o-projeto .about-photo-expanded,
-  #o-projeto .about-photo-expanded img {
-    min-height: clamp(460px, 58vw, 620px) !important;
-    height: clamp(460px, 58vw, 620px) !important;
-  }
-
-  #o-projeto .about-map-compact {
-    height: 100% !important;
-  }
-
-  #o-projeto .about-map-compact #project-sgc-map {
-    height: calc(100% - 112px) !important;
-    min-height: 300px !important;
-  }
-}
-
-@container projetoAbout (max-width: 760px) {
-  #o-projeto.content-card,
-  #o-projeto.about-section {
-    width: min(100%, calc(100vw - 1rem)) !important;
-    padding: 1.2rem 1rem 1.35rem !important;
-  }
-
-  #o-projeto .section-title {
-    grid-template-columns: 42px 1fr !important;
-    gap: 0.55rem !important;
-  }
-
-  #o-projeto .about-display-title {
-    font-size: clamp(2.55rem, 13vw, 4.2rem) !important;
-    line-height: 0.91 !important;
-  }
-
-  #o-projeto .about-copy-columns {
-    grid-template-columns: 1fr !important;
-  }
-
-  #o-projeto .about-visual-module {
-    grid-template-columns: 1fr !important;
-  }
-
-  #o-projeto .about-photo-expanded,
-  #o-projeto .about-photo-expanded img {
-    min-height: clamp(430px, 88vw, 560px) !important;
-    height: clamp(430px, 88vw, 560px) !important;
-  }
-
-  #o-projeto .about-map-compact #project-sgc-map {
-    height: 255px !important;
-    min-height: 255px !important;
-  }
-}
-
-@container projetoAbout (max-width: 520px) {
-  #o-projeto .about-pullquote {
-    font-size: clamp(1.08rem, 5.4vw, 1.35rem) !important;
-    line-height: 1.34 !important;
-  }
-
-  #o-projeto .about-photo-expanded {
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 0 !important;
-  }
-
-  #o-projeto .about-photo-expanded img {
-    min-height: 390px !important;
-    height: 390px !important;
-  }
-
-  #o-projeto .about-stat-overlay {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    width: auto !important;
-    max-width: none !important;
-    margin: -0.85rem 0.75rem 0.75rem !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  #o-projeto .about-stat-overlay .about-stat {
-    min-height: 88px !important;
-  }
-
-  #o-projeto .about-photo-expanded figcaption {
-    position: relative !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    max-width: none !important;
-    margin: 0 0.75rem 0.75rem !important;
-  }
-}
-
-/* Fallback para navegadores sem container queries */
-@media (max-width: 1040px) {
-  #o-projeto .about-hero-grid {
-    grid-template-columns: 1fr !important;
-    grid-template-areas:
-      "copy"
-      "visual" !important;
-  }
-}
-
-@media (max-width: 760px) {
-  #o-projeto .about-visual-module,
-  #o-projeto .about-copy-columns {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* TrÃªs eixos: melhora leitura em desktop, tablet e mobile */
-#frentes-integradas .feature-title-wrap {
-  display: flex !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 0.7rem !important;
-  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
-}
-
-#frentes-integradas .feature-title {
-  max-width: 100% !important;
-  white-space: normal !important;
-  font-size: clamp(1.65rem, 4.4vw, 3.15rem) !important;
-  line-height: 0.98 !important;
-}
-
-#frentes-integradas .feature-band {
-  display: grid !important;
-  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-}
-
-#frentes-integradas .feature-photo,
-#frentes-integradas .feature-panel {
-  min-height: clamp(390px, 36vw, 560px) !important;
-}
-
-#frentes-integradas .feature-panel p.axis-title {
-  font-size: clamp(1.1rem, 1.55vw, 1.55rem) !important;
-  line-height: 1.05 !important;
-  overflow-wrap: anywhere !important;
-}
-
-#frentes-integradas .feature-panel p.axis-detail {
-  font-size: clamp(0.76rem, 0.85vw, 0.92rem) !important;
-}
-
-@media (max-width: 1220px) {
-  #frentes-integradas .feature-band {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  }
-}
-
-@media (max-width: 760px) {
-  #frentes-integradas .feature-title-wrap {
-    display: grid !important;
-    gap: 0.65rem !important;
-  }
-
-  #frentes-integradas .feature-band {
-    grid-template-columns: 1fr !important;
-  }
-
-  #frentes-integradas .feature-photo,
-  #frentes-integradas .feature-panel {
-    min-height: 310px !important;
-  }
-
-  #frentes-integradas .feature-panel p.axis-title,
-  #frentes-integradas .feature-panel p.axis-detail {
-    max-width: 100% !important;
-  }
-}
-</style>
-```
-
-```{=html}
-<style>
-/* ===== Ajuste fino da abertura: evita que o tÃ­tulo invada a foto ===== */
-#o-projeto .about-hero-grid {
-  grid-template-columns: minmax(0, 1.06fr) minmax(430px, 0.64fr) !important;
-  gap: clamp(2.1rem, 4.5vw, 4.2rem) !important;
-}
-
-#o-projeto .about-copy-editorial {
-  position: relative;
-  z-index: 2;
-  min-width: 0;
-}
-
-#o-projeto .about-visual-module {
-  position: relative;
-  z-index: 1;
-  min-width: 0;
-}
-
-#o-projeto .about-display-title {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: min(720px, 100%) !important;
-  font-size: clamp(3.15rem, 4.25vw, 4.85rem) !important;
-  line-height: 0.9 !important;
-  letter-spacing: -0.076em !important;
-  overflow-wrap: normal;
-  word-break: normal;
-  hyphens: none;
-}
-
-#o-projeto .about-display-title span {
-  display: block;
-  max-width: 100%;
-}
-
-#o-projeto .about-display-title span:nth-child(2) {
-  margin-left: 0 !important;
-}
-
-#o-projeto .about-display-title span:nth-child(3) {
-  margin-left: 0 !important;
-}
-
-#o-projeto .about-photo-expanded {
-  min-height: clamp(600px, 54vw, 780px) !important;
-}
-
-#o-projeto .about-photo-expanded img {
-  min-height: clamp(600px, 54vw, 780px) !important;
-}
-
-@media (max-width: 1320px) {
-  #o-projeto .about-hero-grid {
-    grid-template-columns: minmax(0, 1.02fr) minmax(410px, 0.62fr) !important;
-    gap: clamp(1.8rem, 3.6vw, 3.2rem) !important;
-  }
-
-  #o-projeto .about-display-title {
-    font-size: clamp(3rem, 4.05vw, 4.35rem) !important;
-    max-width: 660px !important;
-  }
-}
-
-@media (max-width: 1160px) {
-  #o-projeto .about-hero-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  #o-projeto .about-display-title {
-    font-size: clamp(3rem, 7vw, 4.8rem) !important;
-    max-width: 760px !important;
-  }
-}
-
-@media (max-width: 860px) {
-  #o-projeto .about-display-title {
-    font-size: clamp(2.45rem, 10vw, 4.25rem) !important;
-    max-width: 100% !important;
-  }
-
-  #o-projeto .about-display-title span:nth-child(2),
-  #o-projeto .about-display-title span:nth-child(3) {
-    margin-left: 0;
-  }
-}
-
-@media (max-width: 520px) {
-  #o-projeto .about-display-title {
-    font-size: clamp(2.2rem, 11vw, 3.35rem) !important;
-    line-height: 0.94 !important;
-    letter-spacing: -0.064em !important;
-  }
-}
-</style>
-```
-
-```{=html}
-<style>
-/* ===== Ajuste final: DivulgaÃ§Ã£o ocupando a largura total da pÃ¡gina ===== */
 #divulgacao.content-card {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  margin-left: calc(50% - 50vw) !important;
-  margin-right: calc(50% - 50vw) !important;
-  border-radius: 0 !important;
-  padding-left: max(1rem, calc((100vw - 1500px) / 2 + 2rem)) !important;
-  padding-right: max(1rem, calc((100vw - 1500px) / 2 + 2rem)) !important;
-}
-
-#divulgacao .section-title,
-#divulgacao .lead,
-#divulgacao .media-layout {
-  width: min(1500px, 100%) !important;
-  max-width: 1500px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-@media (max-width: 760px) {
-  #divulgacao.content-card {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    margin-left: calc(50% - 50vw) !important;
-    margin-right: calc(50% - 50vw) !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-}
-</style>
-```
-
-```{=html}
-<style>
-/* ===== CorreÃ§Ã£o responsiva para desktop estreito / meia tela ===== */
-@media (max-width: 1180px) {
-  #o-projeto.content-card,
-  #o-projeto.about-section {
-    width: min(100%, calc(100vw - 1rem)) !important;
-    max-width: calc(100vw - 1rem) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: clamp(1rem, 3vw, 1.8rem) !important;
-    padding-right: clamp(1rem, 3vw, 1.8rem) !important;
-    overflow: hidden !important;
-  }
-
-  #o-projeto .about-hero-grid {
-    grid-template-columns: 1fr !important;
-    grid-template-areas: "copy" "visual" !important;
-    gap: clamp(1.35rem, 3.2vw, 2.2rem) !important;
-  }
-
-  #o-projeto .about-copy-editorial,
-  #o-projeto .about-visual-module,
-  #o-projeto .lead,
-  #o-projeto .about-copy-columns,
-  #o-projeto .about-pullquote {
-    max-width: none !important;
-    width: 100% !important;
-  }
-
-  #o-projeto .about-display-title {
-    max-width: 900px !important;
-    font-size: clamp(3rem, 8.6vw, 5.15rem) !important;
-    line-height: 0.9 !important;
-  }
-
-  #o-projeto .about-visual-module {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto !important;
-    gap: 1rem !important;
-    overflow: hidden !important;
-  }
-
-  #o-projeto .about-photo-expanded {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: clamp(470px, 62vw, 640px) !important;
-    height: auto !important;
-    border-radius: clamp(20px, 2.4vw, 28px) !important;
-  }
-
-  #o-projeto .about-photo-expanded img {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: clamp(470px, 62vw, 640px) !important;
-    height: clamp(470px, 62vw, 640px) !important;
-    object-fit: cover !important;
-    object-position: center center !important;
-  }
-
-  #o-projeto .about-map-compact {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    overflow: hidden !important;
-  }
-
-  #o-projeto .about-map-compact #project-sgc-map {
-    width: 100% !important;
-    height: clamp(260px, 42vw, 360px) !important;
-    min-height: 260px !important;
-  }
-
-  #o-projeto .about-stat-overlay {
-    width: min(330px, calc(100% - 1.4rem)) !important;
-    max-width: 330px !important;
-  }
-}
-
-@media (max-width: 900px) {
-  #o-projeto .about-copy-columns { grid-template-columns: 1fr !important; }
-  #o-projeto .about-display-title {
-    max-width: 100% !important;
-    font-size: clamp(2.5rem, 10.5vw, 4.45rem) !important;
-  }
-  #o-projeto .about-display-title span:nth-child(2),
-  #o-projeto .about-display-title span:nth-child(3) { margin-left: 0 !important; }
-  #o-projeto .about-photo-expanded,
-  #o-projeto .about-photo-expanded img {
-    min-height: clamp(420px, 82vw, 560px) !important;
-    height: clamp(420px, 82vw, 560px) !important;
-  }
-}
-
-@media (max-width: 620px) {
-  #o-projeto.content-card,
-  #o-projeto.about-section {
-    width: calc(100vw - 0.65rem) !important;
-    max-width: calc(100vw - 0.65rem) !important;
-    padding-left: 0.95rem !important;
-    padding-right: 0.95rem !important;
-  }
-  #o-projeto .about-display-title {
-    font-size: clamp(2.15rem, 11.6vw, 3.35rem) !important;
-    letter-spacing: -0.064em !important;
-  }
-  #o-projeto .about-stat-overlay {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    width: auto !important;
-    max-width: none !important;
-    margin: -0.85rem 0.75rem 0.75rem !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-  #o-projeto .about-photo-expanded {
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 0 !important;
-  }
-  #o-projeto .about-photo-expanded img {
-    min-height: 390px !important;
-    height: 390px !important;
-  }
-  #o-projeto .about-photo-expanded figcaption {
-    position: relative !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    margin: 0 0.75rem 0.75rem !important;
-  }
-}
-
-@media (max-width: 1180px) {
-  .objectives-section {
-    width: min(100%, calc(100vw - 1rem)) !important;
-    max-width: calc(100vw - 1rem) !important;
-    overflow: hidden !important;
-  }
-  .objective-slide {
-    grid-template-columns: 1fr !important;
-    gap: 1.6rem !important;
-    min-height: auto !important;
-    padding: clamp(1.5rem, 4vw, 2.6rem) clamp(1rem, 3vw, 2rem) 4.5rem !important;
-  }
-  .objective-text { max-width: 100% !important; }
-  .objective-text h2 {
-    max-width: 920px !important;
-    font-size: clamp(1.9rem, 5.2vw, 3.05rem) !important;
-  }
-  .objective-text p { max-width: 820px !important; }
-  .objective-image { width: min(390px, 76vw) !important; }
-}
-
-@media (min-width: 761px) and (max-width: 1080px) {
-  #frentes-integradas .feature-band { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-  #frentes-integradas .feature-photo,
-  #frentes-integradas .feature-panel { min-height: 360px !important; }
-}
-</style>
-```
-
-```{=html}
-<style>
-/* ===== CORREÃ‡ÃƒO FINAL DE OVERFLOW HORIZONTAL â€” HOME / SOBRE =====
-   MantÃ©m hero e faixa "TrÃªs eixos" em largura total, mas trava as demais
-   seÃ§Ãµes dentro da largura real da tela. */
-
-html,
-body {
-  width: 100% !important;
-  max-width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  overflow-x: hidden !important;
-}
-
-body {
-  position: relative;
-}
-
-#quarto-content,
-.page-columns,
-.page-layout-full,
-main,
-main.content,
-.content {
-  width: 100% !important;
-  max-width: none !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  overflow-x: visible !important;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-img,
-video,
-iframe,
-svg,
-canvas {
-  max-width: 100% !important;
-}
-
-/* Full-bleed real: ocupa a largura inteira da janela, sem limitar ao corpo do Quarto. */
-.hero-strip,
-.full-bleed-feature,
-#frentes-integradas {
   position: relative !important;
-  left: 50% !important;
+  left: auto !important;
   right: auto !important;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: translateX(-50%) !important;
-  overflow: hidden !important;
-}
-
-.hero-video,
-.hero-overlay {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-.hero-title-panel {
-  max-width: min(940px, calc(100vw - 4rem)) !important;
-}
-
-/* Preserva a animaÃ§Ã£o da faixa full-bleed sem perder o translateX(-50%). */
-.full-bleed-feature.reveal-ready {
-  transform: translateX(-50%) translateY(44px) !important;
-}
-
-.full-bleed-feature.reveal-ready.is-visible {
-  transform: translateX(-50%) translateY(0) !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .full-bleed-feature.reveal-ready,
-  .full-bleed-feature.reveal-ready.is-visible {
-    transform: translateX(-50%) !important;
-  }
-}
-
-/* SeÃ§Ãµes centrais: nÃ£o usam 100vw direto; ficam contidas e centralizadas. */
-.content-card,
-.objectives-section,
-.about-section,
-.method-section,
-.researchers-section,
-#expedicoes-recentes,
-#o-projeto.content-card,
-#o-projeto.about-section {
-  width: min(1260px, calc(100vw - 2rem)) !important;
-  max-width: calc(100vw - 2rem) !important;
+  transform: none !important;
+  width: min(1320px, calc(100% - 1.5rem)) !important;
+  max-width: calc(100% - 1.5rem) !important;
+  min-width: 0 !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  overflow: hidden !important;
-}
-
-#o-projeto.content-card,
-#o-projeto.about-section {
-  width: min(1320px, calc(100vw - 1.5rem)) !important;
-  max-width: calc(100vw - 1.5rem) !important;
-}
-
-.objectives-section {
-  width: min(1280px, calc(100vw - 1rem)) !important;
-  max-width: calc(100vw - 1rem) !important;
-}
-
-/* DivulgaÃ§Ã£o: larga, mas sem criar rolagem lateral. */
-#divulgacao.content-card {
-  width: min(1520px, calc(100vw - 2rem)) !important;
-  max-width: calc(100vw - 2rem) !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+  padding-left: clamp(1rem, 2.5vw, 2.2rem) !important;
+  padding-right: clamp(1rem, 2.5vw, 2.2rem) !important;
   border-radius: 0 !important;
-  padding-left: clamp(1rem, 3vw, 3rem) !important;
-  padding-right: clamp(1rem, 3vw, 3rem) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .section-title,
-#divulgacao .lead,
-#divulgacao .media-layout {
-  width: min(1500px, 100%) !important;
-  max-width: 1500px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* Grids: remove mÃ­nimos rÃ­gidos que empurram a pÃ¡gina para a direita. */
-.two-col,
-.about-intro-grid,
-#o-projeto .about-hero-grid,
-.researchers-layout,
-.method-intro-grid,
-.objective-slide,
-.media-layout,
-#divulgacao .media-layout,
-#divulgacao .media-panel,
-#divulgacao .media-grid,
-#divulgacao .media-item,
-.expedition-preview-grid,
-.info-grid,
-.info-grid-three,
-.contact-grid,
-.impact-grid,
-.method-river,
-.feature-band,
-#frentes-integradas .feature-band {
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-
-#o-projeto .about-hero-grid {
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.64fr) !important;
-}
-
-#o-projeto .about-copy-editorial,
-#o-projeto .about-visual-module,
-#o-projeto .about-photo-expanded,
-#o-projeto .about-map-compact,
-#o-projeto .lead,
-#o-projeto .about-copy-columns,
-#o-projeto .about-pullquote,
-.researchers-copy,
-.researchers-panel,
-.media-panel,
-.media-grid,
-.media-item,
-.media-body,
-.feature-photo,
-.feature-panel,
-.objective-text,
-.objective-image-wrap {
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-
-/* TrÃªs eixos: a faixa Ã© full-bleed, e o conteÃºdo interno ocupa toda a largura dela. */
-#frentes-integradas .feature-title-wrap {
-  width: min(1320px, calc(100vw - clamp(1rem, 4vw, 4rem))) !important;
-  max-width: calc(100vw - 1rem) !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-#frentes-integradas .feature-band {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-/* DivulgaÃ§Ã£o: cards horizontais quando couber, empilhados antes de estourar. */
-#divulgacao .media-panel {
-  grid-template-columns: minmax(0, 0.23fr) minmax(0, 1fr) !important;
-}
-
-#divulgacao .media-item {
-  grid-template-columns: minmax(0, 42%) minmax(0, 1fr) !important;
-}
-
-/* TÃ­tulos longos nÃ£o podem criar largura extra. */
-.section-title,
-.section-title h2,
-.about-display-title,
-.objective-text h2,
-.feature-title,
-.feature-panel p,
-.media-body h4,
-.media-body p,
-.researcher-card h4,
-.researcher-card p,
-.expedition-preview-card h3,
-.expedition-preview-card p {
-  max-width: 100% !important;
-  overflow-wrap: break-word !important;
-}
-
-/* NavegaÃ§Ã£o do carrossel nÃ£o pode empurrar a pÃ¡gina. */
-.objective-nav,
-.objective-dots {
-  max-width: calc(100% - 2rem) !important;
-}
-
-/* Notebooks e tablets: empilha blocos que antes tinham mÃ­nimos de 400â€“520px. */
-@media (max-width: 1180px) {
-  .content-card,
-  .about-section,
-  .method-section,
-  .researchers-section,
-  #expedicoes-recentes,
-  #o-projeto.content-card,
-  #o-projeto.about-section,
-  .objectives-section {
-    width: calc(100vw - 1rem) !important;
-    max-width: calc(100vw - 1rem) !important;
-  }
-
-  #o-projeto .about-hero-grid,
-  .about-intro-grid,
-  .method-intro-grid,
-  .objective-slide,
-  .researchers-layout {
-    grid-template-columns: 1fr !important;
-    grid-template-areas: none !important;
-  }
-
-  #o-projeto .about-copy-editorial,
-  #o-projeto .about-visual-module {
-    grid-area: auto !important;
-  }
-
-  #divulgacao .media-panel {
-    grid-template-columns: 1fr !important;
-  }
-
-  #divulgacao .media-panel-header {
-    min-width: 0 !important;
-  }
-}
-
-@media (max-width: 980px) {
-  .expedition-preview-grid,
-  .info-grid,
-  .info-grid-three,
-  .contact-grid,
-  .impact-grid,
-  .method-river,
-  #divulgacao .media-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  #divulgacao .media-item {
-    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
-  }
-}
-
-@media (max-width: 760px) {
-  .content-card,
-  .about-section,
-  .method-section,
-  .researchers-section,
-  #expedicoes-recentes,
-  #o-projeto.content-card,
-  #o-projeto.about-section,
-  .objectives-section {
-    width: calc(100vw - 0.75rem) !important;
-    max-width: calc(100vw - 0.75rem) !important;
-  }
-
-  .hero-strip,
-  .full-bleed-feature,
-  #frentes-integradas {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-
-  #divulgacao.content-card {
-    width: calc(100vw - 0.75rem) !important;
-    max-width: calc(100vw - 0.75rem) !important;
-  }
-
-  #divulgacao .media-item {
-    grid-template-columns: 1fr !important;
-  }
-
-  #divulgacao .media-thumb {
-    height: 230px !important;
-    min-height: 230px !important;
-  }
-
-  .feature-band,
-  #frentes-integradas .feature-band {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (max-width: 520px) {
-  .hero-title-panel {
-    left: 1rem !important;
-    width: calc(100vw - 2rem) !important;
-  }
-
-  .section-title {
-    grid-template-columns: 42px 1fr !important;
-  }
-}
-</style>
-```
-
-```{=html}
-<style>
-/* ===== CorreÃ§Ã£o definitiva de overflow horizontal â€” seÃ§Ã£o DivulgaÃ§Ã£o =====
-   A seÃ§Ã£o deixa de usar 100vw/full-bleed e passa a respeitar o contÃªiner real
-   do Quarto. Isso evita o escape Ã  direita em notebook, meia tela e telas com
-   barra de rolagem vertical. */
-#divulgacao.content-card {
-  width: min(1320px, 100%, calc(100vw - 1rem)) !important;
-  max-width: min(1320px, calc(100vw - 1rem)) !important;
-  min-width: 0 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  transform: none !important;
-  left: auto !important;
-  right: auto !important;
-  padding-left: clamp(0.95rem, 2.4vw, 2rem) !important;
-  padding-right: clamp(0.95rem, 2.4vw, 2rem) !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-}
-
-#divulgacao,
-#divulgacao * {
-  box-sizing: border-box !important;
-}
-
-#divulgacao .section-title,
-#divulgacao .lead,
-#divulgacao .media-layout,
-#divulgacao .media-panel,
-#divulgacao .media-grid,
-#divulgacao .media-item,
-#divulgacao .media-body,
-#divulgacao .media-thumb {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-}
-
-#divulgacao .media-layout {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
-  gap: clamp(0.9rem, 1.8vw, 1.25rem) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-panel {
-  display: grid !important;
-  grid-template-columns: minmax(0, 220px) minmax(0, 1fr) !important;
-  gap: clamp(0.85rem, 1.6vw, 1.25rem) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-panel-header {
-  min-width: 0 !important;
-  max-width: 100% !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(0.75rem, 1.4vw, 1rem) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-item {
-  display: grid !important;
-  grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-thumb,
-#divulgacao .media-thumb img {
-  max-width: 100% !important;
-  min-width: 0 !important;
-}
-
-#divulgacao .media-body h4,
-#divulgacao .media-body p,
-#divulgacao .media-date,
-#divulgacao .media-link,
-#divulgacao .media-panel h3 {
-  max-width: 100% !important;
-  overflow-wrap: anywhere !important;
-  word-break: normal !important;
-}
-
-@media (max-width: 1180px) {
-  #divulgacao.content-card {
-    width: min(100%, calc(100vw - 1rem)) !important;
-    max-width: calc(100vw - 1rem) !important;
-  }
-
-  #divulgacao .media-panel {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-}
-
-@media (max-width: 980px) {
-  #divulgacao .media-grid {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  #divulgacao .media-item {
-    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
-  }
-}
-
-@media (max-width: 700px) {
-  #divulgacao.content-card {
-    width: calc(100vw - 0.75rem) !important;
-    max-width: calc(100vw - 0.75rem) !important;
-    padding-left: 0.9rem !important;
-    padding-right: 0.9rem !important;
-  }
-
-  #divulgacao .media-panel,
-  #divulgacao .media-item {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  #divulgacao .media-thumb {
-    height: 220px !important;
-    min-height: 220px !important;
-  }
-}
-</style>
-```
-
-
-```{=html}
-<style>
-/* ===== BLOCO FINAL â€” DivulgaÃ§Ã£o sem escape + CoordenaÃ§Ã£o 3 x 3 ===== */
-
-/* DivulgaÃ§Ã£o: largura contida e estÃ¡vel em notebook, meia tela, tablet e mobile. */
-#divulgacao.content-card {
-  width: min(1320px, calc(100vw - 1rem)) !important;
-  max-width: calc(100vw - 1rem) !important;
-  min-width: 0 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-  padding-left: clamp(0.95rem, 2.4vw, 2rem) !important;
-  padding-right: clamp(0.95rem, 2.4vw, 2rem) !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
 }
@@ -5783,46 +6635,14 @@ canvas {
 #divulgacao .media-thumb {
   width: 100% !important;
   max-width: 100% !important;
-}
-
-#divulgacao .media-layout {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
-  gap: clamp(0.9rem, 1.8vw, 1.25rem) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-panel {
-  display: grid !important;
-  grid-template-columns: minmax(0, 220px) minmax(0, 1fr) !important;
-  gap: clamp(0.85rem, 1.6vw, 1.25rem) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(0.75rem, 1.4vw, 1rem) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-item {
-  display: grid !important;
-  grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-body h4,
-#divulgacao .media-body p,
-#divulgacao .media-date,
-#divulgacao .media-link,
-#divulgacao .media-panel h3 {
-  max-width: 100% !important;
-  overflow-wrap: anywhere !important;
-  word-break: normal !important;
+  min-width: 0 !important;
 }
 
 @media (max-width: 1180px) {
+  #divulgacao.content-card {
+    width: calc(100% - 1rem) !important;
+    max-width: calc(100% - 1rem) !important;
+  }
   #divulgacao .media-panel {
     grid-template-columns: minmax(0, 1fr) !important;
   }
@@ -5832,7 +6652,6 @@ canvas {
   #divulgacao .media-grid {
     grid-template-columns: minmax(0, 1fr) !important;
   }
-
   #divulgacao .media-item {
     grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
   }
@@ -5840,481 +6659,15 @@ canvas {
 
 @media (max-width: 700px) {
   #divulgacao.content-card {
-    width: calc(100vw - 0.75rem) !important;
-    max-width: calc(100vw - 0.75rem) !important;
-    padding-left: 0.9rem !important;
-    padding-right: 0.9rem !important;
-  }
-
-  #divulgacao .media-panel,
-  #divulgacao .media-item {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  #divulgacao .media-thumb {
-    height: 220px !important;
-    min-height: 220px !important;
-  }
-}
-
-/* Rede de coordenaÃ§Ã£o cientÃ­fica: 9 responsÃ¡veis em 3 x 3 no desktop. */
-#pesquisadores-responsaveis.content-card.researchers-section,
-section#pesquisadores-responsaveis.researchers-section {
-  width: min(1460px, calc(100vw - 2rem)) !important;
-  max-width: calc(100vw - 2rem) !important;
-  min-width: 0 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  overflow: hidden !important;
-}
-
-#pesquisadores-responsaveis .researchers-layout {
-  display: grid !important;
-  grid-template-columns: minmax(300px, 0.66fr) minmax(0, 1.34fr) !important;
-  gap: clamp(1.35rem, 2.6vw, 2.6rem) !important;
-  align-items: start !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-}
-
-#pesquisadores-responsaveis .researchers-copy,
-#pesquisadores-responsaveis .researchers-panel,
-#pesquisadores-responsaveis .researchers-list,
-#pesquisadores-responsaveis .researcher-card {
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-
-#pesquisadores-responsaveis .researchers-copy p:not(.lead),
-#pesquisadores-responsaveis .researchers-summary {
-  max-width: 100% !important;
-}
-
-#pesquisadores-responsaveis .researchers-panel {
-  padding: clamp(1rem, 1.7vw, 1.35rem) !important;
-}
-
-#pesquisadores-responsaveis .researchers-list {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 0.85rem !important;
-}
-
-#pesquisadores-responsaveis .researcher-card {
-  height: 100% !important;
-}
-
-@media (max-width: 1220px) {
-  #pesquisadores-responsaveis.content-card.researchers-section,
-  section#pesquisadores-responsaveis.researchers-section {
-    width: calc(100vw - 1rem) !important;
-    max-width: calc(100vw - 1rem) !important;
-  }
-
-  #pesquisadores-responsaveis .researchers-layout {
-    grid-template-columns: 1fr !important;
-  }
-
-  #pesquisadores-responsaveis .researchers-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  }
-}
-
-@media (max-width: 900px) {
-  #pesquisadores-responsaveis .researchers-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
-
-@media (max-width: 620px) {
-  #pesquisadores-responsaveis.content-card.researchers-section,
-  section#pesquisadores-responsaveis.researchers-section {
-    width: calc(100vw - 0.75rem) !important;
-    max-width: calc(100vw - 0.75rem) !important;
-  }
-
-  #pesquisadores-responsaveis .researchers-list,
-  #pesquisadores-responsaveis .researchers-summary {
-    grid-template-columns: 1fr !important;
-  }
-}
-</style>
-```
-
-```{=html}
-<style>
-/* ======================================================================
-   CORREÃ‡ÃƒO DEFINITIVA â€” NOTEBOOK LENOVO V14 / TELAS ESTREITAS
-   ----------------------------------------------------------------------
-   Objetivo: impedir qualquer vazamento horizontal nas seÃ§Ãµes centrais
-   sem mexer na lÃ³gica visual geral da home. Esta camada precisa ficar
-   no FINAL do arquivo para sobrescrever regras anteriores com 100vw.
-   ====================================================================== */
-
-html,
-body {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-
-@supports (overflow-x: clip) {
-  html,
-  body {
-    overflow-x: clip !important;
-  }
-}
-
-body,
-#quarto-content,
-.page-layout-full,
-.page-columns,
-main,
-main.content,
-.content,
-.column-page,
-.column-screen,
-.quarto-container,
-#quarto-document-content {
-  max-width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box !important;
-}
-
-img,
-video,
-svg,
-canvas,
-iframe {
-  max-width: 100% !important;
-}
-
-/* Full-bleed sem criar rolagem horizontal por causa da barra de rolagem. */
-.hero-strip,
-.full-bleed-feature,
-#frentes-integradas {
-  width: 100% !important;
-  max-width: 100% !important;
-  left: auto !important;
-  right: auto !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: none !important;
-  overflow: hidden !important;
-}
-
-.full-bleed-feature.reveal-ready,
-.full-bleed-feature.reveal-ready.is-visible {
-  transform: none !important;
-}
-
-/* SeÃ§Ãµes centrais: usa 100%, nÃ£o 100vw. 100vw Ã© a origem mais comum do escape. */
-#metodo-integrado.content-card,
-#objetivos.objectives-section,
-#expedicoes-recentes.content-card,
-#divulgacao.content-card,
-#pesquisadores-responsaveis.content-card,
-#pesquisadores-responsaveis.researchers-section {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-  width: min(1260px, calc(100% - 1.25rem)) !important;
-  max-width: calc(100% - 1.25rem) !important;
-  min-width: 0 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  overflow: hidden !important;
-  padding-left: clamp(0.95rem, 2vw, 1.8rem) !important;
-  padding-right: clamp(0.95rem, 2vw, 1.8rem) !important;
-}
-
-#objetivos.objectives-section {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-#divulgacao.content-card {
-  width: min(1320px, calc(100% - 1.25rem)) !important;
-  max-width: calc(100% - 1.25rem) !important;
-  border-radius: 0 !important;
-}
-
-/* A rede pode ser mais larga, mas ainda presa Ã  largura real da tela. */
-#pesquisadores-responsaveis.content-card,
-#pesquisadores-responsaveis.researchers-section {
-  width: min(1460px, calc(100% - 1.25rem)) !important;
-  max-width: calc(100% - 1.25rem) !important;
-}
-
-/* Todos os filhos diretos e grids internos respeitam a caixa do pai. */
-#metodo-integrado *,
-#objetivos *,
-#expedicoes-recentes *,
-#divulgacao *,
-#pesquisadores-responsaveis * {
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-
-.method-intro-grid,
-.method-river,
-.impact-grid,
-.objectives-carousel,
-.objective-slide,
-.objective-text,
-.objective-image-wrap,
-.expedition-preview-grid,
-#divulgacao .media-layout,
-#divulgacao .media-panel,
-#divulgacao .media-grid,
-#divulgacao .media-item,
-#divulgacao .media-body,
-#pesquisadores-responsaveis .researchers-layout,
-#pesquisadores-responsaveis .researchers-panel,
-#pesquisadores-responsaveis .researchers-list,
-#pesquisadores-responsaveis .researcher-card {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-}
-
-/* COMO O PROJETO ATUA â€” evita 4 cards apertados no Lenovo V14. */
-#metodo-integrado .method-intro-grid {
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
-  gap: clamp(1rem, 2vw, 1.8rem) !important;
-}
-
-#metodo-integrado .method-river,
-#metodo-integrado .impact-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-}
-
-@media (max-width: 1368px) {
-  #metodo-integrado .method-river,
-  #metodo-integrado .impact-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  #metodo-integrado .method-step {
-    min-height: 210px !important;
-  }
-}
-
-/* OBJETIVOS â€” reduz o cÃ­rculo e o espaÃ§amento em notebook menor. */
-#objetivos .objectives-carousel {
-  overflow: hidden !important;
-}
-
-#objetivos .objective-slide.active {
-  display: grid !important;
-}
-
-#objetivos .objective-slide {
-  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.55fr) !important;
-  gap: clamp(1rem, 2.2vw, 2rem) !important;
-  padding: clamp(1.4rem, 3vw, 2.8rem) clamp(1rem, 2.5vw, 2.2rem) 4.4rem !important;
-}
-
-#objetivos .objective-image {
-  width: min(330px, 27vw) !important;
-  max-width: 100% !important;
-}
-
-#objetivos .objective-text h2 {
-  font-size: clamp(1.65rem, 3.5vw, 3rem) !important;
-  line-height: 1.08 !important;
-}
-
-#objetivos .objective-text p {
-  font-size: clamp(0.95rem, 1.35vw, 1.12rem) !important;
-  line-height: 1.55 !important;
-}
-
-#objetivos .objective-nav,
-#objetivos .objective-dots,
-#objetivos .objective-photo-dots {
-  max-width: calc(100% - 1rem) !important;
-}
-
-@media (max-width: 1180px) {
-  #objetivos .objective-slide {
-    grid-template-columns: minmax(0, 1fr) minmax(180px, 0.42fr) !important;
-    gap: 1rem !important;
-    padding: 1.3rem 1rem 4.2rem !important;
-  }
-
-  #objetivos .objective-image {
-    width: min(250px, 28vw) !important;
-  }
-
-  #objetivos .objective-text h2 {
-    font-size: clamp(1.45rem, 3.8vw, 2.4rem) !important;
-  }
-
-  #objetivos .objective-text p {
-    font-size: 0.94rem !important;
-    line-height: 1.48 !important;
-  }
-}
-
-@media (max-width: 900px) {
-  #objetivos .objective-slide {
-    grid-template-columns: 1fr !important;
-  }
-
-  #objetivos .objective-image {
-    width: min(260px, 62vw) !important;
-  }
-}
-
-/* EXPEDIÃ‡Ã•ES RECENTES */
-#expedicoes-recentes .expedition-preview-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: clamp(0.8rem, 1.5vw, 1rem) !important;
-}
-
-#expedicoes-recentes .expedition-preview-card,
-#expedicoes-recentes .expedition-preview-card h3,
-#expedicoes-recentes .expedition-preview-card p {
-  overflow-wrap: anywhere !important;
-}
-
-@media (max-width: 1180px) {
-  #expedicoes-recentes .expedition-preview-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
-
-/* DIVULGAÃ‡ÃƒO â€” contida, sem 100vw e sem grid que empurre para fora. */
-#divulgacao .media-layout {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
-  gap: clamp(0.9rem, 1.7vw, 1.25rem) !important;
-}
-
-#divulgacao .media-panel {
-  display: grid !important;
-  grid-template-columns: minmax(0, 210px) minmax(0, 1fr) !important;
-  gap: clamp(0.85rem, 1.5vw, 1.2rem) !important;
-}
-
-#divulgacao .media-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(0.75rem, 1.2vw, 1rem) !important;
-}
-
-#divulgacao .media-item {
-  display: grid !important;
-  grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
-}
-
-#divulgacao .media-body h4,
-#divulgacao .media-body p,
-#divulgacao .media-panel h3,
-#divulgacao .media-date,
-#divulgacao .media-link {
-  overflow-wrap: anywhere !important;
-}
-
-@media (max-width: 1368px) {
-  #divulgacao .media-panel {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  #divulgacao .media-panel-header {
-    min-height: auto !important;
-    flex-direction: row !important;
-    align-items: center !important;
-  }
-}
-
-@media (max-width: 980px) {
-  #divulgacao .media-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* REDE DE COORDENAÃ‡ÃƒO â€” 3 x 3 no desktop, sem escape no V14. */
-#pesquisadores-responsaveis .researchers-layout {
-  display: grid !important;
-  grid-template-columns: minmax(280px, 0.68fr) minmax(0, 1.32fr) !important;
-  gap: clamp(1rem, 2vw, 2rem) !important;
-  align-items: start !important;
-}
-
-#pesquisadores-responsaveis .researchers-panel {
-  padding: clamp(0.9rem, 1.4vw, 1.2rem) !important;
-}
-
-#pesquisadores-responsaveis .researchers-list {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: clamp(0.65rem, 1vw, 0.85rem) !important;
-}
-
-#pesquisadores-responsaveis .researcher-card {
-  height: 100% !important;
-  padding: clamp(0.72rem, 1vw, 0.95rem) !important;
-}
-
-#pesquisadores-responsaveis .researcher-card h4,
-#pesquisadores-responsaveis .researcher-card p,
-#pesquisadores-responsaveis .researchers-label {
-  overflow-wrap: anywhere !important;
-}
-
-@media (max-width: 1280px) {
-  #pesquisadores-responsaveis .researchers-layout {
-    grid-template-columns: 1fr !important;
-  }
-
-  #pesquisadores-responsaveis .researchers-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  }
-}
-
-@media (max-width: 760px) {
-  #metodo-integrado.content-card,
-  #objetivos.objectives-section,
-  #expedicoes-recentes.content-card,
-  #divulgacao.content-card,
-  #pesquisadores-responsaveis.content-card,
-  #pesquisadores-responsaveis.researchers-section {
     width: calc(100% - 0.75rem) !important;
     max-width: calc(100% - 0.75rem) !important;
     padding-left: 0.9rem !important;
     padding-right: 0.9rem !important;
   }
-
-  #objetivos.objectives-section {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-
-  #metodo-integrado .method-intro-grid,
-  #metodo-integrado .method-river,
-  #metodo-integrado .impact-grid,
-  #expedicoes-recentes .expedition-preview-grid,
-  #pesquisadores-responsaveis .researchers-list,
-  #pesquisadores-responsaveis .researchers-summary,
   #divulgacao .media-panel,
-  #divulgacao .media-grid,
   #divulgacao .media-item {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
-
   #divulgacao .media-thumb {
     height: 220px !important;
     min-height: 220px !important;
@@ -6323,236 +6676,225 @@ iframe {
 </style>
 ```
 
-
 ```{=html}
 <style>
-/* ======================================================================
-   CORREÃ‡ÃƒO FINAL DA HERO â€” FULL WIDTH REAL
-   ----------------------------------------------------------------------
-   A camada anterior corrigiu o escape das seÃ§Ãµes internas, mas acabou
-   prendendo a faixa inicial ao contÃªiner central. Esta regra devolve
-   apenas a hero/faixa inicial ao modo full-bleed, ocupando toda a largura
-   da janela, sem alterar as seÃ§Ãµes centrais abaixo.
-   ====================================================================== */
-.hero-strip {
+/* =====================================================================
+   FIX DIVULGAÇÃO — notebook pequeno / tela em 100%
+   Adicione este bloco NO FINAL do arquivo index.qmd (dentro de <style>)
+   ou como último <style> do documento.
+   ===================================================================== */
+
+/* Reset: garante que nenhuma regra anterior force layout horizontal */
+#divulgacao.content-card {
   position: relative !important;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  min-height: 100vh !important;
-  left: 50% !important;
+  left: auto !important;
   right: auto !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: translateX(-50%) !important;
-  overflow: hidden !important;
-}
-
-.hero-strip .hero-video,
-.hero-strip .hero-overlay {
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 100% !important;
-}
-
-.hero-strip .hero-title-panel {
-  max-width: min(940px, calc(100vw - 4rem)) !important;
-}
-
-/* MantÃ©m a faixa dos trÃªs eixos em largura total, mas sem mexer nos cards internos. */
-.full-bleed-feature,
-#frentes-integradas {
-  position: relative !important;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  left: 50% !important;
-  right: auto !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: translateX(-50%) !important;
-  overflow: hidden !important;
-}
-
-.full-bleed-feature.reveal-ready {
-  transform: translateX(-50%) translateY(44px) !important;
-}
-
-.full-bleed-feature.reveal-ready.is-visible {
-  transform: translateX(-50%) translateY(0) !important;
-}
-
-@media (max-width: 820px) {
-  .hero-strip {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-
-  .hero-strip .hero-title-panel {
-    left: 1rem !important;
-    width: calc(100vw - 2rem) !important;
-    max-width: calc(100vw - 2rem) !important;
-  }
-}
-</style>
-```
-
-```{=html}
-<style>
-/* ======================================================================
-   CORREÃ‡ÃƒO FINAL â€” REDE DE COORDENAÃ‡ÃƒO CIENTÃFICA
-   ----------------------------------------------------------------------
-   Esta camada precisa ficar no final do arquivo. Ela corrige o escape Ã 
-   direita da seÃ§Ã£o "Rede de coordenaÃ§Ã£o cientÃ­fica" em notebooks pequenos.
-   ====================================================================== */
-
-/* Centraliza a seÃ§Ã£o pela janela real do navegador, nÃ£o pelo container interno do Quarto. */
-#pesquisadores-responsaveis.content-card,
-#pesquisadores-responsaveis.researchers-section,
-section#pesquisadores-responsaveis {
-  position: relative !important;
-  left: 50% !important;
-  right: auto !important;
-  transform: translateX(-50%) !important;
-
-  width: min(1180px, calc(100vw - 2rem)) !important;
-  max-width: calc(100vw - 2rem) !important;
+  transform: none !important;
+  width: min(1260px, calc(100% - 1.5rem)) !important;
+  max-width: calc(100% - 1.5rem) !important;
   min-width: 0 !important;
-
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  margin-top: 2.6rem !important;
-
-  padding-left: clamp(1rem, 2.4vw, 2rem) !important;
-  padding-right: clamp(1rem, 2.4vw, 2rem) !important;
-
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: clamp(1.2rem, 2.5vw, 2.2rem) !important;
+  border-radius: 0 !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
 }
 
-/* Preserva a animaÃ§Ã£o de entrada sem perder a centralizaÃ§Ã£o por translateX. */
-#pesquisadores-responsaveis.reveal-ready {
-  transform: translateX(-50%) translateY(44px) !important;
-}
-
-#pesquisadores-responsaveis.reveal-ready.is-visible {
-  transform: translateX(-50%) translateY(0) !important;
-}
-
-/* Nada dentro da seÃ§Ã£o pode forÃ§ar largura extra. */
-#pesquisadores-responsaveis,
-#pesquisadores-responsaveis * {
+#divulgacao,
+#divulgacao * {
   box-sizing: border-box !important;
   min-width: 0 !important;
   max-width: 100% !important;
 }
 
-/* No notebook pequeno: texto em cima, painel dos pesquisadores embaixo. */
-#pesquisadores-responsaveis .researchers-layout {
-  display: grid !important;
-  grid-template-columns: 1fr !important;
-  gap: 1.35rem !important;
-
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-}
-
-#pesquisadores-responsaveis .researchers-copy,
-#pesquisadores-responsaveis .researchers-panel,
-#pesquisadores-responsaveis .researchers-list,
-#pesquisadores-responsaveis .researcher-card,
-#pesquisadores-responsaveis .researchers-summary,
-#pesquisadores-responsaveis .researchers-actions {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-}
-
-/* Os dois cards de nÃºmeros ficam sempre dentro da caixa. */
-#pesquisadores-responsaveis .researchers-summary {
+/* Layout geral: dois painéis empilhados */
+#divulgacao .media-layout {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 0.8rem !important;
+  gap: clamp(1rem, 2vw, 1.4rem) !important;
+  align-items: start !important;
 }
 
-/* Pesquisadores: 3 por linha quando couber. */
-#pesquisadores-responsaveis .researchers-list {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 0.85rem !important;
-  overflow: hidden !important;
-}
-
-/* Cards seguros para telas estreitas. */
-#pesquisadores-responsaveis .researcher-card {
+/* Cada painel: header + grid de cards empilhados */
+#divulgacao .media-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.9rem !important;
+  padding: clamp(0.9rem, 1.8vw, 1.2rem) !important;
+  border-radius: 22px !important;
+  background: linear-gradient(180deg, rgba(255,253,247,0.98), rgba(246,241,232,0.82)) !important;
+  border: 1px solid rgba(98,106,56,0.24) !important;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.07) !important;
   height: 100% !important;
-  padding: 0.85rem 0.9rem !important;
+}
+
+/* Header do painel: horizontal compacto */
+#divulgacao .media-panel-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.75rem !important;
+  padding: 0.85rem 1rem !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(180deg, rgba(46,59,36,0.96), rgba(98,106,56,0.92)),
+    url("figures/tsiino_bg.png") !important;
+  background-size: cover !important;
+  min-height: auto !important;
+}
+
+#divulgacao .media-panel-header::after {
+  display: none !important;
+  content: none !important;
+}
+
+#divulgacao .media-panel h3 {
+  color: rgba(255,253,247,0.92) !important;
+  font-size: 0.74rem !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+/* Grid de cards: sempre 1 coluna dentro de cada painel */
+#divulgacao .media-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.85rem !important;
+}
+
+/* Card individual: thumb em cima, body embaixo — SEM layout lateral */
+#divulgacao .media-item {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  background: rgba(255,253,247,0.98) !important;
+  border: 1px solid rgba(98,106,56,0.20) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.055) !important;
+  transition: transform 180ms ease, box-shadow 180ms ease !important;
+}
+
+#divulgacao .media-item:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.10) !important;
+}
+
+/* Thumb: altura fixa, largura total */
+#divulgacao .media-thumb {
+  width: 100% !important;
+  height: clamp(200px, 22vw, 280px) !important;
+  min-height: 200px !important;
+  flex-shrink: 0 !important;
+  background:
+    linear-gradient(135deg, rgba(46,59,36,0.94), rgba(98,106,56,0.78)),
+    url("figures/tsiino_bg.png") !important;
+  background-size: cover !important;
+  display: grid !important;
+  place-items: center !important;
+  color: rgba(255,253,247,0.82) !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
   overflow: hidden !important;
 }
 
-/* Textos longos quebram linha em vez de empurrar o layout. */
-#pesquisadores-responsaveis .researchers-lead,
-#pesquisadores-responsaveis .researchers-copy p,
-#pesquisadores-responsaveis .researcher-card h4,
-#pesquisadores-responsaveis .researcher-card p,
-#pesquisadores-responsaveis .researchers-label,
-#pesquisadores-responsaveis .section-title h2 {
-  max-width: 100% !important;
-  overflow-wrap: break-word !important;
-  word-break: normal !important;
+#divulgacao .media-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+}
+
+/* Body: texto com espaço generoso */
+#divulgacao .media-body {
+  padding: 1rem 1.1rem 1.15rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+#divulgacao .media-date {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--red, #A93632) !important;
+  margin-bottom: 0.45rem !important;
   white-space: normal !important;
 }
 
-/* Notebook em meia tela / tablet. */
-@media (max-width: 1020px) {
-  #pesquisadores-responsaveis.content-card,
-  #pesquisadores-responsaveis.researchers-section,
-  section#pesquisadores-responsaveis {
-    width: calc(100vw - 1rem) !important;
-    max-width: calc(100vw - 1rem) !important;
-  }
-
-  #pesquisadores-responsaveis .researchers-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
+#divulgacao .media-body h4 {
+  margin: 0 0 0.45rem !important;
+  font-size: 1rem !important;
+  line-height: 1.28 !important;
+  font-weight: 800 !important;
+  color: #171717 !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
 }
 
-/* Celular. */
-@media (max-width: 640px) {
-  #pesquisadores-responsaveis.content-card,
-  #pesquisadores-responsaveis.researchers-section,
-  section#pesquisadores-responsaveis {
-    width: calc(100vw - 0.75rem) !important;
-    max-width: calc(100vw - 0.75rem) !important;
-    padding-left: 0.95rem !important;
-    padding-right: 0.95rem !important;
-  }
+#divulgacao .media-body p {
+  margin: 0 0 0.8rem !important;
+  font-size: 0.86rem !important;
+  line-height: 1.5 !important;
+  color: #675F55 !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
 
-  #pesquisadores-responsaveis .researchers-list,
-  #pesquisadores-responsaveis .researchers-summary {
+#divulgacao .media-link {
+  margin-top: auto !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--red, #A93632) !important;
+  text-decoration: none !important;
+}
+
+/* ── Responsivo ── */
+
+/* Tablet / janela estreita: empilha os dois painéis */
+@media (max-width: 900px) {
+  #divulgacao .media-layout {
     grid-template-columns: 1fr !important;
   }
 }
-</style>
-```
 
+/* Thumb menor em mobile */
+@media (max-width: 600px) {
+  #divulgacao.content-card {
+    padding: 1rem 0.9rem !important;
+  }
 
-```{=html}
-<style>
-/* Remove as setas internas das fotos dos objetivos.
-   MantÃ©m os pontinhos funcionando. */
-#objetivos .objective-photo-arrow,
-#objetivos .objective-photo-prev,
-#objetivos .objective-photo-next {
-  display: none !important;
-}
+  #divulgacao .media-thumb {
+    height: 210px !important;
+    min-height: 210px !important;
+  }
 
-/* Garante que os pontinhos internos da imagem continuem clicÃ¡veis */
-#objetivos .objective-photo-dots {
-  z-index: 20 !important;
-  pointer-events: auto !important;
+  #divulgacao .media-panel {
+    border-radius: 18px !important;
+  }
 }
 </style>
 ```
