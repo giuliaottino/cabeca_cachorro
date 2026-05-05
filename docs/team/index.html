@@ -1958,8 +1958,65 @@ main.content,
 })();
 
 </script>
-<script src="../js/translations.js"></script>
-<script src="../js/language.js"></script>
+<!-- Tsiino Hiiwiida i18n scripts v13
+     Carrega translations.js, patch complementar e depois language.js.
+     Funciona no Quarto Preview e no GitHub Pages em /cabeca_cachorro/. -->
+<script>
+(function () {
+  "use strict";
+
+  const PROJECT_BASE = "cabeca_cachorro";
+  const VERSION = "20260504-v13";
+
+  function getPreviewBase() {
+    let path = window.location.pathname || "/";
+
+    if (path === "" || path === "/") {
+      return "";
+    }
+
+    if (path.endsWith("/")) {
+      path += "index.html";
+    }
+
+    const parts = path.split("/").filter(Boolean);
+    if (parts.length <= 1) {
+      return "";
+    }
+
+    return "../".repeat(parts.length - 1);
+  }
+
+  function getBase() {
+    if (window.location.hostname.endsWith("github.io")) {
+      return "/" + PROJECT_BASE + "/";
+    }
+
+    return getPreviewBase();
+  }
+
+  function loadScript(src, onload) {
+    const script = document.createElement("script");
+    script.src = getBase() + src + "?v=" + VERSION;
+    script.async = false;
+    script.onload = onload;
+    script.onerror = function () {
+      console.error("[Tsiino i18n] Não foi possível carregar:", script.src);
+    };
+    document.body.appendChild(script);
+  }
+
+  loadScript("js/translations.js", function () {
+    loadScript("js/translations-home-missing.js", function () {
+      loadScript("js/language.js", function () {
+        if (window.TSIINO_REFRESH_I18N) {
+          window.TSIINO_REFRESH_I18N();
+        }
+      });
+    });
+  });
+})();
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

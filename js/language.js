@@ -1,521 +1,688 @@
+/* ==========================================================================
+   Tsiino Hiiwiida — language.js v14
+   Runtime global de tradução PT/EN.
+
+   Diferença da v14:
+   - Traduz também elementos inteiros por textContent exato.
+   - Isso resolve parágrafos com <strong>, spans ou quebras internas, onde
+     a tradução por nó de texto não encontra a frase completa.
+   - PT restaura o HTML original renderizado pelo Quarto.
+   ========================================================================== */
+
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "tsiino-language";
-  const DEFAULT_LANGUAGE = "pt";
-  const SYSTEM_LANGUAGES = ["pt"];
+  const CONFIG = Object.assign({
+    defaultLanguage: "pt",
+    targetLanguage: "en",
+    persistLanguage: false,
+    storageKey: "tsiino_i18n_lang",
+    projectBase: "cabeca_cachorro"
+  }, window.TSIINO_I18N_CONFIG || {});
 
-  const BLOCK_SELECTOR = [
-    "h1", "h2", "h3", "h4", "h5", "h6",
-    "p", "figcaption", "blockquote", "li",
-    "button", "a", "span", "strong", "em",
-    ".hero-kicker", ".hero-subtitle", ".hero-description",
-    ".about-eyebrow", ".method-eyebrow", ".feature-eyebrow",
-    ".about-display-title", ".about-pullquote",
-    ".objective-kicker", ".expedition-date", ".media-date",
-    ".media-panel-label", ".researchers-kicker", ".researchers-label",
-    ".project-map-header h3", ".project-map-header p",
-    ".about-stat span", ".feature-title", ".feature-panel h3", ".feature-panel p",
-    ".method-step h3", ".method-step p", ".impact-card h3", ".impact-card p",
-    ".empty-media", ".btn-main", ".btn-ghost", ".media-link",
-    ".metric-label", ".metric-sub", ".panel-title", ".chart-title", ".dashboard-title"
-  ].join(",");
+  const DEFAULT_LANG = CONFIG.defaultLanguage || "pt";
+  const TARGET_LANG = CONFIG.targetLanguage || "en";
+  const STORAGE_KEY = CONFIG.storageKey || "tsiino_i18n_lang";
 
-  const ATTRIBUTE_MAP = [
-    ["alt", "alt"],
-    ["title", "title"],
-    ["placeholder", "placeholder"],
-    ["aria-label", "aria-label"],
-    ["data-label", "data-label"],
-    ["data-tip", "data-tip"]
+  const LEGACY_STORAGE_KEYS = [
+    "site-language",
+    "tsiino-language",
+    "language",
+    "tsiino_lang"
   ];
 
-  const EXCLUDE_SELECTOR = [
-    "script", "style", "noscript", "template", "canvas", "iframe",
-    "pre", "code", "kbd", "samp",
-    ".leaflet-container", ".leaflet-control", ".leaflet-pane",
-    ".quarto-code-tools-source", ".sourceCode"
+  const BLOCKED_TAGS = new Set([
+    "SCRIPT", "STYLE", "CODE", "PRE", "KBD", "SAMP", "TEXTAREA", "NOSCRIPT", "SVG", "CANVAS"
+  ]);
+
+  const ATTRS_TO_TRANSLATE = [
+    "alt",
+    "title",
+    "aria-label",
+    "placeholder",
+    "data-label"
+  ];
+
+  const ELEMENT_SELECTOR = [
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "p", "figcaption",
+    ".hero-kicker",
+    ".hero-subtitle",
+    ".hero-description",
+    ".about-eyebrow",
+    ".method-eyebrow",
+    ".feature-eyebrow",
+    ".objective-kicker",
+    ".about-pullquote",
+    ".project-map-header p",
+    ".project-map-header h3",
+    ".about-stat span",
+    ".feature-panel h3",
+    ".feature-panel p",
+    ".method-step h3",
+    ".method-step p",
+    ".impact-card h3",
+    ".impact-card p",
+    ".media-date",
+    ".media-link",
+    ".media-panel-label",
+    ".researchers-label",
+    ".empty-media",
+    ".tag",
+    ".agency-pill"
   ].join(",");
 
-  let isApplying = false;
-  let observer = null;
-  let observerTimer = null;
-  const mapsCache = new Map();
+  let currentLang = DEFAULT_LANG;
 
-  function cfg() {
-    return window.TRANSLATIONS || {};
-  }
+  let textNodes = [];
+  let attrNodes = [];
+  let elementNodes = [];
+  let chartTextNodes = [];
 
-  function normalize(text) {
-    return String(text || "")
+  const capturedTextNodes = new WeakSet();
+  const capturedAttrKeys = new Set();
+  const capturedElements = new WeakSet();
+  const capturedChartTextElements = new WeakSet();
+
+  function normalizeText(value) {
+    return String(value || "")
       .replace(/\u00a0/g, " ")
-      .replace(/[\r\n\t]+/g, " ")
       .replace(/\s+/g, " ")
       .trim();
   }
 
-  function getSupportedLanguages() {
-    const c = cfg();
-    return Array.isArray(c.supportedLanguages) && c.supportedLanguages.length
-      ? c.supportedLanguages
-      : ["pt", "en"];
+  function preserveSpacing(original, translated) {
+    const originalString = String(original || "");
+    const start = (originalString.match(/^\s*/) || [""])[0];
+    const end = (originalString.match(/\s*$/) || [""])[0];
+    return start + translated + end;
   }
 
-  function getCurrentLanguage() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const supported = getSupportedLanguages();
-    if (saved && supported.includes(saved)) return saved;
-    return cfg().defaultLanguage || DEFAULT_LANGUAGE;
+  function isPlainObject(value) {
+    return value && typeof value === "object" && !Array.isArray(value);
   }
 
-  function setCurrentLanguage(language) {
-    localStorage.setItem(STORAGE_KEY, language);
-  }
+  function walkParallel(ptNode, langNode, exact) {
+    if (typeof ptNode === "string" && typeof langNode === "string") {
+      const pt = normalizeText(ptNode);
+      const translated = normalizeText(langNode);
 
-  function nextLanguage(language) {
-    const supported = getSupportedLanguages();
-    if (supported.length <= 1) return language;
-    const index = Math.max(0, supported.indexOf(language));
-    return supported[(index + 1) % supported.length];
-  }
+      if (pt && translated && pt !== translated) {
+        exact[pt] = translated;
+      }
 
-  function isSystemLanguage(language) {
-    return language === DEFAULT_LANGUAGE || SYSTEM_LANGUAGES.includes(language);
-  }
-
-  function isExcluded(nodeOrElement) {
-    const element = nodeOrElement.nodeType === Node.ELEMENT_NODE
-      ? nodeOrElement
-      : nodeOrElement.parentElement;
-    if (!element) return true;
-    return Boolean(element.closest(EXCLUDE_SELECTOR));
-  }
-
-  function getAllDictionarySections() {
-    const dict = cfg().dictionary || {};
-    const sections = [];
-    Object.keys(dict).forEach(function (sectionName) {
-      const section = dict[sectionName];
-      if (section && typeof section === "object") sections.push(section);
-    });
-    return sections;
-  }
-
-  function buildMaps(targetLanguage) {
-    if (mapsCache.has(targetLanguage)) return mapsCache.get(targetLanguage);
-
-    const exact = new Map();
-    const reverse = new Map();
-    const phrases = [];
-    const reversePhrases = [];
-
-    getAllDictionarySections().forEach(function (section) {
-      Object.keys(section).forEach(function (ptText) {
-        const entry = section[ptText];
-        if (!entry || typeof entry !== "object") return;
-        const translated = entry[targetLanguage];
-        if (!translated || typeof translated !== "string") return;
-
-        const ptKey = normalize(ptText);
-        const targetValue = normalize(translated);
-        if (!ptKey || !targetValue) return;
-
-        exact.set(ptKey, translated);
-        reverse.set(targetValue, ptText);
-
-        if (ptKey.length >= 12) {
-          phrases.push({ from: ptText, fromNorm: ptKey, to: translated });
-          reversePhrases.push({ from: translated, fromNorm: targetValue, to: ptText });
-        }
-      });
-    });
-
-    phrases.sort((a, b) => b.fromNorm.length - a.fromNorm.length);
-    reversePhrases.sort((a, b) => b.fromNorm.length - a.fromNorm.length);
-
-    const maps = { exact, reverse, phrases, reversePhrases };
-    mapsCache.set(targetLanguage, maps);
-    return maps;
-  }
-
-  function replaceNormalizedWholeText(originalText, maps, targetLanguage) {
-    const normalized = normalize(originalText);
-    if (!normalized) return null;
-    if (isSystemLanguage(targetLanguage)) {
-      return maps.reverse.get(normalized) || null;
+      return;
     }
-    return maps.exact.get(normalized) || null;
+
+    if (!isPlainObject(ptNode) || !isPlainObject(langNode)) {
+      return;
+    }
+
+    Object.keys(ptNode).forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(langNode, key)) {
+        walkParallel(ptNode[key], langNode[key], exact);
+      }
+    });
   }
 
-  function replacePhrasesInText(originalText, maps, targetLanguage) {
-    if (!originalText || !normalize(originalText)) return originalText;
+  function getDictionary(lang) {
+    const exact = {};
 
-    let output = String(originalText);
-    const phraseList = isSystemLanguage(targetLanguage) ? maps.reversePhrases : maps.phrases;
+    if (
+      window.TRANSLATIONS &&
+      window.TRANSLATIONS.pt &&
+      window.TRANSLATIONS[lang]
+    ) {
+      walkParallel(window.TRANSLATIONS.pt, window.TRANSLATIONS[lang], exact);
+    }
 
-    phraseList.forEach(function (item) {
-      if (output.includes(item.from)) {
-        output = output.split(item.from).join(item.to);
+    if (
+      window.TSIINO_I18N_DICTIONARY &&
+      window.TSIINO_I18N_DICTIONARY[lang] &&
+      window.TSIINO_I18N_DICTIONARY[lang].exact
+    ) {
+      Object.assign(exact, window.TSIINO_I18N_DICTIONARY[lang].exact);
+    }
+
+    if (
+      lang === TARGET_LANG &&
+      window.TSIINO_I18N_FALLBACKS &&
+      window.TSIINO_I18N_FALLBACKS.exact
+    ) {
+      Object.assign(exact, window.TSIINO_I18N_FALLBACKS.exact);
+    }
+
+    return exact;
+  }
+
+  function getPatterns(lang) {
+    if (
+      window.TSIINO_I18N_PATTERNS &&
+      window.TSIINO_I18N_PATTERNS[lang] &&
+      Array.isArray(window.TSIINO_I18N_PATTERNS[lang])
+    ) {
+      return window.TSIINO_I18N_PATTERNS[lang];
+    }
+
+    return [];
+  }
+
+  function applyPatternTranslation(key, patterns) {
+    for (let i = 0; i < patterns.length; i += 1) {
+      const rule = patterns[i];
+      if (!rule || !rule.pattern || typeof rule.replacement !== "string") continue;
+
+      let regex;
+
+      try {
+        regex = rule.pattern instanceof RegExp
+          ? rule.pattern
+          : new RegExp(rule.pattern, rule.flags || "");
+      } catch (error) {
+        continue;
+      }
+
+      if (regex.test(key)) {
+        return key.replace(regex, rule.replacement);
+      }
+    }
+
+    return null;
+  }
+
+  function isBlockedElement(el) {
+    if (!el) return true;
+
+    let node = el;
+
+    while (node) {
+      if (BLOCKED_TAGS.has(node.tagName)) return true;
+
+      if (node.classList) {
+        if (
+          node.classList.contains("MathJax") ||
+          node.classList.contains("aa-DetachedSearchButton") ||
+          node.classList.contains("sourceCode") ||
+          node.classList.contains("plotly") ||
+          node.classList.contains("leaflet-container")
+        ) {
+          return true;
+        }
+      }
+
+      node = node.parentElement;
+    }
+
+    return false;
+  }
+
+  function shouldSkipTextNode(node) {
+    if (!node || !node.parentElement) return true;
+    if (isBlockedElement(node.parentElement)) return true;
+    if (!normalizeText(node.nodeValue)) return true;
+    return false;
+  }
+
+  function hasTranslatedElementAncestor(node) {
+    let el = node && node.parentElement;
+
+    while (el) {
+      if (el.dataset && el.dataset.tsiinoI18nElementTranslated === "1") {
+        return true;
+      }
+      el = el.parentElement;
+    }
+
+    return false;
+  }
+
+  function shouldCaptureElement(el) {
+    if (!el || capturedElements.has(el)) return false;
+    if (isBlockedElement(el)) return false;
+
+    // Nunca trocar textContent de elementos de navegação/interativos.
+    // Isso evita destruir <a>, <button> e a estrutura da navbar do Quarto.
+    if (
+      el.closest("#quarto-header") ||
+      el.closest(".navbar") ||
+      el.closest(".tsiino-site-footer") ||
+      el.closest(".quarto-navbar-tools") ||
+      el.matches("a, button, li, ul, ol, nav")
+    ) {
+      return false;
+    }
+
+    const text = normalizeText(el.textContent);
+    if (!text) return false;
+
+    // Não capture containers muito grandes. Eles misturam seções inteiras.
+    if (text.length > 900) return false;
+
+    // Evita capturar elementos que só servem de wrapper para muitos blocos.
+    const blockChildren = el.querySelectorAll("section, article, div, p, h1, h2, h3, h4, h5, h6, ul, ol, table");
+    if (blockChildren.length > 8) return false;
+
+    return true;
+  }
+
+  function captureChartTextOriginals() {
+    if (!document.body) return;
+
+    const selectors = [
+      ".js-plotly-plot svg text",
+      ".plotly svg text",
+      ".plot-container svg text",
+      ".html-widget svg text",
+      "svg text"
+    ].join(",");
+
+    document.querySelectorAll(selectors).forEach(function (el) {
+      if (!el || capturedChartTextElements.has(el)) return;
+
+      // Evita capturar ícones pequenos ou botões SVG do Quarto/navbar.
+      if (
+        el.closest("#quarto-header") ||
+        el.closest(".navbar") ||
+        el.closest(".quarto-navbar-tools") ||
+        el.closest(".tsiino-site-footer")
+      ) {
         return;
       }
 
-      const escaped = item.from
-        .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-        .replace(/\s+/g, "\\s+");
-      try {
-        output = output.replace(new RegExp(escaped, "g"), item.to);
-      } catch (error) {
-        // Keep the original if a browser rejects the regex.
-      }
-    });
+      const text = normalizeText(el.textContent);
+      if (!text) return;
 
-    return output;
-  }
-
-  function getStructuredTranslation(path, targetLanguage) {
-    const langObject = cfg()[targetLanguage];
-    if (!langObject) return undefined;
-    return String(path || "").split(".").reduce(function (obj, part) {
-      return obj && obj[part];
-    }, langObject);
-  }
-
-  function setTextIfChanged(element, value) {
-    const next = String(value).trim();
-    if (element.textContent !== next) element.textContent = next;
-  }
-
-  function setHtmlIfChanged(element, value) {
-    const next = String(value).trim();
-    if (element.innerHTML !== next) element.innerHTML = next;
-  }
-
-  function setAttributeIfChanged(element, attr, value) {
-    const next = String(value).trim();
-    if (element.getAttribute(attr) !== next) element.setAttribute(attr, next);
-  }
-
-  function translateDataI18n(targetLanguage) {
-    document.querySelectorAll("[data-i18n]").forEach(function (element) {
-      if (isExcluded(element)) return;
-      const value = getStructuredTranslation(element.getAttribute("data-i18n"), targetLanguage);
-      if (value !== undefined) setTextIfChanged(element, value);
-    });
-
-    document.querySelectorAll("[data-i18n-html]").forEach(function (element) {
-      if (isExcluded(element)) return;
-      const value = getStructuredTranslation(element.getAttribute("data-i18n-html"), targetLanguage);
-      if (value !== undefined) setHtmlIfChanged(element, value);
-    });
-
-    [
-      ["data-i18n-alt", "alt"],
-      ["data-i18n-title", "title"],
-      ["data-i18n-placeholder", "placeholder"],
-      ["data-i18n-aria", "aria-label"],
-      ["data-i18n-tip", "data-tip"]
-    ].forEach(function (pair) {
-      document.querySelectorAll("[" + pair[0] + "]").forEach(function (element) {
-        if (isExcluded(element)) return;
-        const value = getStructuredTranslation(element.getAttribute(pair[0]), targetLanguage);
-        if (value !== undefined) setAttributeIfChanged(element, pair[1], value);
+      capturedChartTextElements.add(el);
+      chartTextNodes.push({
+        el: el,
+        original: el.textContent
       });
     });
   }
 
-  function translateBlocks(targetLanguage, maps, root) {
-    (root || document).querySelectorAll(BLOCK_SELECTOR).forEach(function (element) {
-      if (isExcluded(element)) return;
-      if (element.id === "language-toggle" || element.closest("#language-toggle")) return;
-      if (element.closest(".navbar") && !element.matches(".navbar a, .navbar span, .navbar button")) return;
-      if (element.querySelector("img, video, iframe, canvas, svg, input, select, textarea")) return;
+  function restoreChartTextOriginals() {
+    captureChartTextOriginals();
 
-      const whole = replaceNormalizedWholeText(element.textContent, maps, targetLanguage);
-      if (whole !== null) setTextIfChanged(element, whole);
+    chartTextNodes.forEach(function (item) {
+      if (item.el) {
+        item.el.textContent = item.original;
+      }
     });
   }
 
-  function translateTextNodes(targetLanguage, maps, root) {
+  function translateChartText(lang) {
+    captureChartTextOriginals();
+
+    if (lang === DEFAULT_LANG) {
+      restoreChartTextOriginals();
+      return;
+    }
+
+    const dict = getDictionary(lang);
+    const patterns = getPatterns(lang);
+
+    chartTextNodes.forEach(function (item) {
+      if (!item.el) return;
+      item.el.textContent = translateExact(item.original, dict, patterns);
+    });
+  }
+
+  function captureOriginals() {
+    if (!document.body) return;
+
+    document.querySelectorAll(ELEMENT_SELECTOR).forEach(function (el) {
+      if (!shouldCaptureElement(el)) return;
+
+      capturedElements.add(el);
+      elementNodes.push({
+        el: el,
+        originalHTML: el.innerHTML,
+        originalText: el.textContent
+      });
+    });
+
     const walker = document.createTreeWalker(
-      root || document.body,
+      document.body,
       NodeFilter.SHOW_TEXT,
       {
         acceptNode: function (node) {
-          if (!node.nodeValue || !normalize(node.nodeValue)) return NodeFilter.FILTER_REJECT;
-          if (isExcluded(node)) return NodeFilter.FILTER_REJECT;
-          if (node.parentElement && node.parentElement.closest("#language-toggle")) return NodeFilter.FILTER_REJECT;
+          if (capturedTextNodes.has(node)) return NodeFilter.FILTER_REJECT;
+          if (shouldSkipTextNode(node)) return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
         }
       }
     );
 
-    const nodes = [];
-    while (walker.nextNode()) nodes.push(walker.currentNode);
+    let node;
+    while ((node = walker.nextNode())) {
+      capturedTextNodes.add(node);
+      textNodes.push({
+        node: node,
+        original: node.nodeValue
+      });
+    }
 
-    nodes.forEach(function (node) {
-      const exact = replaceNormalizedWholeText(node.nodeValue, maps, targetLanguage);
-      if (exact !== null) {
-        if (node.nodeValue !== exact) node.nodeValue = exact;
-        return;
-      }
-      const replaced = replacePhrasesInText(node.nodeValue, maps, targetLanguage);
-      if (replaced !== node.nodeValue) node.nodeValue = replaced;
-    });
-  }
+    captureChartTextOriginals();
 
-  function translateSvgAndChartText(targetLanguage, maps, root) {
-    const chartTextSelector = [
-      "svg text",
-      ".plotly text",
-      ".svg-container text",
-      ".legend text",
-      ".gtitle",
-      ".xtitle",
-      ".ytitle",
-      ".annotation-text",
-      ".hovertext text",
-      "svg title",
-      "svg desc"
-    ].join(",");
+    document.querySelectorAll("*").forEach(function (el) {
+      if (isBlockedElement(el)) return;
 
-    (root || document).querySelectorAll(chartTextSelector).forEach(function (element) {
-      if (!element || element.closest("#language-toggle")) return;
-      const current = element.textContent;
-      if (!current || !normalize(current)) return;
+      ATTRS_TO_TRANSLATE.forEach(function (attr) {
+        if (!el.hasAttribute(attr)) return;
 
-      const exact = replaceNormalizedWholeText(current, maps, targetLanguage);
-      if (exact !== null) {
-        setTextIfChanged(element, exact);
-        return;
-      }
+        const value = el.getAttribute(attr);
+        if (!normalizeText(value)) return;
 
-      const replaced = replacePhrasesInText(current, maps, targetLanguage);
-      if (replaced !== current) element.textContent = replaced;
-    });
-  }
-
-  function translateAttributes(targetLanguage, maps, root) {
-    ATTRIBUTE_MAP.forEach(function (pair) {
-      const attr = pair[0];
-      (root || document).querySelectorAll("[" + attr + "]").forEach(function (element) {
-        if (isExcluded(element)) return;
-        if (element.id === "language-toggle") return;
-        const current = element.getAttribute(attr);
-        if (!current) return;
-
-        const exact = replaceNormalizedWholeText(current, maps, targetLanguage);
-        if (exact !== null) {
-          setAttributeIfChanged(element, attr, exact);
-          return;
+        if (!el.dataset.tsiinoI18nId) {
+          el.dataset.tsiinoI18nId = String(Math.random()).slice(2);
         }
 
-        const replaced = replacePhrasesInText(current, maps, targetLanguage);
-        if (replaced !== current) element.setAttribute(attr, replaced);
+        const key = el.dataset.tsiinoI18nId + "::" + attr;
+        if (capturedAttrKeys.has(key)) return;
+
+        capturedAttrKeys.add(key);
+        attrNodes.push({
+          el: el,
+          attr: attr,
+          original: value
+        });
       });
     });
   }
 
-  function ensureLanguageButton() {
-    let button = document.getElementById("language-toggle");
-    if (button) return button;
+  function translateExact(original, dict, patterns) {
+    const raw = String(original || "");
+    const key = normalizeText(raw);
 
-    button = document.createElement("button");
-    button.id = "language-toggle";
-    button.className = "language-toggle";
-    button.type = "button";
-    button.innerHTML = '<span class="language-toggle-label"></span>';
+    if (!key) return raw;
 
-    const tools = document.querySelector("#quarto-header .quarto-navbar-tools") ||
-      document.querySelector(".quarto-navbar-tools");
-
-    if (tools) {
-      tools.insertBefore(button, tools.firstChild);
-      return button;
+    if (Object.prototype.hasOwnProperty.call(dict, key)) {
+      return preserveSpacing(raw, dict[key]);
     }
 
-    let rightNavbar = document.querySelector("#quarto-header .navbar-nav.ms-auto") ||
-      document.querySelector(".navbar .navbar-nav.ms-auto");
-
-    if (!rightNavbar) {
-      const collapse = document.querySelector("#quarto-header .navbar-collapse") ||
-        document.querySelector(".navbar .navbar-collapse");
-      rightNavbar = document.createElement("ul");
-      rightNavbar.className = "navbar-nav ms-auto";
-      if (collapse) collapse.appendChild(rightNavbar);
+    const patternTranslation = applyPatternTranslation(key, patterns || []);
+    if (patternTranslation !== null) {
+      return preserveSpacing(raw, patternTranslation);
     }
 
-    if (rightNavbar) {
-      const item = document.createElement("li");
-      item.className = "nav-item language-toggle-item";
-      item.appendChild(button);
-      rightNavbar.appendChild(item);
+    return raw;
+  }
+
+  function restoreOriginals() {
+    captureOriginals();
+
+    elementNodes.forEach(function (item) {
+      if (!item.el) return;
+      item.el.innerHTML = item.originalHTML;
+      delete item.el.dataset.tsiinoI18nElementTranslated;
+    });
+
+    textNodes.forEach(function (item) {
+      if (item.node && item.node.parentElement && !hasTranslatedElementAncestor(item.node)) {
+        item.node.nodeValue = item.original;
+      }
+    });
+
+    attrNodes.forEach(function (item) {
+      if (item.el) {
+        item.el.setAttribute(item.attr, item.original);
+      }
+    });
+
+    restoreChartTextOriginals();
+
+    document.documentElement.lang = "pt-BR";
+    setDocumentTitle(DEFAULT_LANG);
+    setButtonState(DEFAULT_LANG);
+  }
+
+  function applyLanguage(lang) {
+    captureOriginals();
+
+    const dict = getDictionary(lang);
+    const patterns = getPatterns(lang);
+
+    // Primeiro traduz elementos inteiros. Isso resolve frases quebradas por <strong>, spans etc.
+    elementNodes.forEach(function (item) {
+      if (!item.el) return;
+
+      const key = normalizeText(item.originalText);
+
+      if (Object.prototype.hasOwnProperty.call(dict, key)) {
+        item.el.textContent = dict[key];
+        item.el.dataset.tsiinoI18nElementTranslated = "1";
+      } else {
+        const patternTranslation = applyPatternTranslation(key, patterns);
+        if (patternTranslation !== null) {
+          item.el.textContent = patternTranslation;
+          item.el.dataset.tsiinoI18nElementTranslated = "1";
+        } else {
+          delete item.el.dataset.tsiinoI18nElementTranslated;
+        }
+      }
+    });
+
+    // Depois traduz nós de texto isolados que não foram cobertos por elementos inteiros.
+    textNodes.forEach(function (item) {
+      if (!item.node || !item.node.parentElement) return;
+      if (hasTranslatedElementAncestor(item.node)) return;
+
+      item.node.nodeValue = translateExact(item.original, dict, patterns);
+    });
+
+    attrNodes.forEach(function (item) {
+      if (!item.el) return;
+      item.el.setAttribute(item.attr, translateExact(item.original, dict, patterns));
+    });
+
+    translateChartText(lang);
+
+    document.documentElement.lang = lang === "en" ? "en" : lang;
+    setDocumentTitle(lang);
+    setButtonState(lang);
+  }
+
+  function setDocumentTitle(lang) {
+    if (
+      window.TRANSLATIONS &&
+      window.TRANSLATIONS[lang] &&
+      window.TRANSLATIONS[lang].meta &&
+      window.TRANSLATIONS[lang].meta.siteTitle
+    ) {
+      document.title = window.TRANSLATIONS[lang].meta.siteTitle;
+    }
+  }
+
+  function setLanguage(lang) {
+    const normalized = lang === TARGET_LANG ? TARGET_LANG : DEFAULT_LANG;
+    currentLang = normalized;
+
+    try {
+      LEGACY_STORAGE_KEYS.forEach(function (key) {
+        localStorage.removeItem(key);
+      });
+
+      if (CONFIG.persistLanguage) {
+        localStorage.setItem(STORAGE_KEY, currentLang);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (error) {}
+
+    if (currentLang === DEFAULT_LANG) {
+      restoreOriginals();
+    } else {
+      applyLanguage(currentLang);
+    }
+  }
+
+  function getSavedLanguage() {
+    if (!CONFIG.persistLanguage) {
+      return DEFAULT_LANG;
+    }
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved === TARGET_LANG ? TARGET_LANG : DEFAULT_LANG;
+    } catch (error) {
+      return DEFAULT_LANG;
+    }
+  }
+
+  function findNavContainer() {
+    return (
+      document.querySelector("#quarto-header .quarto-navbar-tools") ||
+      document.querySelector("#quarto-header .navbar .container-fluid") ||
+      document.querySelector("#quarto-header .navbar") ||
+      document.body
+    );
+  }
+
+  function ensureButton() {
+    let button = document.querySelector("#tsiino-language-toggle");
+
+    if (!button) {
+      button = document.querySelector(".tsiino-language-toggle");
+    }
+
+    if (!button) {
+      button = document.createElement("button");
+      button.id = "tsiino-language-toggle";
+      button.className = "tsiino-language-toggle";
+      button.type = "button";
+
+      const container = findNavContainer();
+      container.appendChild(button);
+    }
+
+    if (!button.dataset.tsiinoI18nBound) {
+      button.dataset.tsiinoI18nBound = "1";
+
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        const nextLang = currentLang === TARGET_LANG ? DEFAULT_LANG : TARGET_LANG;
+        setLanguage(nextLang);
+      });
     }
 
     return button;
   }
 
-  function updateButton(targetLanguage) {
-    const langInfo = (cfg().languages || {})[targetLanguage] || {};
-    const button = ensureLanguageButton();
-    const label = button.querySelector(".language-toggle-label") || button;
-    label.textContent = langInfo.buttonLabel || (targetLanguage === "pt" ? "EN" : "PT");
-    button.setAttribute("aria-label", langInfo.buttonAria || "Switch language");
-    button.setAttribute("title", langInfo.buttonAria || "Switch language");
-  }
+  function setButtonState(lang) {
+    const button = ensureButton();
 
-  function updateHtmlLang(targetLanguage) {
-    const langInfo = (cfg().languages || {})[targetLanguage] || {};
-    document.documentElement.lang = langInfo.htmlLang || targetLanguage;
-  }
-
-  function idle(callback, timeout) {
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(callback, { timeout: timeout || 800 });
+    if (lang === TARGET_LANG) {
+      button.textContent = "PT";
+      button.setAttribute("aria-label", "Mudar idioma para português");
     } else {
-      window.setTimeout(callback, Math.min(timeout || 250, 250));
+      button.textContent = "EN";
+      button.setAttribute("aria-label", "Switch language to English");
     }
   }
 
-  function applyTranslations(options) {
-    options = options || {};
-    if (isApplying || !window.TRANSLATIONS || !document.body) return;
+  function getRelativePrefix() {
+    const projectBase = CONFIG.projectBase || "cabeca_cachorro";
+    let path = window.location.pathname || "/";
 
-    const targetLanguage = getCurrentLanguage();
-    const root = options.root || document;
-    const maps = buildMaps(targetLanguage);
+    if (path.startsWith("/" + projectBase + "/")) {
+      path = path.slice(projectBase.length + 1);
+    }
 
-    // In initial Portuguese view, avoid scanning the whole page. This preserves
-    // reveal/scroll animations and prevents unnecessary layout work.
-    if (!options.force && isSystemLanguage(targetLanguage) && options.reason === "init") {
-      updateButton(targetLanguage);
-      updateHtmlLang(targetLanguage);
+    if (path === "" || path === "/") {
+      path = "/index.html";
+    }
+
+    if (path.endsWith("/")) {
+      path += "index.html";
+    }
+
+    const parts = path.split("/").filter(Boolean);
+    if (parts.length <= 1) return "";
+
+    return "../".repeat(parts.length - 1);
+  }
+
+  function fixFooterPaths() {
+    const footer = document.querySelector(".tsiino-site-footer");
+
+    if (footer && footer.parentElement !== document.body) {
+      document.body.appendChild(footer);
+    }
+
+    const prefix = getRelativePrefix();
+
+    document.querySelectorAll(".tsiino-site-footer img[data-src]").forEach(function (img) {
+      const src = img.getAttribute("data-src");
+      if (!src) return;
+
+      img.setAttribute("src", prefix + src.replace(/^\/+/, ""));
+
+      if (!img.dataset.tsiinoFooterErrorBound) {
+        img.dataset.tsiinoFooterErrorBound = "1";
+        img.addEventListener("error", function () {
+          img.classList.add("tsiino-footer-logo-missing");
+        });
+      }
+    });
+
+    document.querySelectorAll(".tsiino-footer-home").forEach(function (link) {
+      link.setAttribute("href", prefix + "index.html");
+    });
+  }
+
+  function refreshDynamicContent() {
+    captureOriginals();
+
+    if (currentLang !== DEFAULT_LANG) {
+      applyLanguage(currentLang);
+    }
+  }
+
+  function dictionariesReady() {
+    return !!(
+      window.TRANSLATIONS &&
+      window.TSIINO_I18N_DICTIONARY &&
+      window.TSIINO_I18N_DICTIONARY[TARGET_LANG] &&
+      window.TSIINO_I18N_DICTIONARY[TARGET_LANG].exact
+    );
+  }
+
+  function initWhenReady(attempt) {
+    attempt = attempt || 0;
+
+    ensureButton();
+    fixFooterPaths();
+
+    if (!dictionariesReady() && attempt < 40) {
+      window.setTimeout(function () {
+        initWhenReady(attempt + 1);
+      }, 75);
       return;
     }
 
-    isApplying = true;
-    if (observer) observer.disconnect();
+    captureOriginals();
+    setLanguage(getSavedLanguage());
 
-    try {
-      translateDataI18n(targetLanguage);
-      translateBlocks(targetLanguage, maps, root);
-      translateTextNodes(targetLanguage, maps, root === document ? document.body : root);
-      translateAttributes(targetLanguage, maps, root);
-      updateButton(targetLanguage);
-      updateHtmlLang(targetLanguage);
-    } finally {
-      isApplying = false;
-      if (observer) startObserver(true);
-    }
-
-    if (options.includeCharts !== false) {
-      idle(function () {
-        if (isApplying || !window.TRANSLATIONS) return;
-        const current = getCurrentLanguage();
-        const chartMaps = buildMaps(current);
-        isApplying = true;
-        if (observer) observer.disconnect();
-        try {
-          translateSvgAndChartText(current, chartMaps, root);
-          updateButton(current);
-        } finally {
-          isApplying = false;
-          if (observer) startObserver(true);
-        }
-      }, 900);
-    }
-
-    // Let existing scroll/IntersectionObserver animation code re-evaluate after
-    // text height changes, without forcing repeated translations.
-    window.requestAnimationFrame(function () {
-      window.dispatchEvent(new Event("scroll"));
-      window.dispatchEvent(new Event("resize"));
-    });
-  }
-
-  function scheduleTranslate(reason, root) {
-    window.clearTimeout(observerTimer);
-    observerTimer = window.setTimeout(function () {
-      applyTranslations({ reason: reason || "mutation", root: root || document, includeCharts: true });
-    }, 450);
-  }
-
-  function startObserver(restart) {
-    if (restart && observer) observer.disconnect();
-    if (!document.body) return;
-
-    if (!observer) {
-      observer = new MutationObserver(function (mutations) {
-        if (isApplying) return;
-
-        // Ignore class/style changes from scroll reveal animations. The previous
-        // runtime watched attributes/characterData and kept re-translating during
-        // animations, which delayed the reveal effects in English.
-        let root = null;
-        for (const mutation of mutations) {
-          if (mutation.type === "childList" && mutation.addedNodes.length) {
-            for (const node of mutation.addedNodes) {
-              if (node.nodeType === Node.ELEMENT_NODE && !isExcluded(node)) {
-                root = node;
-                break;
-              }
-            }
-          }
-          if (root) break;
-        }
-
-        if (!root) return;
-        scheduleTranslate("mutation", root);
-      });
-    }
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  }
-
-  function bindButton() {
-    const button = ensureLanguageButton();
-    if (button.dataset.i18nBound) return;
-
-    button.addEventListener("click", function () {
-      const current = getCurrentLanguage();
-      setCurrentLanguage(nextLanguage(current));
-      applyTranslations({ reason: "toggle", force: true, includeCharts: true });
-
-      // Plotly/htmlwidgets can redraw after the button click; translate chart
-      // labels once more later, but do not keep hammering the page.
-      window.setTimeout(function () {
-        const currentLanguage = getCurrentLanguage();
-        const maps = buildMaps(currentLanguage);
-        translateSvgAndChartText(currentLanguage, maps, document);
-      }, 1200);
-    });
-
-    button.dataset.i18nBound = "true";
+    window.setTimeout(refreshDynamicContent, 500);
+    window.setTimeout(refreshDynamicContent, 1500);
+    window.setTimeout(refreshDynamicContent, 3000);
   }
 
   function init() {
-    bindButton();
-    applyTranslations({ reason: "init", includeCharts: getCurrentLanguage() !== DEFAULT_LANGUAGE });
-    startObserver(false);
-
-    // One delayed pass for widgets loaded after Quarto, only when already in a
-    // non-default language.
-    if (getCurrentLanguage() !== DEFAULT_LANGUAGE) {
-      idle(function () {
-        applyTranslations({ reason: "idle", force: true, includeCharts: true });
-      }, 1200);
-    }
+    initWhenReady(0);
   }
-
-  window.TSIINO_TRANSLATE_NOW = function () {
-    applyTranslations({ reason: "manual", force: true, includeCharts: true });
-  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
     init();
   }
+
+  window.addEventListener("load", function () {
+    fixFooterPaths();
+    refreshDynamicContent();
+  });
+
+  window.TSIINO_SET_LANGUAGE = setLanguage;
+  window.TSIINO_REFRESH_I18N = refreshDynamicContent;
 })();
