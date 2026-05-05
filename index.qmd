@@ -6538,13 +6538,13 @@ tagList(
       <div class="researchers-list">
         <article class="researcher-card">
           <span class="agency-pill">FAPEAM</span>
-          <h4>Charles Eugene Zartman</h4>
+          <h4>Charles Zartman</h4>
           <p>Instituto Nacional de Pesquisas da Amazônia — INPA</p>
         </article>
 
         <article class="researcher-card">
           <span class="agency-pill">FAPERJ</span>
-          <h4>Domingos Benicio Oliveira Silva Cardoso</h4>
+          <h4>Domingos Cardoso</h4>
           <p>Jardim Botânico do Rio de Janeiro — JBRJ</p>
         </article>
 
