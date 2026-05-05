@@ -1120,7 +1120,6 @@ team_ordered <- bind_rows(responsaveis, integrantes)
     <h1>Equipe</h1>
     <p class="hero-subtitle">Pesquisadores, instituições e colaboradores do projeto</p>
     <p class="hero-description">
-      Conheça a rede de coordenação científica e os integrantes que articulam pesquisa, campo, coleções, taxonomia e colaboração institucional no Alto Rio Negro.
     </p>
 
     <div class="hero-actions">

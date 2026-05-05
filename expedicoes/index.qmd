@@ -829,7 +829,6 @@ i18n_alt_attr <- function(key) {
     <h1 data-i18n="expeditions.hero.title">Expedições</h1>
     <p class="hero-subtitle" data-i18n="expeditions.hero.subtitle">Mapa, pontos de coleta, fotos e registros de campo</p>
     <p class="hero-description" data-i18n="expeditions.hero.description">
-      Acompanhe as campanhas do projeto Tsiino Hiiwiida na região da Cabeça do Cachorro, em São Gabriel da Cachoeira.
     </p>
 
     <div class="hero-actions">
