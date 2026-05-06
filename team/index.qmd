@@ -8,7 +8,7 @@ format:
 execute:
   echo: false
   eval: true
-  freeze: auto
+  freeze: false
   cache: false
   warning: false
   message: false
@@ -166,9 +166,9 @@ team_data <- team_data |>
   )
 
 responsible_names <- c(
-  "Charles Eugene Zartman",
+  "Charles Zartman",
   "Domingos Cardoso",
-  "Sandra Diane Knapp",
+  "Sandra Knapp",
   "Anna Luiza Ilkiu-Borges",
   "Clistenes Williams Araújo do Nascimento",
   "Dirce Komura",
