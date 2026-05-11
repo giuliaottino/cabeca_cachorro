@@ -1,0 +1,61 @@
+<script>
+(function () {
+  const ROUTES = {
+    '/': '/en/',
+    '/index.html': '/en/',
+    '/acesso/': '/en/data-access/',
+    '/acesso/index.html': '/en/data-access/',
+    '/expedicoes/': '/en/expeditions/',
+    '/expedicoes/index.html': '/en/expeditions/',
+    '/team/': '/en/team/',
+    '/team/index.html': '/en/team/',
+    '/en/': '/',
+    '/en/index.html': '/',
+    '/en/data-access/': '/acesso/',
+    '/en/data-access/index.html': '/acesso/',
+    '/en/expeditions/': '/expedicoes/',
+    '/en/expeditions/index.html': '/expedicoes/',
+    '/en/team/': '/team/',
+    '/en/team/index.html': '/team/'
+  };
+
+  const EN_NAV = [
+    { text: 'About', href: '/en/' },
+    { text: 'Expeditions', href: '/en/expeditions/' },
+    { text: 'Data Access', href: '/en/data-access/' },
+    { text: 'Team', href: '/en/team/' },
+    { text: 'PT', href: '/' }
+  ];
+
+  function clean(path) {
+    let out = path || '/';
+    out = out.replace(/\/+/g, '/');
+    out = out.replace(/index\.html$/, '');
+    if (!out.endsWith('/')) out += '/';
+    return out;
+  }
+
+  function resolveTarget(pathname) {
+    const cleanPath = clean(pathname);
+    return ROUTES[pathname] || ROUTES[cleanPath] || (cleanPath.startsWith('/en/') ? '/' : '/en/');
+  }
+
+  function isEnPage() {
+    return clean(window.location.pathname).startsWith('/en/');
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.getElementById('language-toggle-link') || document.querySelector('.tsiino-language-button');
+    if (toggle) toggle.setAttribute('href', resolveTarget(window.location.pathname));
+
+    if (isEnPage()) {
+      const links = Array.from(document.querySelectorAll('#quarto-header .navbar-nav .nav-link'));
+      EN_NAV.forEach(function (item, idx) {
+        if (!links[idx]) return;
+        links[idx].textContent = item.text;
+        links[idx].setAttribute('href', item.href);
+      });
+    }
+  });
+})();
+</script>
