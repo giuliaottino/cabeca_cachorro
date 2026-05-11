@@ -1380,8 +1380,6 @@ HTML(paste(letter_links, collapse = " | "))
   </div>
 
   <div class="team-section-header">
-    <h3>Coordenação científica</h3>
-    <p>Ordem alinhada à seção de pesquisadores responsáveis da página Sobre.</p>
   </div>
 ```
 
@@ -1402,7 +1400,7 @@ render_team_grid(responsaveis)
 
   <div class="team-section-header">
     <h3>Equipe ampliada</h3>
-    <p>Demais participantes cadastrados na planilha da equipe.</p>
+    <p></p>
   </div>
 ```
 

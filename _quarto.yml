@@ -1,4 +1,4 @@
-project:
+﻿project:
   output-dir: docs
   type: website
   render:
@@ -14,11 +14,11 @@ project:
 website:
   title: "Tsiino Hiwiida"
   page-navigation: true
-  reader-mode: true  
+  reader-mode: false  
   favicon: "figures/tsiino_hex_sticker.png"
 
   navbar:
-    search: true
+    search: false
     background: light
     collapse-below: lg
     type: light
@@ -27,7 +27,7 @@ website:
     left:
       - text: "Sobre"
         href: index.qmd
-      - text: "Expedições"
+      - text: "ExpediÃ§Ãµes"
         href: expedicoes/index.qmd
       - text: "Acesso aos dados"
         href: acesso/index.qmd
@@ -52,3 +52,4 @@ format:
     include-after-body:
       - tsiino-footer.html
       - _includes/language-scripts.html
+      - _includes/navbar-language-placement-safe.html

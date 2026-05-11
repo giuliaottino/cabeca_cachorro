@@ -1,0 +1,389 @@
+- id: fapeam
+  group: fomento
+  order: 1
+  acronym: FAPEAM
+  name: Fundação de Amparo à Pesquisa do Estado do Amazonas
+  role: Instituição de fomento
+  url: https://www.fapeam.am.gov.br/
+  logo: figures/logos/institutions/FAPEAM.png
+  source_file: FAPEAM.png
+- id: faperj
+  group: fomento
+  order: 2
+  acronym: FAPERJ
+  name: Fundação Carlos Chagas Filho de Amparo à Pesquisa do Estado do Rio de Janeiro
+  role: Instituição de fomento
+  url: https://www.faperj.br/
+  logo: figures/logos/institutions/FAPERJ.png
+  source_file: FAPERJ.png
+- id: ukri
+  group: fomento
+  order: 3
+  acronym: UKRI
+  name: UK Research and Innovation
+  role: Instituição de fomento internacional
+  url: https://www.ukri.org/
+  logo: figures/logos/institutions/UKRI.png
+  source_file: UKRI.png
+- id: fapespa
+  group: fomento
+  order: 4
+  acronym: FAPESPA
+  name: Fundação Amazônia de Amparo a Estudos e Pesquisas
+  role: Instituição de fomento
+  url: https://www.fapespa.pa.gov.br/
+  logo: figures/logos/institutions/FAPESPA.png
+  source_file: FAPESPA.png
+- id: facepe
+  group: fomento
+  order: 5
+  acronym: FACEPE
+  name: Fundação de Amparo à Ciência e Tecnologia do Estado de Pernambuco
+  role: Instituição de fomento
+  url: https://www.facepe.br/
+  logo: figures/logos/institutions/FACEPE.png
+  source_file: FACEPE.png
+- id: fapema
+  group: fomento
+  order: 6
+  acronym: FAPEMA
+  name: Fundação de Amparo à Pesquisa e ao Desenvolvimento Científico e Tecnológico do Maranhão
+  role: Instituição de fomento
+  url: https://www.fapema.br/
+  logo: figures/logos/institutions/FAPEMA.png
+  source_file: FAPEMA.png
+- id: fapesp
+  group: fomento
+  order: 7
+  acronym: FAPESP
+  name: Fundação de Amparo à Pesquisa do Estado de São Paulo
+  role: Instituição de fomento
+  url: https://fapesp.br/
+  logo: figures/logos/institutions/FAPESP.png
+  source_file: FAPESP.png
+- id: fapesq_pb
+  group: fomento
+  order: 8
+  acronym: FAPESQ-PB
+  name: Fundação de Apoio à Pesquisa do Estado da Paraíba
+  role: Instituição de fomento
+  url: https://fapesq.rpp.br/
+  logo: figures/logos/institutions/FAPESQ_PB.png
+  source_file: FAPESQ_PB.png
+- id: fapdf
+  group: fomento
+  order: 9
+  acronym: FAPDF
+  name: Fundação de Apoio à Pesquisa do Distrito Federal
+  role: Instituição de fomento
+  url: https://www.fap.df.gov.br/
+  logo: figures/logos/institutions/FAPDF.png
+  source_file: FAPDF.png
+- id: inpa
+  group: participante
+  order: 1
+  acronym: INPA
+  name: Instituto Nacional de Pesquisas da Amazônia
+  role: Instituição participante da rede de coordenação científica
+  url: https://www.gov.br/inpa/pt-br
+  logo: figures/logos/institutions/INPA.png
+  source_file: INPA.png
+- id: jbrj
+  group: participante
+  order: 2
+  acronym: JBRJ
+  name: Instituto de Pesquisas Jardim Botânico do Rio de Janeiro
+  role: Instituição participante da rede de coordenação científica
+  url: https://www.gov.br/jbrj/pt-br
+  logo: figures/logos/institutions/Jardim_Botanico_RJ.png
+  source_file: Jardim_Botanico_RJ.png
+- id: nhm
+  group: participante
+  order: 3
+  acronym: NHM
+  name: Natural History Museum, London
+  role: Instituição participante da rede de coordenação científica
+  url: https://www.nhm.ac.uk/
+  logo: figures/logos/institutions/Natural_History_Museum.png
+  source_file: Natural_History_Museum.png
+- id: mpeg
+  group: participante
+  order: 4
+  acronym: MPEG
+  name: Museu Paraense Emílio Goeldi
+  role: Instituição participante da rede de coordenação científica
+  url: https://www.gov.br/museugoeldi/pt-br
+  logo: figures/logos/institutions/Museu_Goeldi.png
+  source_file: Museu_Goeldi.png
+- id: ufrpe
+  group: participante
+  order: 5
+  acronym: UFRPE
+  name: Universidade Federal Rural de Pernambuco
+  role: Instituição participante da rede de coordenação científica
+  url: https://www.ufrpe.br/
+  logo: figures/logos/institutions/UFRPE.png
+  source_file: UFRPE.png
+- id: ipa
+  group: participante
+  order: 6
+  acronym: IPA
+  name: Instituto Agronômico de Pernambuco
+  role: Instituição participante da rede de coordenação científica
+  url: https://site.ipa.br/
+  logo: figures/logos/institutions/IPA.png
+  source_file: IPA_PE.png
+- id: ufpb
+  group: participante
+  order: 7
+  acronym: UFPB
+  name: Universidade Federal da Paraíba
+  role: Instituição participante da rede de coordenação científica
+  url: https://www.ufpb.br/
+  logo: figures/logos/institutions/UFPB.png
+  source_file: UFPB.png
+- id: unb
+  group: participante
+  order: 8
+  acronym: UnB
+  name: Universidade de Brasília
+  role: Instituição participante da rede de coordenação científica
+  url: https://www.unb.br/
+  logo: figures/logos/institutions/UnB.png
+  source_file: UnB.png
+- id: cnpq
+  group: parceira
+  order: 2
+  acronym: CNPq
+  name: Conselho Nacional de Desenvolvimento Científico e Tecnológico
+  role: Instituição parceira
+  url: https://www.gov.br/cnpq/pt-br
+  logo: figures/logos/institutions/CNPq.png
+  source_file: CNPq.png
+- id: ifma
+  group: parceira
+  order: 3
+  acronym: IFMA
+  name: Instituto Federal do Maranhão
+  role: Instituição parceira
+  url: https://www.ifma.edu.br/
+  logo: figures/logos/institutions/IFMA.png
+  source_file: IFMA.png
+  note: 'Classificada como parceira nesta organização, conforme orientação: participantes são as instituições dos coordenadores/responsáveis,
+    exceto IFMA.'
+- id: ufam
+  group: parceira
+  order: 4
+  acronym: UFAM
+  name: Universidade Federal do Amazonas
+  role: Instituição parceira
+  url: https://www.ufam.edu.br/
+  logo: figures/logos/institutions/UFAM.png
+  source_file: UFAM.png
+- id: ifam
+  group: parceira
+  order: 5
+  acronym: IFAM
+  name: Instituto Federal do Amazonas
+  role: Instituição parceira
+  url: https://www.ifam.edu.br/
+  logo: figures/logos/institutions/IFAM.png
+  source_file: IFAM.png
+- id: uea
+  group: parceira
+  order: 6
+  acronym: UEA
+  name: Universidade do Estado do Amazonas
+  role: Instituição parceira
+  url: https://www.uea.edu.br/
+  logo: figures/logos/institutions/UEA.png
+  source_file: UEA.png
+- id: ufopa
+  group: parceira
+  order: 7
+  acronym: UFOPA
+  name: Universidade Federal do Oeste do Pará
+  role: Instituição parceira
+  url: https://www.ufopa.edu.br/ufopa/
+  logo: figures/logos/institutions/UFOPA.png
+  source_file: UFOPA.png
+- id: ufba
+  group: parceira
+  order: 8
+  acronym: UFBA
+  name: Universidade Federal da Bahia
+  role: Instituição parceira
+  url: https://ufba.br/
+  logo: figures/logos/institutions/UFBA.png
+  source_file: UFBA.png
+- id: uefs
+  group: parceira
+  order: 9
+  acronym: UEFS
+  name: Universidade Estadual de Feira de Santana
+  role: Instituição parceira
+  url: https://www.uefs.br/
+  logo: figures/logos/institutions/UEFS.png
+  source_file: UEFS.png
+- id: uesc
+  group: parceira
+  order: 10
+  acronym: UESC
+  name: Universidade Estadual de Santa Cruz
+  role: Instituição parceira
+  url: https://www.uesc.br/
+  logo: figures/logos/institutions/UESC.png
+  source_file: UESC.png
+- id: inma
+  group: parceira
+  order: 11
+  acronym: INMA
+  name: Instituto Nacional da Mata Atlântica
+  role: Instituição parceira
+  url: https://www.gov.br/inma/pt-br
+  logo: figures/logos/institutions/INMA.png
+  source_file: INMA.png
+- id: fiocruz
+  group: parceira
+  order: 12
+  acronym: Fiocruz
+  name: Fundação Oswaldo Cruz
+  role: Instituição parceira
+  url: https://fiocruz.br/
+  logo: figures/logos/institutions/FIOCRUZ.png
+  source_file: FIOCRUZ.png
+- id: university_copenhagen
+  group: parceira
+  order: 13
+  acronym: UCPH
+  name: University of Copenhagen
+  role: Instituição parceira
+  url: https://www.ku.dk/en
+  logo: figures/logos/institutions/University_of_Copenhagen.png
+  source_file: University_of_Copenhagen.png
+- id: cma
+  group: parceira
+  order: 14
+  acronym: CMA
+  name: Comando Militar da Amazônia
+  role: Instituição parceira
+  url: https://cma.eb.mil.br/
+  logo: figures/logos/institutions/CMA_Comando_Militar_da_Amazonia.png
+  source_file: CMA_Comando_Militar_da_Amazonia.png
+- id: exercito_brasileiro
+  group: parceira
+  order: 15
+  acronym: Exército Brasileiro
+  name: Exército Brasileiro
+  role: Instituição parceira
+  url: https://www.eb.mil.br/
+  logo: figures/logos/institutions/Exercito_Brasileiro.png
+  source_file: Exercito_Brasileiro.png
+- id: segunda_brigada_selva
+  group: parceira
+  order: 16
+  acronym: 2ª Bda Inf Sl
+  name: 2ª Brigada de Infantaria de Selva / Brigada Ararigbóia
+  role: Instituição parceira
+  url: https://www.eb.mil.br/quarteis-por-estado
+  logo: figures/logos/institutions/Segunda_Brigada_de_Infantaria_de_Selva.png
+  source_file: Segunda_Brigada_de_Infantaria_de_Selva.png
+- id: esd
+  group: parceira
+  order: 17
+  acronym: ESD
+  name: Escola Superior de Defesa
+  role: Instituição parceira
+  url: https://www.gov.br/esd/
+  logo: figures/logos/institutions/ESD_Escola_Superior_de_Defesa.png
+  source_file: ESD_Escola_Superior_de_Defesa.png
+- id: sao_gabriel_cachoeira
+  group: parceira
+  order: 18
+  acronym: SGC
+  name: Município de São Gabriel da Cachoeira
+  role: Instituição parceira
+  url: https://transparenciamunicipalaam.org.br/p/sao-gabriel-da-cachoeira
+  logo: figures/logos/institutions/Sao_Gabriel_da_Cachoeira.png
+  source_file: Sao_Gabriel_da_Cachoeira.png
+- id: icmbio
+  group: parceira
+  order: 19
+  acronym: ICMBio
+  name: Instituto Chico Mendes de Conservação da Biodiversidade
+  role: Instituição parceira
+  url: https://www.gov.br/icmbio/pt-br
+  logo: figures/logos/institutions/ICMBio_MMA.png
+  source_file: ICMBio_MMA.png
+- id: funai
+  group: parceira
+  order: 20
+  acronym: FUNAI
+  name: Fundação Nacional dos Povos Indígenas
+  role: Instituição parceira
+  url: https://www.gov.br/funai/pt-br
+  logo: figures/logos/institutions/FUNAI.png
+  source_file: FUNAI.png
+- id: isa
+  group: parceira
+  order: 21
+  acronym: ISA
+  name: Instituto Socioambiental
+  role: Instituição parceira
+  url: https://www.socioambiental.org/
+  logo: figures/logos/institutions/ISA_Instituto_Socioambiental.png
+  source_file: ISA_Instituto_Socioambiental.png
+- id: foirn
+  group: parceira
+  order: 22
+  acronym: FOIRN
+  name: Federação das Organizações Indígenas do Rio Negro
+  role: Instituição parceira
+  url: https://foirn.org.br/
+  logo: figures/logos/institutions/FOIRN.png
+  source_file: FOIRN.png
+- id: ayrca
+  group: parceira
+  order: 23
+  acronym: AYRCA
+  name: Associação Yanomami do Rio Cauaburis e Afluentes
+  role: Instituição parceira
+  url: https://ayrca.wordpress.com/
+  logo: figures/logos/institutions/AYRCA.png
+  source_file: AYRCA.png
+- id: amyk
+  group: parceira
+  order: 24
+  acronym: AMYK
+  name: Associação das Mulheres Yanomami Kumirayoma
+  role: Instituição parceira
+  url: https://ayrca.wordpress.com/associacao-das-mulheres-yanomami-kumirayoma-amyk/
+  logo: figures/logos/institutions/AMYK_Kumirayoma.png
+  source_file: AMYK_Kumirayoma.png
+- id: atriart
+  group: parceira
+  order: 25
+  acronym: ATRIART
+  name: Associação das Tribos Indígenas do Alto Rio Tiquié
+  role: Instituição parceira
+  url: https://foirn.org.br/coordenadorias-e-associacoes/
+  logo: figures/logos/institutions/ATRIART.png
+  source_file: ATRIART.png
+- id: ecoturismo_coracao_amazonia
+  group: parceira
+  order: 26
+  acronym: Ecoturismo Coração da Amazônia
+  name: Ecoturismo Coração da Amazônia
+  role: Instituição parceira
+  url: https://portfolio.jornadaamazonia.org.br/startup/recGnhllvqca4K2fy
+  logo: figures/logos/institutions/Ecoturismo_Coracao_da_Amazonia.png
+  source_file: Ecoturismo_Coracao_da_Amazonia.png
+- id: nhio_hui
+  group: parceira
+  order: 27
+  acronym: Nhiõ Hũí
+  name: Nhiõ Hũí / Água Eterna
+  role: Instituição parceira
+  url: site oficial não localizado com segurança
+  logo: figures/logos/institutions/Nhio_Hui_Agua_Eterna.png
+  source_file: Nhio_Hui_Agua_Eterna.png

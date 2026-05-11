@@ -5099,289 +5099,442 @@ section#pesquisadores-responsaveis {
 ```
 
 ```{=html}
-<section id="objetivos" class="objectives-section" aria-label="Objetivos e abordagem do projeto">
-  <div class="objectives-carousel">
-
-    <article class="objective-slide active">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 01 · Campo</div>
-        <h2>Expedições nos rios Negro, Curicuriari, Içana e Vaupés</h2>
-        <p>
-          As campanhas de campo irão amostrar diferentes habitats da Cabeça do Cachorro, incluindo campinaranas, florestas de terra-firme, igapós, serras e afloramentos rochosos, com foco em plantas vasculares, criptógamas e fungos.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Levantamento de flora e funga em campo"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/levantamento_flora_funga_02.png" alt="Registro de campo de flora e funga"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 02 · Diversidade críptica</div>
-        <h2>Metabarcoding para detectar biodiversidade invisível aos inventários tradicionais</h2>
-        <p>
-          Amostras ambientais de solo, água, sedimentos e tapetes de musgos serão analisadas para revelar linhagens crípticas, organismos raros e componentes pouco detectados por identificação morfológica convencional.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenômicas de ponta"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/metagenomica_02.jpg" alt="Leitura molecular da biodiversidade"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 03 · Taxonomia integrativa</div>
-        <h2>Linhagens raras, negligenciadas e filogeneticamente enigmáticas</h2>
-        <p>
-          O projeto combina morfologia, moléculas, coleções históricas e novas coletas para revisar grupos pouco estudados, posicionar espécies na árvore da vida e apoiar descrições taxonômicas robustas.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/linhagens_raras_01.png" alt="Linhagens raras ou pouco conhecidas"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/linhagens_raras_02.jpg" alt="Identificação taxonômica em campo"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 04 · Interações ecológicas</div>
-        <h2>Fungos, hospedeiros e relações ecológicas complexas</h2>
-        <p>
-          Uma das frentes investiga a diversidade e a evolução de fungos associados a insetos, ampliando o conhecimento sobre interações biológicas amazônicas ainda pouco documentadas.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/fungo.jpg" alt="Material taxonômico para coleções científicas"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/fungo_2.jpg" alt="Preparação de material biológico"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 05 · Bioeconomia e segurança alimentar</div>
-        <h2>PANC, nutrientes e metais em espécies de interesse local</h2>
-        <p>
-          Plantas alimentícias não convencionais, análise de macro e micronutrientes e avaliação de metais, conectando biodiversidade, alimentação, saúde ambiental e possíveis caminhos de bioeconomia.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Taxonomia, sistemática molecular e biomonitoramento"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/taxonomia_molecular_02.jpg" alt="Análises taxonômicas e moleculares"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 06 · Biomonitoramento</div>
-        <h2>Bioindicadores para acompanhar qualidade ambiental</h2>
-        <p>
-          Musgos e outros grupos sensíveis serão utilizados para investigar padrões de acumulação de contaminantes e estabelecer uma base de referência para o monitoramento ambiental em áreas indígenas.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/briofita.jpeg" alt="Amostragem de organismos em campo"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/briofita_2.jpeg" alt="Biomonitoramento e análises científicas"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 07 · Acervos e dados públicos</div>
-        <h2>Catálogo verificado, herbários e banco AmaTreeDNA</h2>
-        <p>
-          As coletas irão fortalecer herbários amazônicos, apoiar a digitalização de espécimes, criar um banco de tecidos e DNA associado a vouchers e consolidar o primeiro catálogo da flora e funga da região.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/catalogo_flora_funga_01.jpg" alt="Catálogo da flora e funga da Cabeça do Cachorro"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Dados taxonômicos verificados"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="objective-slide">
-      <div class="objective-text">
-        <div class="objective-kicker">Objetivo 08 · Formação e comunicação</div>
-        <h2>Oficinas, estudantes, parataxonomistas e comunicação multilíngue</h2>
-        <p>
-          A formação de recursos humanos, as Oficinas Botânicas, a participação de parataxonomistas e a tradução de resultados para Baniwa, Tukano e Nheengatu fazem parte da estratégia de retorno social do projeto.
-        </p>
-      </div>
-
-      <div class="objective-image-wrap">
-        <div class="objective-image">
-          <div class="objective-photo-slide active"><img src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Trabalho de campo com comunidades indígenas locais"></div>
-          <div class="objective-photo-slide"><img src="figures/objetivos/comunidades_indigenas_02.jpg" alt="Colaboração territorial e conhecimento local"></div>
-
-          <button class="objective-photo-arrow objective-photo-prev" type="button" aria-label="Foto anterior">‹</button>
-          <button class="objective-photo-arrow objective-photo-next" type="button" aria-label="Próxima foto">›</button>
-
-          <div class="objective-photo-dots">
-            <button class="objective-photo-dot active" type="button" aria-label="Foto 1"></button>
-            <button class="objective-photo-dot" type="button" aria-label="Foto 2"></button>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <div class="objective-nav" aria-hidden="false">
-      <button class="objective-arrow objective-prev" type="button" aria-label="Objetivo anterior">‹</button>
-      <button class="objective-arrow objective-next" type="button" aria-label="Próximo objetivo">›</button>
+<section id="objetivos" class="objectives-section core-objectives-section" aria-label="Objetivos e abordagem do projeto">
+  <div class="core-objectives-head">
+    <div class="core-objectives-title-wrap">
+      <div class="core-objectives-eyebrow">Objetivos</div>
+      <h2 class="core-objectives-title" aria-label="Objetivos do projeto">
+        <span class="core-title-line core-title-line-a">Objetivos</span>
+        <span class="core-title-line core-title-line-b">do projeto</span>
+      </h2>
+      <p class="core-objectives-lead">
+        Navegue pelas frentes de trabalho do Tsiino Hiiwiida em cards amplos, soltos sobre o fundo da página, com um objetivo em destaque e os próximos objetivos entrando pela extremidade direita da tela.
+      </p>
     </div>
 
-    <div class="objective-dots" aria-label="Navegação dos objetivos">
-      <button class="objective-dot active" type="button" aria-label="Objetivo 1"></button>
-      <button class="objective-dot" type="button" aria-label="Objetivo 2"></button>
-      <button class="objective-dot" type="button" aria-label="Objetivo 3"></button>
-      <button class="objective-dot" type="button" aria-label="Objetivo 4"></button>
-      <button class="objective-dot" type="button" aria-label="Objetivo 5"></button>
-      <button class="objective-dot" type="button" aria-label="Objetivo 6"></button>
-      <button class="objective-dot" type="button" aria-label="Objetivo 7"></button>
-      <button class="objective-dot" type="button" aria-label="Objetivo 8"></button>
+    <div class="core-objectives-controls" aria-label="Navegação dos objetivos">
+      <button class="core-objectives-arrow core-objectives-prev" type="button" aria-label="Objetivo anterior">←</button>
+      <button class="core-objectives-arrow core-objectives-next" type="button" aria-label="Próximo objetivo">→</button>
     </div>
+  </div>
 
+  <div class="core-objectives-viewport" tabindex="0" aria-label="Carrossel de objetivos do projeto">
+    <div class="core-objectives-track" role="list">
+
+      <article class="core-objective-card is-active" data-objective-index="0" role="listitem">
+        <div class="core-objective-media" aria-label="Imagens do Objetivo 1">
+          <img class="core-objective-photo is-photo-active" src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Levantamento de flora e funga em campo" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/levantamento_flora_funga_02.png" alt="Registro de campo de flora e funga" loading="lazy">
+        </div>
+        <div class="core-objective-body">
+          <span class="core-objective-number">01</span>
+          <span class="core-objective-kicker">Campo</span>
+          <h3>Expedições nos rios Negro, Curicuriari, Içana e Vaupés</h3>
+          <p>Campanhas de campo irão amostrar campinaranas, florestas de terra-firme, igapós, serras e afloramentos rochosos, com foco em plantas vasculares, criptógamas e fungos.</p>
+        </div>
+      </article>
+
+      <article class="core-objective-card" data-objective-index="1" role="listitem">
+        <div class="core-objective-media" aria-label="Imagens do Objetivo 2">
+          <img class="core-objective-photo is-photo-active" src="figures/objetivos/linhagens_raras_01.png" alt="Linhagens raras ou pouco conhecidas" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/linhagens_raras_02.jpg" alt="Identificação taxonômica em campo" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenômicas de ponta" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/metagenomica_02.jpg" alt="Leitura molecular da biodiversidade" loading="lazy">
+        </div>
+        <div class="core-objective-body">
+          <span class="core-objective-number">02</span>
+          <span class="core-objective-kicker">Diversidade críptica e taxonomia integrativa</span>
+          <h3>Revelar linhagens crípticas, raras e pouco conhecidas</h3>
+          <p>Metabarcoding, dados moleculares, morfologia, coleções históricas e novas coletas serão integrados para detectar organismos pouco visíveis aos inventários tradicionais.</p>
+        </div>
+      </article>
+
+      <article class="core-objective-card" data-objective-index="2" role="listitem">
+        <div class="core-objective-media" aria-label="Imagens do Objetivo 3">
+          <img class="core-objective-photo is-photo-active" src="figures/objetivos/fungo.jpg" alt="Material taxonômico para coleções científicas" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/fungo_2.jpg" alt="Preparação de material biológico" loading="lazy">
+        </div>
+        <div class="core-objective-body">
+          <span class="core-objective-number">03</span>
+          <span class="core-objective-kicker">Interações ecológicas</span>
+          <h3>Fungos, hospedeiros e relações ecológicas complexas</h3>
+          <p>A frente investiga a diversidade e evolução de fungos associados a insetos, ampliando o conhecimento sobre interações amazônicas ainda pouco documentadas.</p>
+        </div>
+      </article>
+
+      <article class="core-objective-card" data-objective-index="3" role="listitem">
+        <div class="core-objective-media" aria-label="Imagens do Objetivo 4">
+          <img class="core-objective-photo is-photo-active" src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Taxonomia, sistemática molecular e biomonitoramento" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/taxonomia_molecular_02.jpg" alt="Análises taxonômicas e moleculares" loading="lazy">
+        </div>
+        <div class="core-objective-body">
+          <span class="core-objective-number">04</span>
+          <span class="core-objective-kicker">Bioeconomia e segurança alimentar</span>
+          <h3>PANC, nutrientes e metais em espécies de interesse local</h3>
+          <p>Plantas alimentícias não convencionais, macro e micronutrientes e metais serão analisados conectando biodiversidade, alimentação, saúde ambiental e bioeconomia.</p>
+        </div>
+      </article>
+
+      <article class="core-objective-card" data-objective-index="4" role="listitem">
+        <div class="core-objective-media" aria-label="Imagens do Objetivo 5">
+          <img class="core-objective-photo is-photo-active" src="figures/objetivos/briofita.jpeg" alt="Amostragem de organismos em campo" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/briofita_2.jpeg" alt="Biomonitoramento e análises científicas" loading="lazy">
+        </div>
+        <div class="core-objective-body">
+          <span class="core-objective-number">05</span>
+          <span class="core-objective-kicker">Biomonitoramento</span>
+          <h3>Bioindicadores para acompanhar qualidade ambiental</h3>
+          <p>Musgos e outros grupos sensíveis serão usados para investigar contaminantes e criar uma base de referência para monitoramento ambiental em áreas indígenas.</p>
+        </div>
+      </article>
+
+      <article class="core-objective-card" data-objective-index="5" role="listitem">
+        <div class="core-objective-media" aria-label="Imagens do Objetivo 6">
+          <img class="core-objective-photo is-photo-active" src="figures/objetivos/catalogo_flora_funga_01.jpg" alt="Catálogo da flora e funga da Cabeça do Cachorro" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/catalogo_flora_funga_02.jpg" alt="Dados taxonômicos verificados" loading="lazy">
+        </div>
+        <div class="core-objective-body">
+          <span class="core-objective-number">06</span>
+          <span class="core-objective-kicker">Acervos e dados públicos</span>
+          <h3>Catálogo verificado, herbários e banco AmaTreeDNA</h3>
+          <p>As coletas irão fortalecer herbários amazônicos, apoiar a digitalização de espécimes e consolidar o primeiro catálogo da flora e funga da região.</p>
+        </div>
+      </article>
+
+      <article class="core-objective-card" data-objective-index="6" role="listitem">
+        <div class="core-objective-media" aria-label="Imagens do Objetivo 7">
+          <img class="core-objective-photo is-photo-active" src="figures/objetivos/comunidades_indigenas_01.jpg" alt="Trabalho de campo com comunidades indígenas locais" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/comunidades_indigenas_02.jpg" alt="Colaboração territorial e conhecimento local" loading="lazy">
+        </div>
+        <div class="core-objective-body">
+          <span class="core-objective-number">07</span>
+          <span class="core-objective-kicker">Formação e comunicação</span>
+          <h3>Oficinas, estudantes, parataxonomistas e comunicação multilíngue</h3>
+          <p>Oficinas Botânicas, formação de estudantes, participação de parataxonomistas e tradução para Baniwa, Tukano e Nheengatu integram o retorno social do projeto.</p>
+        </div>
+      </article>
+
+    </div>
   </div>
 </section>
 ```
 
 
 ```{=html}
-<section id="expedicoes-recentes" class="content-card">
-  <div class="section-title">
-    <h2>Expedições recentes</h2>
+<section id="expedicoes-recentes" class="exp-collage-section" aria-label="Expedições recentes">
+  <div class="exp-collage-grid" aria-label="Colagem com oito fotos das expedições">
+
+    <figure class="exp-collage-item exp-photo-1" data-label="Expedição 1">
+      <img src="figures/exp_1.jpg" alt="Foto da expedição 1" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
+    <figure class="exp-collage-item exp-photo-2" data-label="Expedição 2">
+      <img src="figures/exp_2.jpg" alt="Foto da expedição 2" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
+    <figure class="exp-collage-item exp-photo-3" data-label="Expedição 3">
+      <img src="figures/exp_3.png" alt="Foto da expedição 3" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
+    <figure class="exp-collage-item exp-photo-4" data-label="Expedição 4">
+      <img src="figures/exp_4.jpg" alt="Foto da expedição 4" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
+    <figure class="exp-collage-item exp-photo-5" data-label="Expedição 5">
+      <img src="figures/exp_5.jpg" alt="Foto da expedição 5" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
+    <figure class="exp-collage-item exp-photo-6" data-label="Expedição 6">
+      <img src="figures/exp_6.jpg" alt="Foto da expedição 6" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
+    <figure class="exp-collage-item exp-photo-7" data-label="Expedição 7">
+      <img src="figures/exp_7.jpg" alt="Foto da expedição 7" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
+    <figure class="exp-collage-item exp-photo-8" data-label="Expedição 8">
+      <img src="figures/exp_8.jpg" alt="Foto da expedição 8" loading="lazy"
+           onerror="this.parentElement.classList.add('is-missing'); this.remove();">
+    </figure>
+
   </div>
 
-  <p class="lead">
-    As expedições são a unidade viva do Tsiino Hiiwiida: cada campanha articula logística, comunidades, pontos de coleta, registros fotográficos, vouchers, amostras de DNA e observações ecológicas.
-  </p>
-```
+  <div class="exp-collage-overlay">
+    <div class="exp-collage-cta">
+      <h2 class="exp-collage-heading">Expedições recentes</h2>
+      <span class="exp-collage-line" aria-hidden="true"></span>
+      <a class="btn-main" href="expedicoes.html">Mapa e fotos das expedições</a>
+    </div>
+  </div>
+</section>
 
-```{r expedicoes-recentes}
-library(htmltools)
+<style>
+/* ===== Expedições recentes: colagem full-width, 8 fotos, responsiva ===== */
 
-expedicoes_home <- read_optional_csv(file.path("_input_data", "expedicoes_tsiino.csv"))
-
-if (nrow(expedicoes_home) > 0) {
-  expedicoes_home$expedicao <- col_or(expedicoes_home, c("expedicao", "expedição", "nome", "name"), "Expedição")
-  expedicoes_home$localidade <- col_or(expedicoes_home, c("localidade", "local", "ponto", "site"), "")
-  expedicoes_home$data <- col_or(expedicoes_home, c("data", "date", "periodo", "período"), "")
-  expedicoes_home$resumo <- col_or(expedicoes_home, c("resumo", "descricao", "descrição", "observacoes", "observações"), "")
-
-  expedicoes_home <- utils::tail(expedicoes_home, 3)
-
-  tagList(
-    tags$div(
-      class = "expedition-preview-grid",
-      lapply(seq_len(nrow(expedicoes_home)), function(i) {
-        tags$article(
-          class = "expedition-preview-card",
-          tags$div(class = "expedition-date", ifelse(nz(expedicoes_home$data[i]), expedicoes_home$data[i], "Campanha")),
-          tags$h3(expedicoes_home$expedicao[i]),
-          tags$p(ifelse(nz(expedicoes_home$resumo[i]), expedicoes_home$resumo[i], paste("Localidade:", expedicoes_home$localidade[i])))
-        )
-      })
-    ),
-    tags$div(
-      class = "hero-actions",
-      style = "margin-top: 1rem;",
-      tags$a(class = "btn-main", href = "expedicoes.html", "Mapa e fotos das expedições")
-    )
-  )
-} else {
-  tagList(
-    tags$div(
-      class = "empty-media",
-      "Nenhuma expedição foi encontrada em _input_data/expedicoes_tsiino.csv. Quando o arquivo existir, as expedições recentes aparecerão automaticamente aqui."
-    ),
-    tags$div(
-      class = "hero-actions",
-      style = "margin-top: 1rem;",
-      tags$a(class = "btn-main", href = "expedicoes.html", "Abrir página de expedições")
-    )
-  )
+#expedicoes-recentes.exp-collage-section {
+  position: relative !important;
+  inline-size: 100vw !important;
+  max-inline-size: 100vw !important;
+  margin-block: clamp(2.4rem, 4vw, 3.8rem) 0 !important;
+  margin-inline: calc(50% - 50vw) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: var(--green-dark) !important;
+  block-size: clamp(460px, 52vw, 740px) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  z-index: 2;
 }
-```
 
-```{=html}
-</section>
+#expedicoes-recentes .exp-collage-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: clamp(3px, 0.35vw, 6px);
+  inline-size: 100%;
+  block-size: 100%;
+  background: var(--green-dark);
+}
+
+#expedicoes-recentes .exp-collage-item {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(217,154,39,0.24), transparent 32%),
+    linear-gradient(135deg, rgba(46,59,36,0.96), rgba(98,106,56,0.82)),
+    url("figures/tsiino_bg.png");
+  background-size: cover;
+  background-position: center;
+}
+
+#expedicoes-recentes .exp-collage-item::before {
+  content: attr(data-label);
+  position: absolute;
+  inset: auto 0.8rem 0.8rem 0.8rem;
+  z-index: 2;
+  display: none;
+  padding: 0.45rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(23,23,23,0.46);
+  color: rgba(255,253,247,0.92);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+#expedicoes-recentes .exp-collage-item.is-missing::before {
+  display: inline-flex;
+  width: fit-content;
+}
+
+#expedicoes-recentes .exp-collage-item.is-missing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, transparent 0 46%, rgba(246,241,232,0.18) 46% 48%, transparent 48% 100%);
+  pointer-events: none;
+}
+
+#expedicoes-recentes .exp-collage-item img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transform: scale(1.01);
+  transition: transform 520ms ease, filter 520ms ease;
+  filter: saturate(0.96) contrast(1.04);
+}
+
+#expedicoes-recentes .exp-collage-item:hover img {
+  transform: scale(1.06);
+  filter: saturate(1.04) contrast(1.06);
+}
+
+/* Bento desktop: todas as 8 aparecem, sem buracos e sem overflow */
+#expedicoes-recentes .exp-photo-1 {
+  grid-column: 1 / 4;
+  grid-row: 1 / 3;
+}
+
+#expedicoes-recentes .exp-photo-2 {
+  grid-column: 4 / 6;
+  grid-row: 1 / 2;
+}
+
+#expedicoes-recentes .exp-photo-3 {
+  grid-column: 6 / 9;
+  grid-row: 1 / 2;
+}
+
+#expedicoes-recentes .exp-photo-4 {
+  grid-column: 4 / 6;
+  grid-row: 2 / 4;
+}
+
+#expedicoes-recentes .exp-photo-5 {
+  grid-column: 6 / 7;
+  grid-row: 2 / 4;
+}
+
+#expedicoes-recentes .exp-photo-6 {
+  grid-column: 7 / 9;
+  grid-row: 2 / 5;
+}
+
+#expedicoes-recentes .exp-photo-7 {
+  grid-column: 1 / 4;
+  grid-row: 3 / 5;
+}
+
+#expedicoes-recentes .exp-photo-8 {
+  grid-column: 4 / 7;
+  grid-row: 4 / 5;
+}
+
+#expedicoes-recentes .exp-collage-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: clamp(1.25rem, 3vw, 2.8rem);
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(23,23,23,0.04) 0%, rgba(46,59,36,0.20) 46%, rgba(46,59,36,0.86) 100%),
+    linear-gradient(90deg, rgba(0,0,0,0.16), transparent 28%, transparent 72%, rgba(0,0,0,0.12));
+}
+
+#expedicoes-recentes .exp-collage-cta {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+#expedicoes-recentes .exp-collage-heading {
+  margin: 0;
+  color: #fff;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(1.55rem, 3vw, 2.45rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  text-shadow: 0 3px 18px rgba(0,0,0,0.76);
+}
+
+#expedicoes-recentes .exp-collage-line {
+  display: block;
+  inline-size: min(420px, 70vw);
+  block-size: 1px;
+  background: rgba(255,253,247,0.78);
+}
+
+#expedicoes-recentes .exp-collage-cta .btn-main {
+  box-shadow: 0 10px 28px rgba(0,0,0,0.38);
+}
+
+/* Tablet */
+@media (max-width: 980px) {
+  #expedicoes-recentes.exp-collage-section {
+    block-size: clamp(420px, 78vw, 640px) !important;
+  }
+
+  #expedicoes-recentes .exp-collage-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+  }
+
+  #expedicoes-recentes .exp-photo-1 {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
+  }
+
+  #expedicoes-recentes .exp-photo-2 {
+    grid-column: 3 / 5;
+    grid-row: 1 / 2;
+  }
+
+  #expedicoes-recentes .exp-photo-3 {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+  }
+
+  #expedicoes-recentes .exp-photo-4 {
+    grid-column: 4 / 5;
+    grid-row: 2 / 4;
+  }
+
+  #expedicoes-recentes .exp-photo-5 {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+
+  #expedicoes-recentes .exp-photo-6 {
+    grid-column: 2 / 4;
+    grid-row: 3 / 4;
+  }
+
+  #expedicoes-recentes .exp-photo-7 {
+    grid-column: 1 / 3;
+    grid-row: 4 / 5;
+  }
+
+  #expedicoes-recentes .exp-photo-8 {
+    grid-column: 3 / 5;
+    grid-row: 4 / 5;
+  }
+}
+
+/* Mobile */
+@media (max-width: 620px) {
+  #expedicoes-recentes.exp-collage-section {
+    block-size: clamp(560px, 140vw, 760px) !important;
+  }
+
+  #expedicoes-recentes .exp-collage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    gap: 3px;
+  }
+
+  #expedicoes-recentes .exp-collage-item {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  #expedicoes-recentes .exp-collage-overlay {
+    padding: 1.1rem 0.85rem 1.4rem;
+  }
+
+  #expedicoes-recentes .exp-collage-heading {
+    font-size: clamp(1.45rem, 8vw, 2rem);
+  }
+
+  #expedicoes-recentes .exp-collage-cta .btn-main {
+    inline-size: min(100%, 320px);
+  }
+}
+</style>
 
 <style>
 /* ===== Divulgação: layout fixo, proporcional e sem cards cortados ===== */
@@ -6294,12 +6447,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <section id="divulgacao" class="content-card">
   <div class="section-title">
-    <h2>Divulgação</h2>
+    <h2>Projeto Tsiino Hiiwiida na mídia</h2>
   </div>
-
-  <p class="lead">
-    Acompanhe a circulação pública do projeto Tsiino Hiiwiida.
-  </p>
 ```
 
 ```{r divulgacao-dinamica}
@@ -6309,190 +6458,150 @@ library(xml2)
 
 get_meta_content <- function(doc, selectors) {
   for (selector in selectors) {
-    value <- doc |>
-      html_element(selector) |>
-      html_attr("content")
-
-    if (!is.na(value) && nzchar(trimws(value))) {
-      return(trimws(value))
-    }
+    value <- doc |> html_element(selector) |> html_attr("content")
+    if (!is.na(value) && nzchar(trimws(value))) return(trimws(value))
   }
-
   ""
 }
 
 fetch_link_preview <- function(url) {
-  empty <- list(
-    titulo = "",
-    descricao = "",
-    imagem = ""
-  )
-
+  empty <- list(titulo = "", descricao = "", imagem = "")
   if (!nz(url) || url == "#") return(empty)
-
   tryCatch({
     doc <- read_html(url)
-
-    titulo <- get_meta_content(
-      doc,
-      c(
-        "meta[property='og:title']",
-        "meta[name='twitter:title']"
-      )
-    )
-
-    if (!nz(titulo)) {
-      titulo <- doc |>
-        html_element("title") |>
-        html_text2()
-    }
-
-    descricao <- get_meta_content(
-      doc,
-      c(
-        "meta[property='og:description']",
-        "meta[name='twitter:description']",
-        "meta[name='description']"
-      )
-    )
-
-    imagem <- get_meta_content(
-      doc,
-      c(
-        "meta[property='og:image']",
-        "meta[property='og:image:secure_url']",
-        "meta[name='twitter:image']"
-      )
-    )
-
-    if (nz(imagem)) {
-      imagem <- xml2::url_absolute(imagem, url)
-    }
-
-    list(
-      titulo = ifelse(is.na(titulo), "", titulo),
-      descricao = ifelse(is.na(descricao), "", descricao),
-      imagem = ifelse(is.na(imagem), "", imagem)
-    )
-  }, error = function(e) {
-    empty
-  })
+    titulo <- get_meta_content(doc, c("meta[property='og:title']", "meta[name='twitter:title']"))
+    if (!nz(titulo)) titulo <- doc |> html_element("title") |> html_text2()
+    descricao <- get_meta_content(doc, c("meta[property='og:description']", "meta[name='twitter:description']", "meta[name='description']"))
+    imagem <- get_meta_content(doc, c("meta[property='og:image']", "meta[property='og:image:secure_url']", "meta[name='twitter:image']"))
+    if (nz(imagem)) imagem <- xml2::url_absolute(imagem, url)
+    list(titulo = ifelse(is.na(titulo), "", titulo), descricao = ifelse(is.na(descricao), "", descricao), imagem = ifelse(is.na(imagem), "", imagem))
+  }, error = function(e) empty)
 }
 
-insta <- read_optional_csv(file.path("_input_data", "divulgacao_instagram.csv"))
-news <- read_optional_csv(file.path("_input_data", "divulgacao_reportagens.csv"))
-
-make_media_items <- function(data, kind = c("instagram", "reportagem")) {
-  kind <- match.arg(kind)
-
-  if (nrow(data) == 0) {
-    arquivo <- if (kind == "instagram") {
-      "_input_data/divulgacao_instagram.csv"
-    } else {
-      "_input_data/divulgacao_reportagens.csv"
-    }
-
-    return(
-      tags$div(
-        class = "empty-media",
-        paste0("Nenhum item encontrado em ", arquivo, ". Ao adicionar linhas nesse CSV e renderizar o site novamente, os cards aparecerão automaticamente aqui.")
-      )
-    )
-  }
-  
-  if (nrow(data) > 2) {
-  data <- utils::tail(data, 2)
-}
-data <- data[rev(seq_len(nrow(data))), , drop = FALSE]
-
-  titulo <- col_or(data, c("titulo", "título", "title", "post"), "Sem título")
-  url <- col_or(data, c("url", "link", "href"), "#")
-  data_item <- col_or(data, c("data", "date", "ano"), "")
-  imagem <- col_or(data, c("imagem", "image", "thumb", "thumbnail", "capa"), "")
-  descricao <- col_or(data, c("descricao", "descrição", "resumo", "caption", "texto"), "")
-  veiculo <- col_or(data, c("veiculo", "veículo", "fonte", "source"), "")
-
-  for (i in seq_len(nrow(data))) {
-  preview <- fetch_link_preview(url[i])
-
-  if (!nz(titulo[i]) || titulo[i] == "Sem título") {
-    titulo[i] <- preview$titulo
-  }
-
-  if (!nz(descricao[i])) {
-    descricao[i] <- preview$descricao
-  }
-
-  if (!nz(imagem[i])) {
-    imagem[i] <- preview$imagem
-  }
-}
-  
-  tags$div(
-    class = "media-grid",
-    lapply(seq_len(nrow(data)), function(i) {
-      thumb <- if (nz(imagem[i])) {
-        tags$div(class = "media-thumb", tags$img(src = imagem[i], alt = titulo[i], loading = "lazy"))
-      } else {
-        tags$div(class = "media-thumb", ifelse(kind == "instagram", "Instagram", "Reportagem"))
-      }
-
-      label <- if (kind == "instagram") {
-        "Post"
-      } else if (nz(veiculo[i])) {
-        veiculo[i]
-      } else {
-        "Matéria"
-      }
-
-      tags$article(
-        class = paste("media-item", paste0("media-item-", kind)),
-        thumb,
-        tags$div(
-          class = "media-body",
-          tags$div(class = "media-date", paste(label, ifelse(nz(data_item[i]), paste("·", data_item[i]), ""))),
-          tags$h4(titulo[i]),
-          if (nz(descricao[i])) tags$p(descricao[i]),
-          tags$a(
-            class = "media-link",
-            href = url[i],
-            target = "_blank",
-            rel = "noopener",
-            ifelse(kind == "instagram", "Ver no Instagram →", "Ler reportagem →")
-          )
-        )
-      )
-    })
+read_media_csv <- function(rel_path, tipo) {
+  data <- read_optional_csv(rel_path)
+  if (nrow(data) == 0) return(data.frame())
+  data.frame(
+    tipo = rep(tipo, nrow(data)),
+    url = col_or(data, c("url", "link", "href"), "#"),
+    titulo = col_or(data, c("titulo", "título", "title", "post"), ""),
+    imagem = col_or(data, c("imagem", "image", "thumb", "thumbnail", "capa"), ""),
+    descricao = col_or(data, c("descricao", "descrição", "resumo", "caption", "texto"), ""),
+    data_item = col_or(data, c("data", "date", "ano"), ""),
+    veiculo = col_or(data, c("veiculo", "veículo", "fonte", "source"), ""),
+    stringsAsFactors = FALSE
   )
 }
 
-tagList(
-  tags$div(
-    class = "media-layout",
-    tags$div(
-      class = "media-panel",
+media_items <- do.call(rbind, Filter(function(x) nrow(x) > 0, list(
+  read_media_csv(file.path("_input_data", "divulgacao_instagram.csv"), "instagram"),
+  read_media_csv(file.path("_input_data", "divulgacao_reportagens.csv"), "reportagem"),
+  read_media_csv(file.path("_input_data", "divulgacao_youtube.csv"), "youtube")
+)))
+
+if (is.null(media_items) || nrow(media_items) == 0) {
+  tags$div(class = "empty-media divulg-empty-media", "Nenhum item encontrado nos CSVs de divulgação. Ao adicionar linhas em _input_data/divulgacao_instagram.csv, _input_data/divulgacao_reportagens.csv ou _input_data/divulgacao_youtube.csv e renderizar o site novamente, o carrossel aparecerá aqui.")
+} else {
+  for (i in seq_len(nrow(media_items))) {
+    preview <- fetch_link_preview(media_items$url[i])
+    if (!nz(media_items$titulo[i])) media_items$titulo[i] <- preview$titulo
+    if (!nz(media_items$descricao[i])) media_items$descricao[i] <- preview$descricao
+    if (!nz(media_items$imagem[i])) media_items$imagem[i] <- preview$imagem
+  }
+  media_items$titulo[!nz(media_items$titulo)] <- "Projeto Tsiino Hiiwiida"
+  parsed_dates <- suppressWarnings(as.Date(media_items$data_item))
+  order_key <- ifelse(is.na(parsed_dates), as.Date("1900-01-01"), parsed_dates)
+  media_items <- media_items[order(order_key, seq_len(nrow(media_items)), decreasing = TRUE), , drop = FALSE]
+
+  make_slide <- function(i) {
+    tipo <- media_items$tipo[i]
+    tipo_label <- switch(tipo, instagram = "Instagram", reportagem = "Reportagem", youtube = "YouTube", "Mídia")
+    link_label <- switch(tipo, instagram = "Ver Instagram →", reportagem = "Ler reportagem →", youtube = "Ver YouTube →", "Abrir link →")
+    slide_class <- paste("carousel-slide", paste0("carousel-slide-", tipo), if (identical(tipo, "youtube")) "is-video" else "")
+    thumb <- if (nz(media_items$imagem[i])) tags$div(class = "carousel-thumb", tags$img(src = media_items$imagem[i], alt = media_items$titulo[i], loading = "lazy")) else tags$div(class = "carousel-thumb carousel-thumb-fallback", tipo_label)
+    tags$article(
+      class = slide_class,
+      thumb,
+      if (identical(tipo, "youtube")) tags$div(class = "carousel-play-icon", "▶"),
       tags$div(
-        class = "media-panel-header",
-        tags$h3("Instagram do projeto"),
-        tags$span(class = "media-panel-label", "Social")
-      ),
-      make_media_items(insta, "instagram")
-    ),
+        class = "carousel-body",
+        tags$span(class = paste("carousel-type-pill", if (identical(tipo, "reportagem")) "is-reportagem" else ""), tipo_label),
+        if (nz(media_items$data_item[i])) tags$span(class = "carousel-date", media_items$data_item[i]),
+        tags$p(class = "carousel-title", media_items$titulo[i]),
+        if (nz(media_items$descricao[i])) tags$p(class = "carousel-description", media_items$descricao[i]),
+        tags$a(class = "carousel-link", href = media_items$url[i], target = "_blank", rel = "noopener", link_label)
+      )
+    )
+  }
+
+  tagList(
     tags$div(
-      class = "media-panel",
-      tags$div(
-        class = "media-panel-header",
-        tags$h3("Reportagens e notícias"),
-        tags$span(class = "media-panel-label", "Imprensa")
-      ),
-      make_media_items(news, "reportagem")
+      class = "divulg-carousel-wrapper",
+      `aria-label` = "Carrossel de divulgação",
+      tags$button(class = "divulg-arrow divulg-prev", type = "button", `aria-label` = "Item anterior", "‹"),
+      tags$div(class = "divulg-track-container", tags$div(class = "divulg-track", id = "divulg-track", lapply(seq_len(nrow(media_items)), make_slide))),
+      tags$button(class = "divulg-arrow divulg-next", type = "button", `aria-label` = "Próximo item", "›"),
+      tags$div(class = "divulg-dots", id = "divulg-dots", `aria-label` = "Navegação do carrossel")
     )
   )
-)
+}
 ```
 
 ```{=html}
 </section>
+
+<script>
+(function(){
+  document.addEventListener("DOMContentLoaded", function(){
+    const track = document.getElementById("divulg-track");
+    const dots = document.getElementById("divulg-dots");
+    const wrapper = document.querySelector(".divulg-carousel-wrapper");
+    if(!track || !dots || !wrapper) return;
+    const slides = Array.from(track.querySelectorAll(".carousel-slide"));
+    if(!slides.length) return;
+    const perView = () => window.innerWidth <= 560 ? 1 : window.innerWidth <= 900 ? 2 : 3;
+    let current = 0, timer = null;
+    const totalGroups = () => Math.max(1, Math.ceil(slides.length / perView()));
+    function buildDots(){
+      dots.innerHTML = "";
+      for(let i = 0; i < totalGroups(); i++){
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "divulg-dot" + (i === current ? " active" : "");
+        btn.setAttribute("aria-label", "Grupo " + (i + 1));
+        btn.addEventListener("click", () => goTo(i, true));
+        dots.appendChild(btn);
+      }
+    }
+    function updateDots(){
+      Array.from(dots.querySelectorAll(".divulg-dot")).forEach((d,i) => d.classList.toggle("active", i === current));
+    }
+    function goTo(index, resetTimer){
+      const total = totalGroups();
+      current = (index + total) % total;
+      const slideWidth = slides[0].getBoundingClientRect().width;
+      const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || 0) || 0;
+      track.style.transform = `translateX(-${current * perView() * (slideWidth + gap)}px)`;
+      updateDots();
+      if(resetTimer) restartAuto();
+    }
+    function stopAuto(){ if(timer) window.clearInterval(timer); timer = null; }
+    function startAuto(){
+      stopAuto();
+      if(totalGroups() > 1 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){ timer = window.setInterval(() => goTo(current + 1, false), 5200); }
+    }
+    function restartAuto(){ stopAuto(); startAuto(); }
+    document.querySelector(".divulg-prev")?.addEventListener("click", () => goTo(current - 1, true));
+    document.querySelector(".divulg-next")?.addEventListener("click", () => goTo(current + 1, true));
+    wrapper.addEventListener("mouseenter", stopAuto);
+    wrapper.addEventListener("mouseleave", startAuto);
+    wrapper.addEventListener("focusin", stopAuto);
+    wrapper.addEventListener("focusout", startAuto);
+    window.addEventListener("resize", () => { current = 0; buildDots(); goTo(0, false); restartAuto(); });
+    buildDots(); goTo(0, false); startAuto();
+  });
+})();
+</script>
 ```
 
 ```{=html}
@@ -6595,306 +6704,2168 @@ tagList(
 </section>
 ```
 
-```{=html}
-<style>
-/* ===== OVERRIDE FINAL — #divulgacao sem escape horizontal =====
-   Este bloco é o último style do documento e vence todos os conflitos
-   de cascata. Usa 100% (largura do contêiner pai) em vez de 100vw
-   (largura da viewport), evitando o escape causado pela barra de rolagem. */
+```{r instituicoes-projeto, results='asis'}
+library(htmltools)
 
-#divulgacao.content-card {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-  width: min(1320px, calc(100% - 1.5rem)) !important;
-  max-width: calc(100% - 1.5rem) !important;
-  min-width: 0 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding-left: clamp(1rem, 2.5vw, 2.2rem) !important;
-  padding-right: clamp(1rem, 2.5vw, 2.2rem) !important;
-  border-radius: 0 !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
+inst_path <- find_up(file.path("_input_data", "institutions.yml"))
+
+as_chr <- function(x, default = "") {
+  if (is.null(x) || length(x) == 0 || all(is.na(x))) return(default)
+  x <- as.character(x[[1]])
+  if (is.na(x) || !nzchar(trimws(x))) default else x
 }
 
-#divulgacao,
-#divulgacao * {
-  box-sizing: border-box !important;
-  min-width: 0 !important;
+as_int <- function(x, default = 999L) {
+  out <- suppressWarnings(as.integer(as_chr(x, as.character(default))))
+  if (is.na(out)) default else out
 }
 
-#divulgacao .section-title,
-#divulgacao .lead,
-#divulgacao .media-layout,
-#divulgacao .media-panel,
-#divulgacao .media-grid,
-#divulgacao .media-item,
-#divulgacao .media-body,
-#divulgacao .media-thumb {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
+read_institutions_yml <- function(path) {
+  if (is.na(path) || !file.exists(path)) return(data.frame())
+  if (!requireNamespace("yaml", quietly = TRUE)) return(data.frame())
+  raw <- yaml::read_yaml(path)
+  if (length(raw) == 0) return(data.frame())
+  rows <- lapply(seq_along(raw), function(i) {
+    item <- raw[[i]]
+    data.frame(
+      id = as_chr(item$id, paste0("inst_", i)),
+      group = as_chr(item$group, "parceira"),
+      order = as_int(item$order, i),
+      acronym = as_chr(item$acronym, as_chr(item$id, paste0("INST ", i))),
+      name = as_chr(item$name, as_chr(item$acronym, "Instituição")),
+      role = as_chr(item$role, "Instituição"),
+      url = as_chr(item$url, ""),
+      logo = as_chr(item$logo, ""),
+      status = as_chr(item$status, ""),
+      note = as_chr(item$note, ""),
+      stringsAsFactors = FALSE
+    )
+  })
+  do.call(rbind, rows)
 }
 
-@media (max-width: 1180px) {
-  #divulgacao.content-card {
-    width: calc(100% - 1rem) !important;
-    max-width: calc(100% - 1rem) !important;
-  }
-  #divulgacao .media-panel {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-}
+institutions <- read_institutions_yml(inst_path)
 
-@media (max-width: 980px) {
-  #divulgacao .media-grid {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-  #divulgacao .media-item {
-    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) !important;
-  }
-}
+if (nrow(institutions) == 0) {
+  tags$section(id = "logos-institucionais", class = "logos-strip", `aria-label` = "Logos institucionais", tags$div(class = "empty-media", "Nenhum cadastro institucional foi encontrado em _input_data/institutions.yml."))
+} else {
+  institutions <- institutions[order(match(institutions$group, c("fomento", "participante", "parceira")), institutions$order, institutions$name), , drop = FALSE]
+  fomento_data <- institutions[institutions$group == "fomento", , drop = FALSE]
+  cnpq_row <- institutions[institutions$id == "cnpq", , drop = FALSE]
+  fomento_display <- unique(rbind(fomento_data, cnpq_row))
+  participante_data <- institutions[institutions$group == "participante", , drop = FALSE]
+  parceira_data <- institutions[institutions$group == "parceira" & institutions$id != "cnpq", , drop = FALSE]
 
-@media (max-width: 700px) {
-  #divulgacao.content-card {
-    width: calc(100% - 0.75rem) !important;
-    max-width: calc(100% - 0.75rem) !important;
-    padding-left: 0.9rem !important;
-    padding-right: 0.9rem !important;
+  make_logo_item <- function(data, i) {
+    content <- list(
+      if (nz(data$logo[i])) tags$img(src = data$logo[i], alt = paste("Logo", data$acronym[i]), loading = "lazy", onerror = "this.style.display='none'; this.parentElement.classList.add('logo-missing');"),
+      tags$span(class = "logo-fallback", data$acronym[i])
+    )
+    if (nz(data$url[i]) && grepl("^https?://", data$url[i])) {
+      tags$a(href = data$url[i], target = "_blank", rel = "noopener", class = "logo-item", `aria-label` = paste(data$acronym[i], "—", data$name[i]), content)
+    } else {
+      tags$span(class = "logo-item", `aria-label` = paste(data$acronym[i], "—", data$name[i]), content)
+    }
   }
-  #divulgacao .media-panel,
-  #divulgacao .media-item {
-    grid-template-columns: minmax(0, 1fr) !important;
+
+  make_logo_group <- function(title, data) {
+    tags$div(
+      class = "logos-group",
+      tags$h3(class = "logos-group-title", title),
+      if (nrow(data) == 0) tags$div(class = "empty-media", "Nenhuma instituição cadastrada neste grupo.") else tags$div(class = "logos-row", lapply(seq_len(nrow(data)), function(i) make_logo_item(data, i)))
+    )
   }
-  #divulgacao .media-thumb {
-    height: 220px !important;
-    min-height: 220px !important;
-  }
+
+  tags$section(
+    id = "logos-institucionais",
+    class = "logos-strip",
+    `aria-label` = "Logos institucionais",
+    make_logo_group("Financiadores", fomento_display),
+    make_logo_group("Instituições participantes", participante_data),
+    make_logo_group("Instituições parceiras", parceira_data)
+  )
 }
-</style>
 ```
 
 ```{=html}
 <style>
-/* =====================================================================
-   FIX DIVULGAÇÃO — notebook pequeno / tela em 100%
-   Adicione este bloco NO FINAL do arquivo index.qmd (dentro de <style>)
-   ou como último <style> do documento.
-   ===================================================================== */
+/* ======================================================================
+   Ajustes finos finais — divulgação, instituições e rodapé
+   ====================================================================== */
+#divulgacao.content-card{position:relative!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:100vw!important;max-width:100vw!important;min-width:0!important;margin-left:0!important;margin-right:0!important;padding:clamp(2.1rem,4vw,3.4rem) 0 clamp(1.4rem,3vw,2.4rem)!important;background:var(--paper)!important;border-top:0!important;box-shadow:none!important;overflow:hidden!important;box-sizing:border-box!important}
+#divulgacao .section-title,#divulgacao .lead{width:min(1520px,calc(100vw - clamp(2rem,8vw,7rem)))!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important;padding-left:0!important;padding-right:0!important}#divulgacao .section-title h2{color:var(--green-dark)!important}
+#divulgacao .divulg-carousel-wrapper{position:relative!important;width:100%!important;overflow:hidden!important;padding:0 0 3rem!important;margin-top:clamp(1.1rem,2.4vw,1.9rem)!important}#divulgacao .divulg-track-container{overflow:hidden!important;width:100%!important}#divulgacao .divulg-track{display:flex!important;gap:clamp(1rem,2.2vw,2rem)!important;padding:0 clamp(4.2rem,6vw,6.4rem)!important;transition:transform 420ms cubic-bezier(.4,0,.2,1)!important;will-change:transform!important}
+#divulgacao .carousel-slide{flex:0 0 calc((100% - (2 * clamp(1rem,2.2vw,2rem))) / 3)!important;min-width:0!important;position:relative!important;cursor:pointer!important;overflow:hidden!important;border-radius:0!important;background:var(--green)!important;box-shadow:0 16px 34px rgba(0,0,0,.14)!important;aspect-ratio:16/9!important}#divulgacao .carousel-thumb{width:100%!important;height:100%!important;overflow:hidden!important;background:linear-gradient(135deg,rgba(46,59,36,.92),rgba(98,106,56,.76)),url("figures/tsiino_bg.png")!important;background-size:cover!important;color:rgba(255,253,247,.82)!important;display:grid!important;place-items:center!important;font-family:'Space Mono',monospace!important;font-size:.75rem!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase!important}#divulgacao .carousel-thumb img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;display:block!important;transition:transform 320ms ease!important}#divulgacao .carousel-slide:hover .carousel-thumb img{transform:scale(1.04)!important}
+#divulgacao .carousel-play-icon{display:none!important;position:absolute!important;top:50%!important;left:50%!important;transform:translate(-50%,-55%)!important;width:clamp(58px,6vw,82px)!important;height:clamp(58px,6vw,82px)!important;border-radius:50%!important;border:7px solid rgba(255,255,255,.92)!important;background:rgba(255,255,255,.22)!important;color:#fff!important;font-size:clamp(1.2rem,2vw,1.8rem)!important;align-items:center!important;justify-content:center!important;line-height:1!important;pointer-events:none!important;text-indent:.12em!important;box-shadow:0 8px 24px rgba(0,0,0,.28)!important}#divulgacao .carousel-slide.is-video .carousel-play-icon{display:flex!important}
+#divulgacao .carousel-body{position:absolute!important;inset:auto 0 0 0!important;min-height:56%!important;padding:clamp(1rem,1.8vw,1.55rem)!important;background:linear-gradient(0deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.44) 58%,rgba(0,0,0,0) 100%)!important;color:#fff!important;display:flex!important;flex-direction:column!important;justify-content:flex-end!important;align-items:flex-start!important;gap:.45rem!important}#divulgacao .carousel-type-pill{display:inline-flex!important;align-items:center!important;align-self:flex-start!important;padding:.22rem .58rem!important;border-radius:999px!important;font-family:'Space Mono',monospace!important;font-size:.62rem!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase!important;background:var(--red)!important;color:#fff!important}#divulgacao .carousel-type-pill.is-reportagem{background:var(--green)!important}#divulgacao .carousel-date{font-family:'Space Mono',monospace!important;font-size:.62rem!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase!important;color:rgba(255,255,255,.8)!important}#divulgacao .carousel-title{margin:0!important;max-width:96%!important;font-family:'Montserrat',Arial,sans-serif!important;font-size:clamp(1rem,1.65vw,1.72rem)!important;font-weight:700!important;line-height:1.04!important;letter-spacing:-.035em!important;color:#fff!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}#divulgacao .carousel-description{margin:0!important;max-width:92%!important;font-size:clamp(.78rem,.9vw,.92rem)!important;line-height:1.35!important;color:rgba(255,255,255,.84)!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}#divulgacao .carousel-link{margin-top:.12rem!important;font-family:'Space Mono',monospace!important;font-size:.68rem!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase!important;color:var(--ochre)!important;text-decoration:none!important;align-self:flex-start!important}
+#divulgacao .divulg-arrow{position:absolute!important;top:calc(50% - 1.4rem)!important;transform:translateY(-50%)!important;z-index:10!important;width:54px!important;height:54px!important;border-radius:0!important;border:0!important;background:rgba(35,31,32,.96)!important;color:var(--green-soft)!important;font-size:2.2rem!important;font-weight:500!important;line-height:1!important;display:grid!important;place-items:center!important;cursor:pointer!important;transition:background 180ms ease,color 180ms ease,transform 180ms ease!important}#divulgacao .divulg-prev{left:clamp(.45rem,2vw,2.2rem)!important}#divulgacao .divulg-next{right:clamp(.45rem,2vw,2.2rem)!important}#divulgacao .divulg-arrow:hover{background:var(--green)!important;color:#fff!important;transform:translateY(-50%) scale(1.04)!important}#divulgacao .divulg-dots{position:absolute!important;bottom:1rem!important;left:0!important;right:0!important;display:flex!important;justify-content:center!important;gap:.55rem!important}#divulgacao .divulg-dot{width:9px!important;height:9px!important;border-radius:50%!important;border:0!important;background:rgba(23,23,23,.25)!important;cursor:pointer!important;padding:0!important;transition:background 200ms ease,transform 200ms ease!important}#divulgacao .divulg-dot.active{background:var(--green)!important;transform:scale(1.25)!important}#divulgacao .divulg-empty-media{width:min(1180px,calc(100vw - 2rem))!important;margin-left:auto!important;margin-right:auto!important}
+@media(max-width:900px){#divulgacao .divulg-track{padding-left:clamp(3.3rem,7vw,4.5rem)!important;padding-right:clamp(3.3rem,7vw,4.5rem)!important}#divulgacao .carousel-slide{flex-basis:calc((100% - clamp(1rem,2.2vw,2rem)) / 2)!important}}@media(max-width:560px){#divulgacao .section-title,#divulgacao .lead{width:calc(100vw - 1.5rem)!important}#divulgacao .divulg-track{gap:0!important;padding-left:0!important;padding-right:0!important}#divulgacao .carousel-slide{flex-basis:100%!important}#divulgacao .divulg-arrow{width:42px!important;height:42px!important;font-size:1.6rem!important}#divulgacao .carousel-description{display:none!important}}
 
-/* Reset: garante que nenhuma regra anterior force layout horizontal */
-#divulgacao.content-card {
+#pesquisadores-responsaveis.content-card,#pesquisadores-responsaveis.researchers-section,section#pesquisadores-responsaveis{background:rgba(255,253,247,.96)!important}
+#logos-institucionais.logos-strip{position:relative!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:100vw!important;max-width:100vw!important;margin:clamp(3rem,5.4vw,5rem) 0 0!important;padding:clamp(2.6rem,4.2vw,4.2rem) clamp(1.5rem,4vw,4.5rem) clamp(3.2rem,5vw,5rem)!important;background:rgba(255,253,247,.96)!important;border-top:1px solid rgba(98,106,56,.14)!important;border-bottom:0!important;box-sizing:border-box!important;overflow:hidden!important;z-index:2!important}#logos-institucionais.reveal-ready{transform:translateX(-50%) translateY(44px)!important}#logos-institucionais.reveal-ready.is-visible{transform:translateX(-50%) translateY(0)!important}.logos-group{margin:0 auto clamp(1.75rem,3.2vw,2.75rem)!important;width:min(1760px,100%)!important}.logos-group:last-child{margin-bottom:0!important}.logos-group-title{font-family:'Space Mono',monospace!important;font-size:clamp(.68rem,.9vw,.82rem)!important;font-weight:800!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:var(--muted)!important;margin:0 0 1.1rem!important;padding-bottom:.58rem!important;border-bottom:1px solid rgba(98,106,56,.18)!important}.logos-row{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:clamp(.8rem,2.35vw,2.1rem) clamp(1.1rem,3vw,2.6rem)!important}.logo-item{display:flex!important;align-items:center!important;justify-content:center!important;min-width:clamp(70px,8vw,120px)!important;max-width:178px!important;min-height:48px!important;padding:.35rem!important;border-radius:8px!important;text-decoration:none!important;transition:transform 220ms ease!important}.logo-item img{display:block!important;height:clamp(34px,3.65vw,58px)!important;width:auto!important;max-width:158px!important;object-fit:contain!important;filter:grayscale(100%) opacity(.58)!important;transition:filter 240ms ease,transform 240ms ease!important}.logo-item:hover img{filter:grayscale(0%) opacity(1)!important;transform:scale(1.1)!important}.logo-fallback{display:none!important;font-family:'Space Mono',monospace!important;font-size:.7rem!important;font-weight:800!important;color:var(--muted)!important;letter-spacing:.06em!important;text-transform:uppercase!important}.logo-item.logo-missing .logo-fallback{display:block!important}.logo-item.logo-missing img{display:none!important}body:has(#logos-institucionais) main.content{padding-bottom:0!important}@media(max-width:640px){#logos-institucionais.logos-strip{padding-left:1rem!important;padding-right:1rem!important}.logos-row{gap:.75rem 1rem!important}.logo-item{min-width:76px!important}.logo-item img{height:clamp(26px,8vw,38px)!important;max-width:110px!important}}
+</style>
+```
+
+
+```{=html}
+<style>
+/* ======================================================================
+   AJUSTE FINAL — OBJETIVOS DO PROJETO EM CARROSSEL FULL-BLEED
+   ----------------------------------------------------------------------
+   Escopo restrito ao #objetivos. Mantém o restante da página intacto.
+   Remove o card branco da seção, mantém o título direto sobre o background,
+   usa cards mais largos, fotos mais altas e corpo com texto sem corte.
+   O trilho ocupa 100vw: os cards entram pela extremidade direita da tela
+   e saem também pela borda direita conforme a navegação avança.
+   ====================================================================== */
+
+#objetivos.objectives-section.core-objectives-section {
   position: relative !important;
-  left: auto !important;
+  left: 50% !important;
   right: auto !important;
-  transform: none !important;
-  width: min(1260px, calc(100% - 1.5rem)) !important;
-  max-width: calc(100% - 1.5rem) !important;
+  transform: translateX(-50%) !important;
+
+  inline-size: 100vw !important;
+  width: 100vw !important;
+  max-inline-size: 100vw !important;
+  max-width: 100vw !important;
+  min-inline-size: 0 !important;
   min-width: 0 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding: clamp(1.2rem, 2.5vw, 2.2rem) !important;
+
+  margin: clamp(2.35rem, 4.4vw, 4.2rem) 0 0 !important;
+  padding:
+    clamp(0.95rem, 2.5vw, 2.45rem)
+    0
+    clamp(1.15rem, 3.4vw, 3.25rem) !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  border-top: 0 !important;
   border-radius: 0 !important;
+  box-shadow: none !important;
   overflow: hidden !important;
-  box-sizing: border-box !important;
+  isolation: isolate;
 }
 
-#divulgacao,
-#divulgacao * {
-  box-sizing: border-box !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-
-/* Layout geral: dois painéis empilhados */
-#divulgacao .media-layout {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(1rem, 2vw, 1.4rem) !important;
-  align-items: start !important;
-}
-
-/* Cada painel: header + grid de cards empilhados */
-#divulgacao .media-panel {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.9rem !important;
-  padding: clamp(0.9rem, 1.8vw, 1.2rem) !important;
-  border-radius: 22px !important;
-  background: linear-gradient(180deg, rgba(255,253,247,0.98), rgba(246,241,232,0.82)) !important;
-  border: 1px solid rgba(98,106,56,0.24) !important;
-  box-shadow: 0 12px 26px rgba(0,0,0,0.07) !important;
-  height: 100% !important;
-}
-
-/* Header do painel: horizontal compacto */
-#divulgacao .media-panel-header {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 0.75rem !important;
-  padding: 0.85rem 1rem !important;
-  border-radius: 16px !important;
-  background:
-    linear-gradient(180deg, rgba(46,59,36,0.96), rgba(98,106,56,0.92)),
-    url("figures/tsiino_bg.png") !important;
-  background-size: cover !important;
-  min-height: auto !important;
-}
-
-#divulgacao .media-panel-header::after {
-  display: none !important;
+#objetivos.core-objectives-section::before,
+#objetivos.core-objectives-section::after {
   content: none !important;
+  display: none !important;
 }
 
-#divulgacao .media-panel h3 {
-  color: rgba(255,253,247,0.92) !important;
-  font-size: 0.74rem !important;
-  line-height: 1.3 !important;
-  margin: 0 !important;
-  max-width: none !important;
-}
+#objetivos .core-objectives-head {
+  width: min(1480px, calc(100vw - clamp(1rem, 5vw, 6.2rem))) !important;
+  max-width: calc(100vw - clamp(1rem, 5vw, 6.2rem)) !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
 
-/* Grid de cards: sempre 1 coluna dentro de cada painel */
-#divulgacao .media-grid {
   display: grid !important;
-  grid-template-columns: 1fr !important;
-  gap: 0.85rem !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(0.9rem, 2.2vw, 2rem) !important;
+  align-items: end !important;
 }
 
-/* Card individual: thumb em cima, body embaixo — SEM layout lateral */
-#divulgacao .media-item {
+#objetivos .core-objectives-title-wrap {
+  min-width: 0 !important;
+  max-width: 1040px !important;
+}
+
+#objetivos .core-objectives-eyebrow {
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin-bottom: clamp(0.45rem, 0.9vw, 0.75rem) !important;
+  padding: 0.34rem 0.78rem !important;
+  border-radius: 999px !important;
+  background: rgba(246,241,232,0.74) !important;
+  color: var(--green-dark) !important;
+  border: 1px solid rgba(98,106,56,0.28) !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06) !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: clamp(0.62rem, 0.76vw, 0.74rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+#objetivos .core-objectives-title {
+  position: relative !important;
+  display: block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--ink) !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: clamp(2.75rem, 6.35vw, 7.25rem) !important;
+  line-height: 0.80 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.092em !important;
+  text-transform: none !important;
+  font-style: normal !important;
+  transform: rotate(-1.15deg) !important;
+  transform-origin: left center !important;
+  text-wrap: balance;
+}
+
+#objetivos .core-title-line {
+  display: block !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-style: normal !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.096em !important;
+  color: var(--ink) !important;
+  text-shadow:
+    1px 1px 0 rgba(217,154,39,0.42),
+    0 12px 26px rgba(0,0,0,0.07) !important;
+}
+
+#objetivos .core-title-line-b {
+  width: fit-content !important;
+  margin-left: clamp(1.1rem, 7.5vw, 7.2rem) !important;
+  margin-top: 0.01em !important;
+  color: var(--red-dark) !important;
+  position: relative !important;
+}
+
+#objetivos .core-title-line-b::after {
+  content: "";
+  position: absolute;
+  left: 0.02em;
+  right: -0.03em;
+  bottom: 0.02em;
+  height: 0.12em;
+  background: rgba(217,154,39,0.70);
+  transform: skewX(-16deg) rotate(-0.8deg);
+  transform-origin: left center;
+  z-index: -1;
+}
+
+#objetivos .core-title-ribbon {
+  display: none !important;
+}
+
+#objetivos .core-objectives-lead {
+  max-width: 820px !important;
+  margin: clamp(0.75rem, 1.35vw, 1.1rem) 0 0 0 !important;
+  color: var(--muted) !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: clamp(0.9rem, 1vw, 1.04rem) !important;
+  line-height: 1.56 !important;
+  font-weight: 500 !important;
+}
+
+#objetivos .core-objectives-controls {
   display: flex !important;
-  flex-direction: column !important;
-  min-height: 0 !important;
-  border-radius: 18px !important;
-  overflow: hidden !important;
-  background: rgba(255,253,247,0.98) !important;
-  border: 1px solid rgba(98,106,56,0.20) !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.055) !important;
-  transition: transform 180ms ease, box-shadow 180ms ease !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.72rem !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin-bottom: clamp(0.05rem, 0.5vw, 0.4rem) !important;
 }
 
-#divulgacao .media-item:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 14px 28px rgba(0,0,0,0.10) !important;
-}
-
-/* Thumb: altura fixa, largura total */
-#divulgacao .media-thumb {
-  width: 100% !important;
-  height: clamp(200px, 22vw, 280px) !important;
-  min-height: 200px !important;
-  flex-shrink: 0 !important;
-  background:
-    linear-gradient(135deg, rgba(46,59,36,0.94), rgba(98,106,56,0.78)),
-    url("figures/tsiino_bg.png") !important;
-  background-size: cover !important;
+#objetivos .core-objectives-arrow {
+  inline-size: clamp(44px, 3.45vw, 56px) !important;
+  block-size: clamp(44px, 3.45vw, 56px) !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(98,106,56,0.24) !important;
   display: grid !important;
   place-items: center !important;
-  color: rgba(255,253,247,0.82) !important;
-  font-family: 'Space Mono', monospace !important;
-  font-size: 0.68rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-  overflow: hidden !important;
+  cursor: pointer !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: clamp(1.08rem, 1.45vw, 1.32rem) !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease !important;
 }
 
-#divulgacao .media-thumb img {
+#objetivos .core-objectives-prev {
+  background: rgba(246,241,232,0.76) !important;
+  color: var(--green-dark) !important;
+}
+
+#objetivos .core-objectives-next {
+  background: var(--green-dark) !important;
+  color: var(--cream) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.16) !important;
+}
+
+#objetivos .core-objectives-arrow:hover,
+#objetivos .core-objectives-arrow:focus-visible {
+  transform: translateY(-2px) !important;
+  background: var(--red) !important;
+  color: #fff !important;
+  outline: none !important;
+  box-shadow: 0 13px 28px rgba(0,0,0,0.18) !important;
+}
+
+#objetivos .core-objectives-viewport {
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
+  margin: clamp(1.05rem, 2vw, 1.85rem) 0 0 !important;
+  padding: 0 0 clamp(0.45rem, 1vw, 0.85rem) !important;
+  overflow: hidden !important;
+  outline: none !important;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+#objetivos .core-objectives-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+#objetivos .core-objectives-track {
+  width: max-content !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-end !important;
+  gap: clamp(0.9rem, 1.7vw, 1.75rem) !important;
+
+  /* Sem margem lateral: os cards entram e saem pela borda real da tela. */
+  padding:
+    clamp(0.15rem, 0.55vw, 0.5rem)
+    100vw
+    clamp(0.55rem, 1.2vw, 1rem)
+    0 !important;
+
+  transform: translate3d(0,0,0);
+  transition: transform 620ms cubic-bezier(.2,.75,.18,1) !important;
+  will-change: transform;
+}
+
+#objetivos .core-objective-card {
+  --objective-photo-height: clamp(220px, 18vw, 290px);
+
+  position: relative !important;
+  flex: 0 0 clamp(500px, 34vw, 650px) !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: clamp(405px, 29vw, 500px) !important;
+  height: auto !important;
+
+  display: grid !important;
+  grid-template-rows: var(--objective-photo-height) auto !important;
+
+  overflow: hidden !important;
+  border: 1px solid rgba(98,106,56,0.20) !important;
+  border-radius: 0 !important;
+  background:
+    radial-gradient(circle at 26% 8%, rgba(255,255,255,0.38), transparent 25%),
+    linear-gradient(135deg, rgba(98,106,56,0.18), rgba(217,154,39,0.16)),
+    rgba(255,253,247,0.91) !important;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.11) !important;
+  opacity: 0.56;
+  transform: translateY(42px);
+  transform-origin: bottom left;
+  cursor: pointer;
+  transition:
+    flex-basis 520ms cubic-bezier(.2,.75,.18,1),
+    min-height 520ms cubic-bezier(.2,.75,.18,1),
+    opacity 260ms ease,
+    transform 520ms cubic-bezier(.2,.75,.18,1),
+    box-shadow 260ms ease,
+    filter 260ms ease !important;
+}
+
+#objetivos .core-objective-card:nth-child(1) {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.32), transparent 26%),
+    linear-gradient(135deg, rgba(217,154,39,0.24), rgba(98,106,56,0.18)),
+    rgba(255,253,247,0.92) !important;
+}
+
+#objetivos .core-objective-card:nth-child(2) {
+  background:
+    radial-gradient(circle at 26% 8%, rgba(255,255,255,0.36), transparent 26%),
+    linear-gradient(135deg, rgba(169,54,50,0.16), rgba(217,154,39,0.14)),
+    rgba(255,253,247,0.92) !important;
+}
+
+#objetivos .core-objective-card:nth-child(3) {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.30), transparent 24%),
+    linear-gradient(135deg, rgba(46,59,36,0.16), rgba(98,106,56,0.16)),
+    rgba(255,253,247,0.92) !important;
+}
+
+#objetivos .core-objective-card:nth-child(4) {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.35), transparent 26%),
+    linear-gradient(135deg, rgba(217,154,39,0.19), rgba(169,54,50,0.13)),
+    rgba(255,253,247,0.92) !important;
+}
+
+#objetivos .core-objective-card:nth-child(5) {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.33), transparent 26%),
+    linear-gradient(135deg, rgba(98,106,56,0.22), rgba(215,221,197,0.45)),
+    rgba(255,253,247,0.92) !important;
+}
+
+#objetivos .core-objective-card:nth-child(6) {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.33), transparent 26%),
+    linear-gradient(135deg, rgba(46,59,36,0.15), rgba(217,154,39,0.16)),
+    rgba(255,253,247,0.92) !important;
+}
+
+#objetivos .core-objective-card:nth-child(7) {
+  background:
+    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.32), transparent 26%),
+    linear-gradient(135deg, rgba(169,54,50,0.14), rgba(98,106,56,0.16)),
+    rgba(255,253,247,0.92) !important;
+}
+
+#objetivos .core-objective-card:hover {
+  opacity: 1;
+  filter: saturate(1.03);
+}
+
+#objetivos .core-objective-card.is-active {
+  --objective-photo-height: clamp(250px, 22vw, 350px);
+  flex-basis: clamp(720px, 54vw, 1040px) !important;
+  min-height: clamp(455px, 35vw, 575px) !important;
+  opacity: 1;
+  transform: translateY(0);
+  box-shadow: 0 23px 48px rgba(0,0,0,0.16) !important;
+  z-index: 8;
+}
+
+#objetivos .core-objective-card.is-next {
+  --objective-photo-height: clamp(235px, 19.5vw, 315px);
+  flex-basis: clamp(500px, 38vw, 720px) !important;
+  min-height: clamp(420px, 31vw, 525px) !important;
+  opacity: 0.92;
+  transform: translateY(24px);
+  z-index: 5;
+}
+
+#objetivos .core-objective-card.is-far,
+#objetivos .core-objective-card.is-after {
+  --objective-photo-height: clamp(190px, 15vw, 250px);
+  flex-basis: clamp(320px, 25vw, 520px) !important;
+  min-height: clamp(320px, 25vw, 430px) !important;
+  opacity: 0.74;
+  transform: translateY(50px);
+  z-index: 4;
+}
+
+#objetivos .core-objective-card.is-before {
+  opacity: 0.38;
+  transform: translateY(54px);
+}
+
+#objetivos .core-objective-media {
+  position: relative !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: var(--objective-photo-height) !important;
+  min-height: var(--objective-photo-height) !important;
+  overflow: hidden !important;
+  background: rgba(46,59,36,0.14) !important;
+}
+
+#objetivos .core-objective-media::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 34%;
+  background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.18));
+  pointer-events: none;
+  z-index: 2;
+}
+
+#objetivos .core-objective-photo {
+  position: absolute !important;
+  inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
   object-position: center center !important;
-  display: block !important;
+  opacity: 0;
+  transform: scale(1.025);
+  transition: opacity 520ms ease, transform 900ms ease !important;
 }
 
-/* Body: texto com espaço generoso */
-#divulgacao .media-body {
-  padding: 1rem 1.1rem 1.15rem !important;
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 !important;
+#objetivos .core-objective-photo.is-photo-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#objetivos .core-objective-body {
+  position: relative !important;
+  width: 100% !important;
+  max-width: none !important;
   min-width: 0 !important;
+  padding: clamp(1rem, 1.55vw, 1.45rem) clamp(1rem, 1.75vw, 1.65rem) clamp(1.05rem, 1.65vw, 1.55rem) !important;
+  background: rgba(255,253,247,0.92) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: visible !important;
 }
 
-#divulgacao .media-date {
+#objetivos .core-objective-number {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: clamp(2.05rem, 2.45vw, 2.52rem) !important;
+  height: clamp(2.05rem, 2.45vw, 2.52rem) !important;
+  border-radius: 50% !important;
+  margin-bottom: 0.55rem !important;
+  background: var(--green-dark) !important;
+  color: var(--cream) !important;
   font-family: 'Space Mono', monospace !important;
-  font-size: 0.68rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.1em !important;
-  text-transform: uppercase !important;
-  color: var(--red, #A93632) !important;
-  margin-bottom: 0.45rem !important;
-  white-space: normal !important;
+  font-weight: 900 !important;
+  font-size: clamp(0.68rem, 0.82vw, 0.78rem) !important;
 }
 
-#divulgacao .media-body h4 {
-  margin: 0 0 0.45rem !important;
-  font-size: 1rem !important;
-  line-height: 1.28 !important;
-  font-weight: 800 !important;
-  color: #171717 !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
-  hyphens: none !important;
-  display: -webkit-box !important;
-  -webkit-line-clamp: 3 !important;
-  -webkit-box-orient: vertical !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-body p {
-  margin: 0 0 0.8rem !important;
-  font-size: 0.86rem !important;
-  line-height: 1.5 !important;
-  color: #675F55 !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
-  hyphens: none !important;
-  display: -webkit-box !important;
-  -webkit-line-clamp: 3 !important;
-  -webkit-box-orient: vertical !important;
-  overflow: hidden !important;
-}
-
-#divulgacao .media-link {
-  margin-top: auto !important;
+#objetivos .core-objective-kicker {
+  display: block !important;
+  margin-bottom: 0.42rem !important;
+  color: var(--red-dark) !important;
   font-family: 'Space Mono', monospace !important;
-  font-size: 0.68rem !important;
+  font-size: clamp(0.58rem, 0.66vw, 0.72rem) !important;
+  line-height: 1.24 !important;
   font-weight: 800 !important;
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
-  color: var(--red, #A93632) !important;
-  text-decoration: none !important;
 }
 
-/* ── Responsivo ── */
+#objetivos .core-objective-card h3 {
+  margin: 0 !important;
+  color: var(--ink) !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: clamp(1.22rem, 1.75vw, 2.05rem) !important;
+  line-height: 1.06 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.055em !important;
+  text-wrap: balance;
+}
 
-/* Tablet / janela estreita: empilha os dois painéis */
+#objetivos .core-objective-card p {
+  margin: 0.55rem 0 0 0 !important;
+  color: var(--muted) !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: clamp(0.84rem, 0.92vw, 0.98rem) !important;
+  line-height: 1.42 !important;
+  font-weight: 500 !important;
+  overflow: visible !important;
+}
+
+#objetivos .core-objective-card:not(.is-active):not(.is-next) p {
+  display: none !important;
+}
+
+#objetivos .core-objective-card.is-after .core-objective-kicker,
+#objetivos .core-objective-card.is-before .core-objective-kicker {
+  display: none !important;
+}
+
+#objetivos .core-objective-card.is-far h3,
+#objetivos .core-objective-card.is-after h3,
+#objetivos .core-objective-card.is-before h3 {
+  font-size: clamp(0.98rem, 1.2vw, 1.18rem) !important;
+  line-height: 1.08 !important;
+}
+
+/* Notebook menor / meia tela */
+@media (max-width: 1180px) {
+  #objetivos .core-objectives-head {
+    width: calc(100vw - 2rem) !important;
+    max-width: calc(100vw - 2rem) !important;
+  }
+
+  #objetivos .core-objectives-title {
+    font-size: clamp(2.35rem, 7.1vw, 5.45rem) !important;
+  }
+
+  #objetivos .core-objective-card.is-active {
+    --objective-photo-height: clamp(245px, 24vw, 320px);
+    flex-basis: clamp(650px, 62vw, 800px) !important;
+    min-height: clamp(450px, 43vw, 560px) !important;
+  }
+
+  #objetivos .core-objective-card.is-next {
+    --objective-photo-height: clamp(225px, 21vw, 290px);
+    flex-basis: clamp(430px, 41vw, 570px) !important;
+    min-height: clamp(405px, 38vw, 510px) !important;
+  }
+
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after {
+    --objective-photo-height: clamp(185px, 17vw, 235px);
+    flex-basis: clamp(300px, 29vw, 405px) !important;
+    min-height: clamp(315px, 31vw, 420px) !important;
+  }
+}
+
+/* Tablet */
 @media (max-width: 900px) {
-  #divulgacao .media-layout {
+  #objetivos.objectives-section.core-objectives-section {
+    padding-top: clamp(1.15rem, 4.2vw, 2.25rem) !important;
+  }
+
+  #objetivos .core-objectives-head {
     grid-template-columns: 1fr !important;
+    gap: 0.9rem !important;
+    align-items: start !important;
+    width: calc(100vw - 1.35rem) !important;
+    max-width: calc(100vw - 1.35rem) !important;
+  }
+
+  #objetivos .core-objectives-controls {
+    justify-content: flex-start !important;
+    margin-bottom: 0 !important;
+  }
+
+  #objetivos .core-objectives-title {
+    font-size: clamp(2.2rem, 9.6vw, 4.25rem) !important;
+    line-height: 0.82 !important;
+    transform: rotate(-1deg) !important;
+  }
+
+  #objetivos .core-title-line-b {
+    margin-left: clamp(0.9rem, 10vw, 4.4rem) !important;
+  }
+
+  #objetivos .core-objectives-lead {
+    max-width: 100% !important;
+  }
+
+  #objetivos .core-objectives-viewport {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-top: clamp(1rem, 3vw, 1.7rem) !important;
+  }
+
+  #objetivos .core-objectives-track {
+    gap: 0.9rem !important;
+    padding-right: 100vw !important;
+    padding-left: 0 !important;
+  }
+
+  #objetivos .core-objective-card,
+  #objetivos .core-objective-card.is-active,
+  #objetivos .core-objective-card.is-next,
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after {
+    --objective-photo-height: clamp(245px, 42vw, 335px);
+    flex-basis: min(88vw, 650px) !important;
+    min-height: auto !important;
+  }
+
+  #objetivos .core-objective-card.is-active {
+    transform: translateY(0) !important;
+  }
+
+  #objetivos .core-objective-card.is-next {
+    transform: translateY(18px) !important;
+  }
+
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after {
+    transform: translateY(34px) !important;
+  }
+
+  #objetivos .core-objective-card p,
+  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
+    display: block !important;
+    font-size: 0.86rem !important;
+    line-height: 1.42 !important;
+  }
+
+  #objetivos .core-objective-card.is-after .core-objective-kicker,
+  #objetivos .core-objective-card.is-before .core-objective-kicker {
+    display: block !important;
   }
 }
 
-/* Thumb menor em mobile */
-@media (max-width: 600px) {
-  #divulgacao.content-card {
-    padding: 1rem 0.9rem !important;
+/* Celular */
+@media (max-width: 620px) {
+  #objetivos.objectives-section.core-objectives-section {
+    margin-top: 2.2rem !important;
+    padding-top: 1.15rem !important;
+    padding-bottom: 1.8rem !important;
   }
 
-  #divulgacao .media-thumb {
-    height: 210px !important;
-    min-height: 210px !important;
+  #objetivos .core-objectives-head {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
   }
 
-  #divulgacao .media-panel {
-    border-radius: 18px !important;
+  #objetivos .core-objectives-title {
+    font-size: clamp(2rem, 13vw, 3.38rem) !important;
+    line-height: 0.85 !important;
+    letter-spacing: -0.085em !important;
+  }
+
+  #objetivos .core-title-line-b {
+    margin-left: clamp(0.7rem, 9vw, 2.3rem) !important;
+  }
+
+  #objetivos .core-objectives-lead {
+    font-size: 0.86rem !important;
+    line-height: 1.5 !important;
+  }
+
+  #objetivos .core-objectives-controls {
+    gap: 0.55rem !important;
+  }
+
+  #objetivos .core-objectives-arrow {
+    inline-size: 42px !important;
+    block-size: 42px !important;
+  }
+
+  #objetivos .core-objectives-viewport {
+    margin-top: 1rem !important;
+  }
+
+  #objetivos .core-objectives-track {
+    gap: 0.75rem !important;
+    padding: 0 100vw 0.8rem 0 !important;
+  }
+
+  #objetivos .core-objective-card,
+  #objetivos .core-objective-card.is-active,
+  #objetivos .core-objective-card.is-next,
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after,
+  #objetivos .core-objective-card.is-before {
+    --objective-photo-height: clamp(250px, 62vw, 350px);
+    flex-basis: calc(100vw - 0.75rem) !important;
+    min-height: auto !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  #objetivos .core-objective-body {
+    padding: 0.98rem 1rem 1.05rem !important;
+  }
+
+  #objetivos .core-objective-card h3,
+  #objetivos .core-objective-card.is-far h3,
+  #objetivos .core-objective-card.is-after h3,
+  #objetivos .core-objective-card.is-before h3 {
+    font-size: clamp(1.28rem, 6.4vw, 1.72rem) !important;
+    line-height: 1.06 !important;
+  }
+
+  #objetivos .core-objective-card p,
+  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
+    display: block !important;
+    overflow: visible !important;
+    -webkit-line-clamp: unset !important;
+    font-size: 0.84rem !important;
+    line-height: 1.42 !important;
+  }
+
+  #objetivos .core-objective-card.is-after .core-objective-kicker,
+  #objetivos .core-objective-card.is-before .core-objective-kicker {
+    display: block !important;
+  }
+}
+
+/* Celular muito estreito */
+@media (max-width: 380px) {
+  #objetivos .core-objective-card,
+  #objetivos .core-objective-card.is-active,
+  #objetivos .core-objective-card.is-next,
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after,
+  #objetivos .core-objective-card.is-before {
+    --objective-photo-height: 235px;
+  }
+
+  #objetivos .core-objective-card p,
+  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
+    font-size: 0.81rem !important;
+    line-height: 1.38 !important;
+  }
+}
+
+/* Movimento reduzido: mantém navegação sem transições longas. */
+@media (prefers-reduced-motion: reduce) {
+  #objetivos .core-objectives-track,
+  #objetivos .core-objective-card,
+  #objetivos .core-objective-photo,
+  #objetivos .core-objectives-arrow {
+    transition: none !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  document.addEventListener("DOMContentLoaded", function () {
+    const root = document.getElementById("objetivos");
+    if (!root) return;
+
+    const viewport = root.querySelector(".core-objectives-viewport");
+    const track = root.querySelector(".core-objectives-track");
+    const cards = Array.from(root.querySelectorAll(".core-objective-card"));
+    const prev = root.querySelector(".core-objectives-prev");
+    const next = root.querySelector(".core-objectives-next");
+
+    if (!viewport || !track || !cards.length) return;
+
+    let activeIndex = 0;
+    let photoTimer = null;
+    let ticking = false;
+    let pointerStartX = null;
+    let pointerStartY = null;
+
+    function wrap(index) {
+      return (index + cards.length) % cards.length;
+    }
+
+    function resetPhotos(card) {
+      cards.forEach(function (item) {
+        const photos = Array.from(item.querySelectorAll(".core-objective-photo"));
+        photos.forEach(function (photo, i) {
+          photo.classList.toggle("is-photo-active", i === 0);
+        });
+        item.dataset.photoIndex = "0";
+      });
+
+      if (photoTimer) {
+        clearInterval(photoTimer);
+        photoTimer = null;
+      }
+
+      const activePhotos = Array.from(card.querySelectorAll(".core-objective-photo"));
+      if (activePhotos.length <= 1 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      photoTimer = setInterval(function () {
+        const current = Number(card.dataset.photoIndex || 0);
+        const nextPhoto = (current + 1) % activePhotos.length;
+        card.dataset.photoIndex = String(nextPhoto);
+
+        activePhotos.forEach(function (photo, i) {
+          photo.classList.toggle("is-photo-active", i === nextPhoto);
+        });
+      }, 3600);
+    }
+
+    function classifyCards() {
+      cards.forEach(function (card, i) {
+        const distance = i - activeIndex;
+
+        card.classList.toggle("is-active", distance === 0);
+        card.classList.toggle("is-next", distance === 1);
+        card.classList.toggle("is-far", distance === 2);
+        card.classList.toggle("is-after", distance > 2);
+        card.classList.toggle("is-before", distance < 0);
+        card.setAttribute("aria-current", distance === 0 ? "true" : "false");
+        card.setAttribute("tabindex", distance === 0 ? "0" : "-1");
+      });
+    }
+
+    function alignActiveCard() {
+      const activeCard = cards[activeIndex];
+      if (!activeCard) return;
+
+      const viewportWidth = viewport.clientWidth;
+      const maxShift = Math.max(0, track.scrollWidth - viewportWidth);
+      const isMobile = window.matchMedia("(max-width: 620px)").matches;
+      const leftBreath = isMobile ? 0 : 0;
+
+      const desired = Math.max(0, activeCard.offsetLeft - leftBreath);
+      const shift = Math.min(maxShift, desired);
+
+      track.style.transform = "translate3d(" + (-shift) + "px, 0, 0)";
+    }
+
+    function requestAlign() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        ticking = false;
+        alignActiveCard();
+      });
+    }
+
+    function setActive(index, shouldFocus) {
+      activeIndex = wrap(index);
+      classifyCards();
+      resetPhotos(cards[activeIndex]);
+      requestAlign();
+
+      if (shouldFocus) {
+        cards[activeIndex].focus({ preventScroll: true });
+      }
+    }
+
+    cards.forEach(function (card, i) {
+      card.addEventListener("click", function () {
+        setActive(i, false);
+      });
+
+      card.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setActive(i, true);
+        }
+      });
+    });
+
+    if (prev) {
+      prev.addEventListener("click", function () {
+        setActive(activeIndex - 1, false);
+      });
+    }
+
+    if (next) {
+      next.addEventListener("click", function () {
+        setActive(activeIndex + 1, false);
+      });
+    }
+
+    viewport.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setActive(activeIndex + 1, false);
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setActive(activeIndex - 1, false);
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        setActive(0, false);
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        setActive(cards.length - 1, false);
+      }
+    });
+
+    viewport.addEventListener("pointerdown", function (event) {
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
+      viewport.classList.add("is-dragging");
+    }, { passive: true });
+
+    viewport.addEventListener("pointerup", function (event) {
+      if (pointerStartX === null || pointerStartY === null) {
+        viewport.classList.remove("is-dragging");
+        return;
+      }
+
+      const dx = event.clientX - pointerStartX;
+      const dy = event.clientY - pointerStartY;
+
+      viewport.classList.remove("is-dragging");
+
+      if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        setActive(activeIndex + (dx < 0 ? 1 : -1), false);
+      }
+
+      pointerStartX = null;
+      pointerStartY = null;
+    }, { passive: true });
+
+    viewport.addEventListener("pointercancel", function () {
+      pointerStartX = null;
+      pointerStartY = null;
+      viewport.classList.remove("is-dragging");
+    }, { passive: true });
+
+    window.addEventListener("resize", requestAlign, { passive: true });
+
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(requestAlign);
+      ro.observe(root);
+      ro.observe(viewport);
+      ro.observe(track);
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(requestAlign);
+    }
+
+    window.addEventListener("load", requestAlign);
+
+    setActive(0, false);
+  });
+})();
+</script>
+```
+
+
+```{=html}
+<style>
+/* ======================================================================
+   AJUSTE FINAL FINO — OBJETIVOS MAIS COMPACTOS NO MESMO FRAME
+   ----------------------------------------------------------------------
+   Escopo apenas #objetivos. Reduz o respiro vertical entre título, lead e
+   carrossel; aumenta a área útil das fotos; mantém os cards saindo/entrando
+   pelas extremidades da tela; impede corte do texto no card ativo.
+   ====================================================================== */
+
+#objetivos.objectives-section.core-objectives-section {
+  margin-top: clamp(1.35rem, 2.6vw, 2.8rem) !important;
+  padding-top: clamp(0.2rem, 0.75vw, 0.7rem) !important;
+  padding-bottom: clamp(0.65rem, 1.6vw, 1.35rem) !important;
+  min-height: 0 !important;
+}
+
+#objetivos .core-objectives-head {
+  width: min(1480px, calc(100vw - clamp(1rem, 4.2vw, 5.4rem))) !important;
+  max-width: calc(100vw - clamp(1rem, 4.2vw, 5.4rem)) !important;
+  margin-bottom: 0 !important;
+  gap: clamp(0.65rem, 1.5vw, 1.45rem) !important;
+  align-items: end !important;
+}
+
+#objetivos .core-objectives-title-wrap {
+  max-width: 960px !important;
+}
+
+#objetivos .core-objectives-eyebrow {
+  margin-bottom: clamp(0.22rem, 0.45vw, 0.42rem) !important;
+  padding: 0.28rem 0.68rem !important;
+  font-size: clamp(0.58rem, 0.68vw, 0.68rem) !important;
+  line-height: 1.05 !important;
+}
+
+#objetivos .core-objectives-title {
+  font-size: clamp(2.25rem, 4.75vw, 5.35rem) !important;
+  line-height: 0.74 !important;
+  letter-spacing: -0.098em !important;
+  transform: rotate(-0.85deg) !important;
+}
+
+#objetivos .core-title-line {
+  letter-spacing: -0.102em !important;
+  text-shadow:
+    1px 1px 0 rgba(217,154,39,0.34),
+    0 10px 22px rgba(0,0,0,0.055) !important;
+}
+
+#objetivos .core-title-line-b {
+  margin-left: clamp(0.75rem, 5.2vw, 5rem) !important;
+  margin-top: -0.02em !important;
+}
+
+#objetivos .core-title-line-b::after {
+  bottom: 0.015em !important;
+  height: 0.105em !important;
+}
+
+#objetivos .core-objectives-lead {
+  max-width: 760px !important;
+  margin-top: clamp(0.3rem, 0.65vw, 0.52rem) !important;
+  font-size: clamp(0.84rem, 0.88vw, 0.96rem) !important;
+  line-height: 1.42 !important;
+}
+
+#objetivos .core-objectives-controls {
+  margin-bottom: clamp(0.15rem, 1.6vw, 1.35rem) !important;
+  gap: 0.58rem !important;
+}
+
+#objetivos .core-objectives-arrow {
+  inline-size: clamp(40px, 3vw, 50px) !important;
+  block-size: clamp(40px, 3vw, 50px) !important;
+}
+
+#objetivos .core-objectives-viewport {
+  margin-top: clamp(0.15rem, 0.7vw, 0.62rem) !important;
+  padding-bottom: clamp(0.25rem, 0.8vw, 0.65rem) !important;
+}
+
+#objetivos .core-objectives-track {
+  align-items: flex-start !important;
+  gap: clamp(0.75rem, 1.35vw, 1.35rem) !important;
+  padding-top: 0 !important;
+  padding-bottom: clamp(0.35rem, 0.9vw, 0.75rem) !important;
+}
+
+/* Cards: mais largos, fotos mais altas, corpo mais compacto e sem corte no ativo. */
+#objetivos .core-objective-card {
+  --objective-photo-height: clamp(285px, 33vh, 360px);
+
+  flex-basis: clamp(560px, 40vw, 760px) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  grid-template-rows: var(--objective-photo-height) minmax(150px, auto) !important;
+  transform: translateY(28px) !important;
+  overflow: hidden !important;
+}
+
+#objetivos .core-objective-card.is-active {
+  --objective-photo-height: clamp(305px, 35vh, 380px);
+
+  flex-basis: clamp(760px, 60vw, 1080px) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  grid-template-rows: var(--objective-photo-height) minmax(165px, auto) !important;
+  transform: translateY(0) !important;
+}
+
+#objetivos .core-objective-card.is-next {
+  --objective-photo-height: clamp(292px, 33vh, 365px);
+
+  flex-basis: clamp(620px, 47vw, 860px) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  grid-template-rows: var(--objective-photo-height) minmax(150px, auto) !important;
+  transform: translateY(14px) !important;
+}
+
+#objetivos .core-objective-card.is-far,
+#objetivos .core-objective-card.is-after {
+  --objective-photo-height: clamp(260px, 30vh, 330px);
+
+  flex-basis: clamp(430px, 33vw, 650px) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  grid-template-rows: var(--objective-photo-height) minmax(118px, auto) !important;
+  transform: translateY(28px) !important;
+}
+
+#objetivos .core-objective-card.is-before {
+  transform: translateY(32px) !important;
+}
+
+#objetivos .core-objective-media {
+  height: var(--objective-photo-height) !important;
+  min-height: var(--objective-photo-height) !important;
+}
+
+#objetivos .core-objective-photo {
+  object-fit: cover !important;
+  object-position: center 45% !important;
+}
+
+#objetivos .core-objective-body {
+  padding:
+    clamp(0.78rem, 1.1vw, 1.08rem)
+    clamp(0.9rem, 1.25vw, 1.22rem)
+    clamp(0.85rem, 1.15vw, 1.1rem) !important;
+  overflow: visible !important;
+}
+
+#objetivos .core-objective-number {
+  width: clamp(1.82rem, 2vw, 2.18rem) !important;
+  height: clamp(1.82rem, 2vw, 2.18rem) !important;
+  margin-bottom: 0.42rem !important;
+  font-size: clamp(0.6rem, 0.72vw, 0.72rem) !important;
+}
+
+#objetivos .core-objective-kicker {
+  margin-bottom: 0.32rem !important;
+  font-size: clamp(0.54rem, 0.6vw, 0.66rem) !important;
+  line-height: 1.16 !important;
+}
+
+#objetivos .core-objective-card h3 {
+  font-size: clamp(1.22rem, 1.68vw, 2rem) !important;
+  line-height: 1.03 !important;
+  letter-spacing: -0.06em !important;
+}
+
+#objetivos .core-objective-card p {
+  margin-top: 0.46rem !important;
+  font-size: clamp(0.8rem, 0.84vw, 0.94rem) !important;
+  line-height: 1.34 !important;
+  overflow: visible !important;
+}
+
+#objetivos .core-objective-card.is-active p,
+#objetivos .core-objective-card.is-next p {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  overflow: visible !important;
+}
+
+/* Notebook menor e meia tela: mantém o bloco inteiro mais congestionado. */
+@media (max-width: 1180px) {
+  #objetivos.objectives-section.core-objectives-section {
+    padding-top: 0.35rem !important;
+  }
+
+  #objetivos .core-objectives-head {
+    width: calc(100vw - 1.4rem) !important;
+    max-width: calc(100vw - 1.4rem) !important;
+    gap: 0.7rem !important;
+  }
+
+  #objetivos .core-objectives-title {
+    font-size: clamp(2.05rem, 6.2vw, 4.7rem) !important;
+    line-height: 0.76 !important;
+  }
+
+  #objetivos .core-objectives-lead {
+    margin-top: 0.35rem !important;
+    font-size: clamp(0.82rem, 1.15vw, 0.94rem) !important;
+    line-height: 1.38 !important;
+  }
+
+  #objetivos .core-objectives-viewport {
+    margin-top: 0.35rem !important;
+  }
+
+  #objetivos .core-objective-card.is-active {
+    --objective-photo-height: clamp(285px, 34vh, 350px);
+    flex-basis: clamp(660px, 68vw, 860px) !important;
+    grid-template-rows: var(--objective-photo-height) minmax(160px, auto) !important;
+  }
+
+  #objetivos .core-objective-card.is-next {
+    --objective-photo-height: clamp(270px, 32vh, 330px);
+    flex-basis: clamp(520px, 52vw, 680px) !important;
+  }
+
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after {
+    --objective-photo-height: clamp(245px, 30vh, 305px);
+    flex-basis: clamp(360px, 38vw, 500px) !important;
+  }
+}
+
+/* Tablet: evita corte horizontal e mantém cards amplos. */
+@media (max-width: 900px) {
+  #objetivos.objectives-section.core-objectives-section {
+    padding-top: 0.55rem !important;
+  }
+
+  #objetivos .core-objectives-head {
+    grid-template-columns: 1fr !important;
+    gap: 0.55rem !important;
+  }
+
+  #objetivos .core-objectives-controls {
+    justify-content: flex-start !important;
+    margin-bottom: 0 !important;
+  }
+
+  #objetivos .core-objectives-title {
+    font-size: clamp(2.15rem, 9vw, 4.1rem) !important;
+    line-height: 0.8 !important;
+  }
+
+  #objetivos .core-objectives-viewport {
+    margin-top: 0.45rem !important;
+  }
+
+  #objetivos .core-objective-card,
+  #objetivos .core-objective-card.is-active,
+  #objetivos .core-objective-card.is-next,
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after {
+    --objective-photo-height: clamp(260px, 42vw, 350px);
+    flex-basis: min(86vw, 680px) !important;
+    grid-template-rows: var(--objective-photo-height) auto !important;
+    transform: translateY(0) !important;
+  }
+}
+
+/* Celular: mantém leitura vertical, sem tentar forçar tudo no mesmo frame. */
+@media (max-width: 620px) {
+  #objetivos.objectives-section.core-objectives-section {
+    margin-top: 2rem !important;
+    padding-top: 0.65rem !important;
+  }
+
+  #objetivos .core-objectives-head {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  #objetivos .core-objectives-title {
+    font-size: clamp(2rem, 13vw, 3.2rem) !important;
+    line-height: 0.83 !important;
+  }
+
+  #objetivos .core-objectives-lead {
+    font-size: 0.84rem !important;
+  }
+
+  #objetivos .core-objective-card,
+  #objetivos .core-objective-card.is-active,
+  #objetivos .core-objective-card.is-next,
+  #objetivos .core-objective-card.is-far,
+  #objetivos .core-objective-card.is-after,
+  #objetivos .core-objective-card.is-before {
+    --objective-photo-height: clamp(245px, 70vw, 360px);
+    flex-basis: calc(100vw - 1.4rem) !important;
+  }
+
+  #objetivos .core-objective-card h3 {
+    font-size: clamp(1.28rem, 6.6vw, 1.78rem) !important;
+  }
+
+  #objetivos .core-objective-card p,
+  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
+    display: block !important;
+    overflow: visible !important;
   }
 }
 </style>
 ```
+
+
+```{=html}
+<style>
+/* ======================================================================
+   AJUSTE FINAL — OBJETIVOS COM 3 CARDS VISÍVEIS E CARD ATIVO CENTRAL
+   ----------------------------------------------------------------------
+   Escopo exclusivo: #objetivos.
+   Funcionamento:
+   - card ativo sempre centralizado;
+   - card anterior menor e mais baixo à esquerda;
+   - card seguinte menor e mais baixo à direita;
+   - no primeiro objetivo, a esquerda fica vazia e o próximo aparece à direita;
+   - cards entram e saem pelas extremidades laterais da tela;
+   - bloco mais compacto verticalmente para caber melhor no frame.
+   ====================================================================== */
+
+#objetivos.objectives-section.core-objectives-section {
+  position: relative !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
+
+  margin: clamp(1rem, 1.8vw, 2rem) 0 0 0 !important;
+  padding:
+    clamp(0.25rem, 0.75vw, 0.75rem)
+    0
+    clamp(0.8rem, 1.4vw, 1.25rem)
+    0 !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  isolation: isolate;
+
+  --objective-active-w: 680px;
+  --objective-side-w: 460px;
+  --objective-active-h: 450px;
+  --objective-side-h: 392px;
+  --objective-active-photo-h: 270px;
+  --objective-side-photo-h: 245px;
+  --objective-offset: 600px;
+  --objective-side-y: 46px;
+  --objective-viewport-h: 500px;
+}
+
+#objetivos.objectives-section.core-objectives-section.reveal-ready {
+  transform: translateX(-50%) translateY(44px) !important;
+}
+
+#objetivos.objectives-section.core-objectives-section.reveal-ready.is-visible {
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+#objetivos.core-objectives-section::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Cabeçalho mais compacto */
+#objetivos .core-objectives-head {
+  width: min(1400px, calc(100vw - clamp(1rem, 5vw, 7rem))) !important;
+  max-width: calc(100vw - clamp(1rem, 5vw, 7rem)) !important;
+  margin: 0 auto !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(0.55rem, 1.4vw, 1.25rem) !important;
+  align-items: end !important;
+}
+
+#objetivos .core-objectives-title-wrap {
+  min-width: 0 !important;
+  max-width: 860px !important;
+}
+
+#objetivos .core-objectives-eyebrow {
+  margin: 0 0 clamp(0.12rem, 0.3vw, 0.28rem) 0 !important;
+  padding: 0.25rem 0.62rem !important;
+  line-height: 1.05 !important;
+  font-size: clamp(0.56rem, 0.66vw, 0.68rem) !important;
+  letter-spacing: 0.12em !important;
+}
+
+#objetivos .core-objectives-title {
+  margin: 0 !important;
+  max-width: none !important;
+
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: clamp(2.2rem, 4.9vw, 5.35rem) !important;
+  line-height: 0.72 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.105em !important;
+
+  color: var(--ink) !important;
+  transform: rotate(-0.7deg) !important;
+  transform-origin: left center !important;
+}
+
+#objetivos .core-title-line {
+  display: block !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  text-shadow:
+    1px 1px 0 rgba(217,154,39,0.32),
+    0 10px 22px rgba(0,0,0,0.055) !important;
+}
+
+#objetivos .core-title-line-b {
+  position: relative !important;
+  display: inline-block !important;
+  margin-left: clamp(0.75rem, 5.2vw, 5.2rem) !important;
+  margin-top: -0.015em !important;
+  color: var(--red-dark) !important;
+}
+
+#objetivos .core-title-line-b::after {
+  content: "" !important;
+  position: absolute !important;
+  left: -0.04em !important;
+  right: -0.05em !important;
+  bottom: 0.02em !important;
+  height: 0.1em !important;
+  background: rgba(217,154,39,0.72) !important;
+  z-index: -1 !important;
+}
+
+#objetivos .core-objectives-lead {
+  max-width: 690px !important;
+  margin: clamp(0.22rem, 0.55vw, 0.45rem) 0 0 0 !important;
+  padding: 0 !important;
+
+  color: var(--muted) !important;
+  font-size: clamp(0.82rem, 0.9vw, 0.95rem) !important;
+  line-height: 1.32 !important;
+}
+
+#objetivos .core-objectives-controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.58rem !important;
+  margin: 0 0 clamp(0.25rem, 0.8vw, 0.75rem) 0 !important;
+  z-index: 12 !important;
+}
+
+#objetivos .core-objectives-arrow {
+  inline-size: clamp(40px, 3vw, 50px) !important;
+  block-size: clamp(40px, 3vw, 50px) !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(98,106,56,0.22) !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  font-size: clamp(1rem, 1.3vw, 1.25rem) !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease,
+    box-shadow 180ms ease !important;
+}
+
+#objetivos .core-objectives-prev {
+  background: rgba(246,241,232,0.72) !important;
+  color: var(--green-dark) !important;
+}
+
+#objetivos .core-objectives-next {
+  background: var(--green-dark) !important;
+  color: var(--cream) !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
+}
+
+#objetivos .core-objectives-arrow:hover,
+#objetivos .core-objectives-arrow:focus-visible {
+  transform: translateY(-2px) !important;
+  background: var(--red) !important;
+  color: #fff !important;
+  outline: none !important;
+}
+
+#objetivos .core-objectives-arrow.is-disabled,
+#objetivos .core-objectives-arrow:disabled {
+  opacity: 0.34 !important;
+  cursor: default !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Palco dos cards: altura controlada via JS */
+#objetivos .core-objectives-viewport {
+  position: relative !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
+
+  height: var(--objective-viewport-h) !important;
+  margin: clamp(0.3rem, 0.75vw, 0.65rem) 0 0 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+  outline: none !important;
+  cursor: grab !important;
+  touch-action: pan-y !important;
+}
+
+#objetivos .core-objectives-viewport.is-dragging {
+  cursor: grabbing !important;
+}
+
+#objetivos .core-objectives-track {
+  position: relative !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: var(--objective-viewport-h) !important;
+  min-width: 0 !important;
+
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  transform: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+/* Estado base: todos saem pela direita até receberem uma classe visível */
+#objetivos .core-objective-card {
+  position: absolute !important;
+  top: 0 !important;
+  left: 50% !important;
+
+  width: var(--objective-side-w) !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: var(--objective-side-h) !important;
+
+  display: grid !important;
+  grid-template-rows: var(--objective-side-photo-h) minmax(0, 1fr) !important;
+  grid-template-columns: 1fr !important;
+  flex: none !important;
+
+  overflow: hidden !important;
+  border-radius: 0 !important;
+  border: 1px solid rgba(98,106,56,0.18) !important;
+  background:
+    linear-gradient(180deg, rgba(255,253,247,0.98), rgba(246,241,232,0.90)) !important;
+  box-shadow: 0 16px 30px rgba(0,0,0,0.10) !important;
+
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+
+  transform:
+    translate3d(calc(-50% + 100vw), var(--objective-side-y), 0)
+    scale(0.88) !important;
+  transform-origin: center bottom !important;
+
+  transition:
+    transform 620ms cubic-bezier(.2,.78,.18,1),
+    opacity 260ms ease,
+    width 420ms cubic-bezier(.2,.78,.18,1),
+    height 420ms cubic-bezier(.2,.78,.18,1),
+    box-shadow 260ms ease,
+    filter 260ms ease !important;
+}
+
+#objetivos .core-objective-card.is-current {
+  width: var(--objective-active-w) !important;
+  height: var(--objective-active-h) !important;
+  grid-template-rows: var(--objective-active-photo-h) minmax(0, 1fr) !important;
+
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 8 !important;
+
+  transform: translate3d(-50%, 0, 0) scale(1) !important;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.16) !important;
+  filter: saturate(1.02) contrast(1.02) !important;
+}
+
+#objetivos .core-objective-card.is-prev {
+  opacity: 0.86 !important;
+  pointer-events: auto !important;
+  z-index: 5 !important;
+  transform:
+    translate3d(calc(-50% - var(--objective-offset)), var(--objective-side-y), 0)
+    scale(0.94) !important;
+}
+
+#objetivos .core-objective-card.is-next {
+  opacity: 0.92 !important;
+  pointer-events: auto !important;
+  z-index: 5 !important;
+  transform:
+    translate3d(calc(-50% + var(--objective-offset)), var(--objective-side-y), 0)
+    scale(0.94) !important;
+}
+
+#objetivos .core-objective-card.is-hidden-left {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform:
+    translate3d(calc(-50% - 100vw), var(--objective-side-y), 0)
+    scale(0.82) !important;
+}
+
+#objetivos .core-objective-card.is-hidden-right {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform:
+    translate3d(calc(-50% + 100vw), var(--objective-side-y), 0)
+    scale(0.82) !important;
+}
+
+/* Imagens: mais altas, sem achatamento */
+#objetivos .core-objective-media {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(135deg, rgba(46,59,36,0.18), rgba(217,154,39,0.12)),
+    var(--green-soft) !important;
+}
+
+#objetivos .core-objective-media::after {
+  display: none !important;
+  content: none !important;
+}
+
+#objetivos .core-objective-photo {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center center !important;
+
+  opacity: 0 !important;
+  transform: scale(1.025) !important;
+  transition: opacity 520ms ease, transform 900ms ease !important;
+}
+
+#objetivos .core-objective-photo.is-photo-active {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+/* Corpo do card */
+#objetivos .core-objective-body {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  padding:
+    clamp(0.82rem, 1vw, 1.05rem)
+    clamp(0.9rem, 1.25vw, 1.25rem)
+    clamp(0.86rem, 1.05vw, 1.15rem) !important;
+
+  background:
+    linear-gradient(180deg, rgba(255,253,247,0.96), rgba(246,241,232,0.92)) !important;
+  color: var(--ink) !important;
+  overflow: hidden !important;
+}
+
+#objetivos .core-objective-number {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: clamp(1.9rem, 2.1vw, 2.3rem) !important;
+  height: clamp(1.9rem, 2.1vw, 2.3rem) !important;
+  margin: 0 0 0.42rem 0 !important;
+  border-radius: 50% !important;
+
+  background: var(--green-dark) !important;
+  color: var(--cream) !important;
+
+  font-family: 'Space Mono', monospace !important;
+  font-size: clamp(0.62rem, 0.7vw, 0.75rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+#objetivos .core-objective-kicker {
+  display: block !important;
+  margin: 0 0 0.34rem 0 !important;
+
+  color: var(--red-dark) !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: clamp(0.54rem, 0.62vw, 0.69rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+#objetivos .core-objective-card h3 {
+  margin: 0 !important;
+  color: var(--ink) !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: clamp(1.16rem, 1.48vw, 1.85rem) !important;
+  line-height: 1.02 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.065em !important;
+  text-wrap: balance;
+  overflow-wrap: normal !important;
+}
+
+#objetivos .core-objective-card p {
+  margin: 0.42rem 0 0 0 !important;
+  color: var(--muted) !important;
+  font-size: clamp(0.78rem, 0.84vw, 0.92rem) !important;
+  line-height: 1.3 !important;
+  font-weight: 500 !important;
+  display: block !important;
+  overflow: visible !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+}
+
+/* Cards laterais: texto mais resumido para manter a leitura sem cortar */
+#objetivos .core-objective-card.is-prev .core-objective-number,
+#objetivos .core-objective-card.is-next .core-objective-number {
+  width: clamp(1.75rem, 1.9vw, 2.05rem) !important;
+  height: clamp(1.75rem, 1.9vw, 2.05rem) !important;
+  margin-bottom: 0.34rem !important;
+  font-size: clamp(0.56rem, 0.66vw, 0.68rem) !important;
+}
+
+#objetivos .core-objective-card.is-prev .core-objective-kicker,
+#objetivos .core-objective-card.is-next .core-objective-kicker {
+  font-size: clamp(0.49rem, 0.56vw, 0.62rem) !important;
+  margin-bottom: 0.26rem !important;
+}
+
+#objetivos .core-objective-card.is-prev h3,
+#objetivos .core-objective-card.is-next h3 {
+  font-size: clamp(1rem, 1.16vw, 1.35rem) !important;
+  line-height: 1.03 !important;
+}
+
+#objetivos .core-objective-card.is-prev p,
+#objetivos .core-objective-card.is-next p {
+  margin-top: 0.35rem !important;
+  font-size: clamp(0.72rem, 0.75vw, 0.82rem) !important;
+  line-height: 1.25 !important;
+
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* Tablet: mantém o ativo central e mostra laterais menores/parciais */
+@media (max-width: 900px) {
+  #objetivos.objectives-section.core-objectives-section {
+    padding-top: 0.5rem !important;
+  }
+
+  #objetivos .core-objectives-head {
+    grid-template-columns: 1fr !important;
+    width: calc(100vw - 1.1rem) !important;
+    max-width: calc(100vw - 1.1rem) !important;
+  }
+
+  #objetivos .core-objectives-controls {
+    justify-content: flex-start !important;
+    margin-top: 0.25rem !important;
+  }
+
+  #objetivos .core-objectives-title {
+    font-size: clamp(2.05rem, 9vw, 4.2rem) !important;
+  }
+
+  #objetivos .core-objectives-lead {
+    max-width: 100% !important;
+  }
+}
+
+/* Celular: prioriza um card central legível, com vizinhos sugeridos nas bordas. */
+@media (max-width: 620px) {
+  #objetivos.objectives-section.core-objectives-section {
+    margin-top: 1.6rem !important;
+  }
+
+  #objetivos .core-objectives-head {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  #objetivos .core-objectives-eyebrow {
+    font-size: 0.56rem !important;
+  }
+
+  #objetivos .core-objectives-title {
+    font-size: clamp(2rem, 13vw, 3.25rem) !important;
+    line-height: 0.78 !important;
+  }
+
+  #objetivos .core-title-line-b {
+    margin-left: 0.7rem !important;
+  }
+
+  #objetivos .core-objectives-lead {
+    font-size: 0.82rem !important;
+    line-height: 1.34 !important;
+  }
+
+  #objetivos .core-objective-card h3 {
+    font-size: clamp(1.15rem, 5.9vw, 1.62rem) !important;
+  }
+
+  #objetivos .core-objective-card p {
+    font-size: 0.78rem !important;
+    line-height: 1.34 !important;
+  }
+
+  #objetivos .core-objective-card.is-prev p,
+  #objetivos .core-objective-card.is-next p,
+  #objetivos .core-objective-card.is-prev .core-objective-kicker,
+  #objetivos .core-objective-card.is-next .core-objective-kicker {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #objetivos .core-objective-card,
+  #objetivos .core-objective-photo,
+  #objetivos .core-objectives-arrow {
+    transition: none !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  document.addEventListener("DOMContentLoaded", function () {
+    const root = document.getElementById("objetivos");
+    if (!root) return;
+
+    const viewport = root.querySelector(".core-objectives-viewport");
+    const track = root.querySelector(".core-objectives-track");
+    const cards = Array.from(root.querySelectorAll(".core-objective-card"));
+    const prevBtn = root.querySelector(".core-objectives-prev");
+    const nextBtn = root.querySelector(".core-objectives-next");
+
+    if (!viewport || !track || !cards.length) return;
+
+    let activeIndex = 0;
+    let photoTimer = null;
+    let startX = null;
+    let startY = null;
+    let isDragging = false;
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function measure() {
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+      const isMobile = vw <= 620;
+      const isTablet = vw > 620 && vw <= 900;
+
+      let gap;
+      let activeW;
+      let sideW;
+      let activeH;
+
+      if (isMobile) {
+        gap = clamp(vw * 0.035, 14, 22);
+        activeW = clamp(vw * 0.84, 300, vw - 34);
+        sideW = clamp(vw * 0.66, 230, vw * 0.72);
+        activeH = clamp(vh * 0.50, 390, 470);
+      } else if (isTablet) {
+        gap = clamp(vw * 0.022, 18, 28);
+        activeW = clamp(vw * 0.62, 470, 600);
+        sideW = clamp(vw * 0.39, 300, 410);
+        activeH = clamp(vh * 0.50, 405, 500);
+      } else {
+        gap = clamp(vw * 0.018, 22, 36);
+        activeW = clamp(vw * 0.40, 560, 720);
+
+        const sideBase = clamp(vw * 0.285, 380, 500);
+        const sideMaxThatStillFits = Math.max(300, (vw - activeW - (2 * gap) - 32) / 2);
+        sideW = Math.min(sideBase, sideMaxThatStillFits);
+
+        activeH = clamp(vh * 0.52, 410, 505);
+      }
+
+      const sideH = isMobile ? activeH * 0.88 : activeH * 0.86;
+      const activePhotoH = activeH * (isMobile ? 0.60 : 0.61);
+      const sidePhotoH = sideH * (isMobile ? 0.62 : 0.63);
+      const sideY = isMobile ? 38 : clamp(vh * 0.055, 36, 58);
+      const offset = (activeW / 2) + gap + (sideW / 2);
+      const viewportH = activeH + sideY + (isMobile ? 16 : 18);
+
+      root.style.setProperty("--objective-active-w", Math.round(activeW) + "px");
+      root.style.setProperty("--objective-side-w", Math.round(sideW) + "px");
+      root.style.setProperty("--objective-active-h", Math.round(activeH) + "px");
+      root.style.setProperty("--objective-side-h", Math.round(sideH) + "px");
+      root.style.setProperty("--objective-active-photo-h", Math.round(activePhotoH) + "px");
+      root.style.setProperty("--objective-side-photo-h", Math.round(sidePhotoH) + "px");
+      root.style.setProperty("--objective-offset", Math.round(offset) + "px");
+      root.style.setProperty("--objective-side-y", Math.round(sideY) + "px");
+      root.style.setProperty("--objective-viewport-h", Math.round(viewportH) + "px");
+
+      track.style.transform = "none";
+      viewport.style.height = Math.round(viewportH) + "px";
+      track.style.height = Math.round(viewportH) + "px";
+
+      render();
+    }
+
+    function resetPhotos(card) {
+      cards.forEach(function (item) {
+        const photos = Array.from(item.querySelectorAll(".core-objective-photo"));
+        photos.forEach(function (photo, i) {
+          photo.classList.toggle("is-photo-active", i === 0);
+        });
+        item.dataset.photoIndex = "0";
+      });
+
+      if (photoTimer) {
+        clearInterval(photoTimer);
+        photoTimer = null;
+      }
+
+      const photos = Array.from(card.querySelectorAll(".core-objective-photo"));
+      if (photos.length <= 1 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      photoTimer = setInterval(function () {
+        const current = Number(card.dataset.photoIndex || 0);
+        const nextPhoto = (current + 1) % photos.length;
+        card.dataset.photoIndex = String(nextPhoto);
+
+        photos.forEach(function (photo, i) {
+          photo.classList.toggle("is-photo-active", i === nextPhoto);
+        });
+      }, 3600);
+    }
+
+    function render() {
+      cards.forEach(function (card, i) {
+        card.classList.remove(
+          "is-active",
+          "is-current",
+          "is-prev",
+          "is-next",
+          "is-far",
+          "is-after",
+          "is-before",
+          "is-hidden-left",
+          "is-hidden-right"
+        );
+
+        if (i === activeIndex) {
+          card.classList.add("is-current");
+          card.setAttribute("aria-current", "true");
+          card.setAttribute("tabindex", "0");
+        } else if (i === activeIndex - 1) {
+          card.classList.add("is-prev");
+          card.setAttribute("aria-current", "false");
+          card.setAttribute("tabindex", "-1");
+        } else if (i === activeIndex + 1) {
+          card.classList.add("is-next");
+          card.setAttribute("aria-current", "false");
+          card.setAttribute("tabindex", "-1");
+        } else if (i < activeIndex - 1) {
+          card.classList.add("is-hidden-left");
+          card.setAttribute("aria-current", "false");
+          card.setAttribute("tabindex", "-1");
+        } else {
+          card.classList.add("is-hidden-right");
+          card.setAttribute("aria-current", "false");
+          card.setAttribute("tabindex", "-1");
+        }
+      });
+
+      if (prevBtn) {
+        const disabled = activeIndex === 0;
+        prevBtn.classList.toggle("is-disabled", disabled);
+        prevBtn.disabled = disabled;
+        prevBtn.setAttribute("aria-disabled", disabled ? "true" : "false");
+      }
+
+      if (nextBtn) {
+        const disabled = activeIndex === cards.length - 1;
+        nextBtn.classList.toggle("is-disabled", disabled);
+        nextBtn.disabled = disabled;
+        nextBtn.setAttribute("aria-disabled", disabled ? "true" : "false");
+      }
+    }
+
+    function setActive(index, shouldFocus) {
+      const nextIndex = clamp(index, 0, cards.length - 1);
+      if (nextIndex === activeIndex) {
+        render();
+        return;
+      }
+
+      activeIndex = nextIndex;
+      render();
+      resetPhotos(cards[activeIndex]);
+
+      if (shouldFocus && cards[activeIndex]) {
+        cards[activeIndex].focus({ preventScroll: true });
+      }
+    }
+
+    function captureButton(event, direction) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === "function") {
+        event.stopImmediatePropagation();
+      }
+
+      setActive(activeIndex + direction, false);
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", function (event) {
+        captureButton(event, -1);
+      }, true);
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", function (event) {
+        captureButton(event, 1);
+      }, true);
+    }
+
+    cards.forEach(function (card, i) {
+      card.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof event.stopImmediatePropagation === "function") {
+          event.stopImmediatePropagation();
+        }
+        setActive(i, false);
+      }, true);
+
+      card.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setActive(i, true);
+        }
+      }, true);
+    });
+
+    viewport.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setActive(activeIndex + 1, false);
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setActive(activeIndex - 1, false);
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        setActive(0, false);
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        setActive(cards.length - 1, false);
+      }
+    }, true);
+
+    viewport.addEventListener("pointerdown", function (event) {
+      startX = event.clientX;
+      startY = event.clientY;
+      isDragging = true;
+      viewport.classList.add("is-dragging");
+    }, { passive: true });
+
+    viewport.addEventListener("pointerup", function (event) {
+      if (!isDragging || startX === null || startY === null) {
+        viewport.classList.remove("is-dragging");
+        return;
+      }
+
+      const dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+
+      viewport.classList.remove("is-dragging");
+      isDragging = false;
+
+      if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        setActive(activeIndex + (dx < 0 ? 1 : -1), false);
+      }
+
+      startX = null;
+      startY = null;
+    }, { passive: true });
+
+    viewport.addEventListener("pointercancel", function () {
+      isDragging = false;
+      startX = null;
+      startY = null;
+      viewport.classList.remove("is-dragging");
+    }, { passive: true });
+
+    window.addEventListener("resize", function () {
+      window.requestAnimationFrame(measure);
+    }, { passive: true });
+
+    if (window.ResizeObserver) {
+      const observer = new ResizeObserver(function () {
+        window.requestAnimationFrame(measure);
+      });
+      observer.observe(root);
+      observer.observe(viewport);
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure);
+    }
+
+    window.addEventListener("load", measure);
+
+    activeIndex = 0;
+    resetPhotos(cards[activeIndex]);
+    measure();
+    render();
+  });
+})();
+</script>
+```
+

@@ -1,0 +1,321 @@
+# Cadastro institucional consumido pela página inicial do Tsiino Hiiwiida.
+# Grupos usados no index.qmd:
+#   fomento       = agências de fomento citadas na home e nos cards da coordenação
+#   participante  = instituições vinculadas aos pesquisadores responsáveis
+#   parceira      = instituições parceiras/colaboradoras adicionais
+#
+# Para adicionar uma logo depois:
+# 1. coloque o arquivo em figures/logos/institutions/ ou figures/logos/faps/
+# 2. atualize o campo logo abaixo
+# 3. troque status: logo_pendente por status: ok
+
+- id: fapeam
+  group: fomento
+  order: 1
+  acronym: FAPEAM
+  name: Fundação de Amparo à Pesquisa do Estado do Amazonas
+  role: Instituição de fomento
+  url: https://www.fapeam.am.gov.br
+  logo: figures/logos/faps/fapeam_logo.png
+  status: logo_pendente
+  note: Logo não incluída no pacote recebido; inserir depois com este nome de arquivo.
+
+- id: faperj
+  group: fomento
+  order: 2
+  acronym: FAPERJ
+  name: Fundação Carlos Chagas Filho de Amparo à Pesquisa do Estado do Rio de Janeiro
+  role: Instituição de fomento
+  url: https://www.faperj.br
+  logo: figures/logos/faps/faperj_logo.png
+  status: ok
+
+- id: ukri
+  group: fomento
+  order: 3
+  acronym: UKRI
+  name: UK Research and Innovation
+  role: Instituição de fomento
+  url: https://www.ukri.org
+  logo: figures/logos/faps/ukri_logo.png
+  status: ok
+
+- id: fapespa
+  group: fomento
+  order: 4
+  acronym: FAPESPA
+  name: Fundação Amazônia de Amparo a Estudos e Pesquisas
+  role: Instituição de fomento
+  url: https://www.fapespa.pa.gov.br
+  logo: figures/logos/faps/fapespa_logo.png
+  status: ok
+
+- id: facepe
+  group: fomento
+  order: 5
+  acronym: FACEPE
+  name: Fundação de Amparo à Ciência e Tecnologia do Estado de Pernambuco
+  role: Instituição de fomento
+  url: https://www.facepe.br
+  logo: figures/logos/faps/facepe_logo.png
+  status: ok
+
+- id: fapema
+  group: fomento
+  order: 6
+  acronym: FAPEMA
+  name: Fundação de Amparo à Pesquisa e ao Desenvolvimento Científico e Tecnológico do Maranhão
+  role: Instituição de fomento
+  url: https://www.fapema.br
+  logo: figures/logos/faps/fapema_logo.png
+  status: ok
+
+- id: fapesp
+  group: fomento
+  order: 7
+  acronym: FAPESP
+  name: Fundação de Amparo à Pesquisa do Estado de São Paulo
+  role: Instituição de fomento
+  url: https://fapesp.br
+  logo: figures/logos/faps/fapesp_logo.png
+  status: ok
+
+- id: fapesq
+  group: fomento
+  order: 8
+  acronym: FAPESQ
+  name: Fundação de Apoio à Pesquisa do Estado da Paraíba
+  role: Instituição de fomento
+  url: https://fapesq.rpp.br
+  logo: figures/logos/faps/fapesq_logo.png
+  status: ok
+
+- id: fapdf
+  group: fomento
+  order: 9
+  acronym: FAPDF
+  name: Fundação de Apoio à Pesquisa do Distrito Federal
+  role: Instituição de fomento
+  url: https://www.fap.df.gov.br
+  logo: figures/logos/faps/fapdf_logo.png
+  status: ok
+
+- id: inpa
+  group: participante
+  order: 1
+  acronym: INPA
+  name: Instituto Nacional de Pesquisas da Amazônia
+  role: Instituição participante vinculada à coordenação
+  url: https://www.inpa.gov.br
+  logo: figures/logos/institutions/inpa_logo.png
+  status: logo_pendente
+
+- id: jbrj
+  group: participante
+  order: 2
+  acronym: JBRJ
+  name: Instituto de Pesquisas Jardim Botânico do Rio de Janeiro
+  role: Instituição participante vinculada à coordenação
+  url: https://www.jbrj.gov.br
+  logo: figures/logos/institutions/jbrj_logo.png
+  status: logo_pendente
+
+- id: nhm
+  group: participante
+  order: 3
+  acronym: NHM
+  name: Natural History Museum
+  role: Instituição participante vinculada à coordenação
+  url: https://www.nhm.ac.uk
+  logo: figures/logos/institutions/nhm_logo.png
+  status: logo_pendente
+
+- id: mpeg
+  group: participante
+  order: 4
+  acronym: MPEG
+  name: Museu Paraense Emílio Goeldi
+  role: Instituição participante vinculada à coordenação
+  url: https://www.gov.br/museugoeldi
+  logo: figures/logos/institutions/mpeg_logo.png
+  status: logo_pendente
+
+- id: ufrpe
+  group: participante
+  order: 5
+  acronym: UFRPE
+  name: Universidade Federal Rural de Pernambuco
+  role: Instituição participante vinculada à coordenação
+  url: https://www.ufrpe.br
+  logo: figures/logos/institutions/ufrpe_logo.png
+  status: logo_pendente
+
+- id: ifma
+  group: participante
+  order: 6
+  acronym: IFMA
+  name: Instituto Federal do Maranhão
+  role: Instituição participante vinculada à coordenação
+  url: https://portal.ifma.edu.br
+  logo: figures/logos/institutions/ifma_logo.png
+  status: logo_pendente
+
+- id: ipa
+  group: participante
+  order: 7
+  acronym: IPA
+  name: Instituto de Pesquisas Ambientais
+  role: Instituição participante vinculada à coordenação
+  url: https://www.infraestruturameioambiente.sp.gov.br/ipa/
+  logo: figures/logos/institutions/ipa_logo.png
+  status: logo_pendente
+
+- id: ufpb
+  group: participante
+  order: 8
+  acronym: UFPB
+  name: Universidade Federal da Paraíba
+  role: Instituição participante vinculada à coordenação
+  url: https://www.ufpb.br
+  logo: figures/logos/institutions/ufpb_logo.png
+  status: logo_pendente
+
+- id: unb
+  group: participante
+  order: 9
+  acronym: UnB
+  name: Universidade de Brasília
+  role: Instituição participante vinculada à coordenação
+  url: https://www.unb.br
+  logo: figures/logos/institutions/unb_logo.png
+  status: logo_pendente
+
+- id: exeter
+  group: parceira
+  order: 1
+  acronym: Exeter
+  name: University of Exeter
+  role: Instituição parceira
+  url: https://www.exeter.ac.uk
+  logo: figures/logos/institutions/exeter_logo.png
+  status: logo_pendente
+
+- id: ird
+  group: parceira
+  order: 2
+  acronym: IRD
+  name: Institut de Recherche pour le Développement
+  role: Instituição parceira
+  url: https://www.ird.fr
+  logo: figures/logos/institutions/ird_logo.png
+  status: logo_pendente
+
+- id: kew
+  group: parceira
+  order: 3
+  acronym: Kew
+  name: Royal Botanic Gardens, Kew
+  role: Instituição parceira
+  url: https://www.kew.org
+  logo: figures/logos/institutions/kew_logo.png
+  status: logo_pendente
+
+- id: sfb
+  group: parceira
+  order: 4
+  acronym: SFB
+  name: Serviço Florestal Brasileiro
+  role: Instituição parceira
+  url: https://www.gov.br/florestal
+  logo: figures/logos/institutions/sfb_logo.png
+  status: logo_pendente
+
+- id: ufc
+  group: parceira
+  order: 5
+  acronym: UFC
+  name: Universidade Federal do Ceará
+  role: Instituição parceira
+  url: https://www.ufc.br
+  logo: figures/logos/institutions/ufc_logo.png
+  status: logo_pendente
+
+- id: ufla
+  group: parceira
+  order: 6
+  acronym: UFLA
+  name: Universidade Federal de Lavras
+  role: Instituição parceira
+  url: https://ufla.br
+  logo: figures/logos/institutions/ufla-logo.png
+  status: logo_pendente
+
+- id: ufmg
+  group: parceira
+  order: 7
+  acronym: UFMG
+  name: Universidade Federal de Minas Gerais
+  role: Instituição parceira
+  url: https://www.ufmg.br
+  logo: figures/logos/institutions/UFMG_logo.png
+  status: logo_pendente
+
+- id: ufpe
+  group: parceira
+  order: 8
+  acronym: UFPE
+  name: Universidade Federal de Pernambuco
+  role: Instituição parceira
+  url: https://www.ufpe.br
+  logo: figures/logos/institutions/ufpe_logo.png
+  status: logo_pendente
+
+- id: univasf
+  group: parceira
+  order: 9
+  acronym: UNIVASF
+  name: Universidade Federal do Vale do São Francisco
+  role: Instituição parceira
+  url: https://portais.univasf.edu.br
+  logo: figures/logos/institutions/univasf_logo.png
+  status: logo_pendente
+
+- id: unito
+  group: parceira
+  order: 10
+  acronym: UniTO
+  name: Università di Torino
+  role: Instituição parceira
+  url: https://www.unito.it
+  logo: figures/logos/institutions/unito_logo.png
+  status: logo_pendente
+
+- id: unemat
+  group: parceira
+  order: 11
+  acronym: UNEMAT
+  name: Universidade do Estado de Mato Grosso
+  role: Instituição parceira
+  url: https://unemat.br
+  logo: figures/logos/institutions/unemat_logo.png
+  status: logo_pendente
+
+- id: unimontes
+  group: parceira
+  order: 12
+  acronym: Unimontes
+  name: Universidade Estadual de Montes Claros
+  role: Instituição parceira
+  url: https://unimontes.br
+  logo: figures/logos/institutions/unimontes_logo.png
+  status: logo_pendente
+
+- id: unesp
+  group: parceira
+  order: 13
+  acronym: UNESP
+  name: Universidade Estadual Paulista
+  role: Instituição parceira
+  url: https://www.unesp.br
+  logo: figures/logos/institutions/unesp_logo.png
+  status: logo_pendente

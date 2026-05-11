@@ -1,0 +1,183 @@
+<style>
+/* ===== Navbar: idioma depois de Equipe/Team; sem busca e sem modo leitura ===== */
+#quarto-search,
+#quarto-search-button,
+.quarto-search-button,
+.aa-DetachedSearchButton,
+.aa-DetachedSearchButtonIcon,
+.quarto-navbar-tools .quarto-search-button,
+.quarto-navbar-tools [aria-label*="Search" i],
+.quarto-navbar-tools [title*="Search" i],
+.quarto-navbar-tools [aria-label*="Buscar" i],
+.quarto-navbar-tools [title*="Buscar" i],
+#quarto-reader-toggle,
+.quarto-reader-toggle,
+.quarto-reader-mode-toggle,
+.quarto-navbar-tools [aria-label*="Reader" i],
+.quarto-navbar-tools [title*="Reader" i],
+.quarto-navbar-tools [aria-label*="leitura" i],
+.quarto-navbar-tools [title*="leitura" i] {
+  display: none !important;
+}
+
+.navbar-nav .tsiino-language-nav-item {
+  display: flex !important;
+  align-items: center !important;
+  margin-left: 0.35rem !important;
+}
+
+.navbar-nav .tsiino-language-nav-item > a,
+.navbar-nav .tsiino-language-nav-item > button,
+.navbar-nav .tsiino-language-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 2.65rem !important;
+  min-height: 2.05rem !important;
+  padding: 0.34rem 0.74rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(246, 241, 232, 0.58) !important;
+  background: rgba(246, 241, 232, 0.14) !important;
+  color: #fff !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.76rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  box-shadow: 0 5px 16px rgba(0,0,0,0.18) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
+}
+
+.navbar-nav .tsiino-language-nav-item > a:hover,
+.navbar-nav .tsiino-language-nav-item > button:hover,
+.navbar-nav .tsiino-language-button:hover {
+  transform: translateY(-1px) !important;
+  background: var(--ochre, #D99A27) !important;
+  border-color: var(--ochre, #D99A27) !important;
+  color: #171717 !important;
+}
+
+/* Em páginas com navbar clara, mantém o botão legível */
+body:not(.floating-navbar) .navbar-nav .tsiino-language-nav-item > a,
+body:not(.floating-navbar) .navbar-nav .tsiino-language-nav-item > button,
+body:not(.floating-navbar) .navbar-nav .tsiino-language-button {
+  color: var(--green-dark, #2E3B24) !important;
+  background: rgba(246, 241, 232, 0.72) !important;
+  border-color: rgba(98, 106, 56, 0.34) !important;
+  box-shadow: 0 5px 14px rgba(0,0,0,0.08) !important;
+}
+
+/* No menu colapsado, o idioma vira um item alinhado com os links */
+@media (max-width: 991.98px) {
+  .navbar-nav .tsiino-language-nav-item {
+    margin: 0.35rem 0 0 0 !important;
+    align-items: flex-start !important;
+  }
+
+  .navbar-nav .tsiino-language-nav-item > a,
+  .navbar-nav .tsiino-language-nav-item > button,
+  .navbar-nav .tsiino-language-button {
+    min-width: 3.1rem !important;
+    min-height: 2.15rem !important;
+    padding: 0.42rem 0.82rem !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  function normalizeText(el) {
+    return (el.textContent || "").replace(/\s+/g, " ").trim().toUpperCase();
+  }
+
+  function isLanguageButton(el) {
+    const txt = normalizeText(el);
+    if (!/^(EN|PT|PT-BR)$/.test(txt)) return false;
+    if (!el.matches("a, button")) return false;
+    return Boolean(el.closest(".navbar, #quarto-header, .quarto-navbar-tools"));
+  }
+
+  function hideSearchAndReaderTools() {
+    const selectors = [
+      "#quarto-search",
+      "#quarto-search-button",
+      ".quarto-search-button",
+      ".aa-DetachedSearchButton",
+      ".aa-DetachedSearchButtonIcon",
+      "#quarto-reader-toggle",
+      ".quarto-reader-toggle",
+      ".quarto-reader-mode-toggle",
+      ".quarto-navbar-tools [aria-label*='Search' i]",
+      ".quarto-navbar-tools [title*='Search' i]",
+      ".quarto-navbar-tools [aria-label*='Buscar' i]",
+      ".quarto-navbar-tools [title*='Buscar' i]",
+      ".quarto-navbar-tools [aria-label*='Reader' i]",
+      ".quarto-navbar-tools [title*='Reader' i]",
+      ".quarto-navbar-tools [aria-label*='leitura' i]",
+      ".quarto-navbar-tools [title*='leitura' i]"
+    ];
+
+    document.querySelectorAll(selectors.join(",")).forEach(function (el) {
+      el.setAttribute("hidden", "");
+      el.style.display = "none";
+    });
+  }
+
+  function moveLanguageButton() {
+    hideSearchAndReaderTools();
+
+    const nav = document.querySelector("#quarto-header .navbar-nav, .navbar .navbar-nav");
+    if (!nav) return false;
+
+    let lang = document.querySelector(".tsiino-language-button");
+
+    if (!lang) {
+      const candidates = Array.from(document.querySelectorAll(".navbar a, .navbar button, #quarto-header a, #quarto-header button"));
+      lang = candidates.find(isLanguageButton);
+    }
+
+    if (!lang) return false;
+
+    lang.classList.add("tsiino-language-button");
+    lang.classList.remove("nav-link");
+
+    let holder = document.querySelector(".tsiino-language-nav-item");
+    if (!holder) {
+      holder = document.createElement("li");
+      holder.className = "nav-item tsiino-language-nav-item";
+    }
+
+    if (lang.parentElement !== holder) {
+      holder.appendChild(lang);
+    }
+
+    nav.appendChild(holder);
+    return true;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    moveLanguageButton();
+
+    let tries = 0;
+    const timer = window.setInterval(function () {
+      tries += 1;
+      const ok = moveLanguageButton();
+      if (ok || tries > 40) window.clearInterval(timer);
+    }, 120);
+
+    const observer = new MutationObserver(function () {
+      moveLanguageButton();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+})();
+</script>

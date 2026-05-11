@@ -1,0 +1,340 @@
+﻿<style>
+/* Botão de idioma integrado à navbar */
+#tsiino-navbar-lang-item {
+  margin-left: 0.65rem !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+#tsiino-navbar-lang-item .tsiino-lang-button {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+
+  min-width: 48px !important;
+  height: 34px !important;
+  padding: 0.32rem 0.72rem !important;
+
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,0.46) !important;
+  background: rgba(23,23,23,0.34) !important;
+  color: #fff !important;
+
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+
+  box-shadow: 0 6px 16px rgba(0,0,0,0.22) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease !important;
+}
+
+#tsiino-navbar-lang-item .tsiino-lang-button::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ochre, #D99A27);
+  box-shadow: 0 0 0 3px rgba(217,154,39,0.18);
+}
+
+#tsiino-navbar-lang-item .tsiino-lang-button:hover,
+#tsiino-navbar-lang-item .tsiino-lang-button:focus-visible {
+  background: rgba(169,54,50,0.84) !important;
+  border-color: rgba(255,255,255,0.72) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.30) !important;
+  outline: none !important;
+}
+
+/* Remove busca, modo leitura e a caixa de ferramentas do Quarto */
+#quarto-header .aa-DetachedSearchButton,
+#quarto-header .quarto-reader-toggle,
+#quarto-header .quarto-reader-mode-toggle,
+#quarto-header .quarto-navbar-tools {
+  display: none !important;
+}
+
+/* Esconde botões antigos de idioma que ficarem fora da navbar */
+body > a[id*="language" i],
+body > button[id*="language" i],
+body > div[id*="language" i],
+body > a[class*="language" i],
+body > button[class*="language" i],
+body > div[class*="language" i],
+body > a[class*="lang" i],
+body > button[class*="lang" i],
+body > div[class*="lang" i] {
+  display: none !important;
+}
+
+@media (max-width: 991.98px) {
+  #tsiino-navbar-lang-item {
+    margin-left: 0 !important;
+    margin-top: 0.45rem !important;
+  }
+
+  #tsiino-navbar-lang-item .tsiino-lang-button {
+    width: fit-content !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  const STORAGE_KEYS = ["tsiino-language", "tsiinoLanguage", "language", "site-language"];
+
+  function cleanText(el) {
+    return (el && el.textContent ? el.textContent : "").replace(/\s+/g, " ").trim();
+  }
+
+  function getStoredLanguage() {
+    for (const key of STORAGE_KEYS) {
+      try {
+        const value = window.localStorage.getItem(key);
+        if (/^(pt|pt-br|en)$/i.test(value || "")) return value.toLowerCase();
+      } catch (e) {}
+    }
+    return "";
+  }
+
+  function setStoredLanguage(lang) {
+    STORAGE_KEYS.forEach(function (key) {
+      try { window.localStorage.setItem(key, lang); } catch (e) {}
+    });
+  }
+
+  function detectCurrentLanguage() {
+    const stored = getStoredLanguage();
+    const htmlLang = (document.documentElement.getAttribute("lang") || "").toLowerCase();
+
+    if (stored) return stored.startsWith("en") ? "en" : "pt";
+    if (htmlLang.startsWith("en")) return "en";
+
+    return "pt";
+  }
+
+  function nextLanguage() {
+    return detectCurrentLanguage() === "en" ? "pt" : "en";
+  }
+
+  function updateNavbarLabels(lang) {
+    const labels = {
+      pt: {
+        "about": "Sobre",
+        "expeditions": "Expedições",
+        "data access": "Acesso aos dados",
+        "team": "Equipe"
+      },
+      en: {
+        "sobre": "About",
+        "expedições": "Expeditions",
+        "expedicoes": "Expeditions",
+        "acesso aos dados": "Data access",
+        "equipe": "Team"
+      }
+    };
+
+    document.querySelectorAll("#quarto-header .navbar-nav a, #quarto-header .navbar-nav .nav-link").forEach(function (link) {
+      if (link.closest("#tsiino-navbar-lang-item")) return;
+
+      const key = cleanText(link).toLowerCase();
+
+      if (lang === "en" && labels.en[key]) {
+        link.textContent = labels.en[key];
+      }
+
+      if (lang === "pt" && labels.pt[key]) {
+        link.textContent = labels.pt[key];
+      }
+    });
+  }
+
+  function updateButton(button) {
+    const next = nextLanguage();
+    button.textContent = next.toUpperCase();
+    button.setAttribute("aria-label", next === "en" ? "Ver site em inglês" : "Ver site em português");
+    button.setAttribute("title", next === "en" ? "Ver site em inglês" : "Ver site em português");
+    button.dataset.nextLanguage = next;
+  }
+
+  function applyFallbackTranslation(lang) {
+    document.documentElement.setAttribute("lang", lang === "en" ? "en" : "pt-BR");
+    document.body.dataset.language = lang;
+
+    updateNavbarLabels(lang);
+
+    document.querySelectorAll("[data-lang-pt][data-lang-en]").forEach(function (el) {
+      const txt = lang === "en" ? el.getAttribute("data-lang-en") : el.getAttribute("data-lang-pt");
+      if (txt !== null) el.textContent = txt;
+    });
+
+    window.dispatchEvent(new CustomEvent("tsiino:language-change", { detail: { language: lang } }));
+    document.dispatchEvent(new CustomEvent("tsiino:language-change", { detail: { language: lang } }));
+  }
+
+  function callExistingLanguageSystem(lang) {
+    const candidates = [
+      window.setLanguage,
+      window.setSiteLanguage,
+      window.tsiinoSetLanguage,
+      window.changeLanguage,
+      window.switchLanguage,
+      window.updateLanguage,
+      window.applyLanguage
+    ].filter(function (fn) {
+      return typeof fn === "function";
+    });
+
+    if (candidates.length) {
+      try {
+        candidates[0](lang);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  function findNavbarList() {
+    const lists = Array.from(document.querySelectorAll("#quarto-header .navbar-nav, .navbar .navbar-nav"));
+
+    const withTeam = lists.find(function (list) {
+      return Array.from(list.querySelectorAll("a, .nav-link")).some(function (link) {
+        return /^(equipe|team)$/i.test(cleanText(link));
+      });
+    });
+
+    return withTeam || lists[0] || null;
+  }
+
+  function findTeamItem(nav) {
+    if (!nav) return null;
+
+    const links = Array.from(nav.querySelectorAll("a, .nav-link"));
+
+    const teamLink = links.find(function (link) {
+      return /^(equipe|team)$/i.test(cleanText(link));
+    });
+
+    return teamLink ? teamLink.closest("li") : null;
+  }
+
+  function removeOldLanguageButtons() {
+    document.querySelectorAll("#quarto-header a, #quarto-header button, body > a, body > button").forEach(function (el) {
+      if (el.closest("#tsiino-navbar-lang-item")) return;
+
+      const text = cleanText(el).toUpperCase();
+      const meta = [
+        el.id || "",
+        el.className || "",
+        el.getAttribute("aria-label") || "",
+        el.getAttribute("title") || ""
+      ].join(" ");
+
+      const looksLikeLanguage =
+        /^(EN|PT|PT-BR)$/.test(text) ||
+        /language|idioma|lang/i.test(meta);
+
+      if (looksLikeLanguage) {
+        el.setAttribute("hidden", "");
+        el.style.display = "none";
+      }
+    });
+  }
+
+  function placeButton() {
+    removeOldLanguageButtons();
+
+    const nav = findNavbarList();
+    if (!nav) return false;
+
+    let item = document.getElementById("tsiino-navbar-lang-item");
+
+    if (!item) {
+      item = document.createElement("li");
+      item.id = "tsiino-navbar-lang-item";
+      item.className = "nav-item";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "nav-link tsiino-lang-button";
+
+      item.appendChild(button);
+    }
+
+    const button = item.querySelector(".tsiino-lang-button");
+    updateButton(button);
+
+    if (!button.dataset.bound) {
+      button.dataset.bound = "1";
+
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const lang = button.dataset.nextLanguage || nextLanguage();
+
+        setStoredLanguage(lang);
+
+        const ok = callExistingLanguageSystem(lang);
+        applyFallbackTranslation(lang);
+
+        updateButton(button);
+      });
+    }
+
+    const teamItem = findTeamItem(nav);
+
+    if (teamItem && teamItem.parentElement === nav) {
+      if (teamItem.nextElementSibling !== item) {
+        nav.insertBefore(item, teamItem.nextElementSibling);
+      }
+    } else if (item.parentElement !== nav) {
+      nav.appendChild(item);
+    }
+
+    return true;
+  }
+
+  function init() {
+    let tries = 0;
+
+    function retry() {
+      tries += 1;
+      const ok = placeButton();
+
+      if (!ok && tries < 30) {
+        window.setTimeout(retry, 120);
+      }
+    }
+
+    retry();
+    window.setTimeout(placeButton, 500);
+    window.setTimeout(placeButton, 1200);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
