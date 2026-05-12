@@ -5103,12 +5103,11 @@ section#pesquisadores-responsaveis {
   <div class="core-objectives-head">
     <div class="core-objectives-title-wrap">
       <div class="core-objectives-eyebrow">Objetivos</div>
-      <h2 class="core-objectives-title" aria-label="Objetivos do projeto">
+      <h2 class="core-objectives-title" aria-label="Objetivos do projeto Tsiino Hiiwiida">
         <span class="core-title-line core-title-line-a">Objetivos</span>
-        <span class="core-title-line core-title-line-b">do projeto</span>
+        <span class="core-title-line core-title-line-b">do projeto Tsiino Hiiwiida</span>
       </h2>
       <p class="core-objectives-lead">
-        Navegue pelas frentes de trabalho do Tsiino Hiiwiida em cards amplos, soltos sobre o fundo da página, com um objetivo em destaque e os próximos objetivos entrando pela extremidade direita da tela.
       </p>
     </div>
 
@@ -6683,7 +6682,7 @@ if (is.null(media_items) || nrow(media_items) == 0) {
 
         <article class="researcher-card">
           <span class="agency-pill">FAPESP</span>
-          <h4>Denilson Fernandes Peralta</h4>
+          <h4>Denilson Peralta</h4>
           <p>Instituto de Pesquisas Ambientais — IPA</p>
         </article>
 

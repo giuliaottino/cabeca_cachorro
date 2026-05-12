@@ -39,8 +39,6 @@ website:
         href: team/index.qmd
       - text: "EN"
         href: en/
-        id: language-toggle-link
-        class: tsiino-language-button
 
 format:
   html:
