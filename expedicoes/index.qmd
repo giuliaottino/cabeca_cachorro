@@ -56,6 +56,20 @@ nz <- function(x) {
   !is.na(x) & nzchar(trimws(as.character(x)))
 }
 
+clean_photo_folder <- function(x) {
+  x <- as.character(x)
+  x[is.na(x)] <- ""
+  x <- gsub("\u00A0", " ", x, fixed = TRUE)
+  x <- trimws(x)
+  x <- gsub("\\\\", "/", x)
+  x <- gsub("^\\./+", "", x)
+  x <- gsub("^/+|/+$", "", x)
+  x <- gsub("^_input_data/expedicoes_fotos/+", "", x)
+  x <- gsub("^expedicoes_fotos/+", "", x)
+  x[x == ""] <- NA_character_
+  x
+}
+
 safe_html <- function(x) {
   x <- as.character(x)
   x[is.na(x) | trimws(x) == ""] <- "—"
@@ -927,7 +941,7 @@ expedicoes$municipio <- get_or_na(expedicoes_raw, mun_col)
 expedicoes$equipe <- get_or_na(expedicoes_raw, team_col)
 expedicoes$observacoes <- get_or_na(expedicoes_raw, obs_col)
 expedicoes$resumo <- get_or_na(expedicoes_raw, summary_col)
-expedicoes$pasta_fotos <- get_or_na(expedicoes_raw, photo_col)
+expedicoes$pasta_fotos <- clean_photo_folder(get_or_na(expedicoes_raw, photo_col))
 expedicoes$input_id <- get_or_na(expedicoes_raw, id_col)
 
 expedicoes$expedicao[!nz(expedicoes$expedicao)] <- paste0("Expedição ", which(!nz(expedicoes$expedicao)))
@@ -1226,7 +1240,9 @@ photo_root_html_rel <- file.path("..", "_input_data", "expedicoes_fotos")
 photo_root_abs <- find_up(photo_root_fs_rel)
 
 get_photos <- function(folder) {
-  if (is.na(photo_root_abs) || is.na(folder) || !nzchar(trimws(folder))) {
+  folder <- clean_photo_folder(folder)[1]
+
+  if (is.na(photo_root_abs) || is.na(folder) || !nzchar(folder)) {
     return(character())
   }
 

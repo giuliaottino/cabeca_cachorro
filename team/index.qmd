@@ -172,7 +172,7 @@ responsible_names <- c(
   "Anna Luiza Ilkiu-Borges",
   "Clistenes Williams Araújo do Nascimento",
   "Dirce Komura",
-  "Denilson Fernandes Peralta",
+  "Denilson Peralta",
   "Felipe Wartchow",
   "Micheline Carvalho-Silva"
 )

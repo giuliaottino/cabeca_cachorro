@@ -5103,12 +5103,10 @@ section#pesquisadores-responsaveis {
   <div class="core-objectives-head">
     <div class="core-objectives-title-wrap">
       <div class="core-objectives-eyebrow">Objetivos</div>
-      <h2 class="core-objectives-title" aria-label="Objetivos do projeto Tsiino Hiiwiida">
+      <h2 class="core-objectives-title" aria-label="Objetivos do projeto">
         <span class="core-title-line core-title-line-a">Objetivos</span>
-        <span class="core-title-line core-title-line-b">do projeto Tsiino Hiiwiida</span>
+        <span class="core-title-line core-title-line-b">do projeto</span>
       </h2>
-      <p class="core-objectives-lead">
-      </p>
     </div>
 
     <div class="core-objectives-controls" aria-label="Navegação dos objetivos">
@@ -5137,8 +5135,6 @@ section#pesquisadores-responsaveis {
         <div class="core-objective-media" aria-label="Imagens do Objetivo 2">
           <img class="core-objective-photo is-photo-active" src="figures/objetivos/linhagens_raras_01.png" alt="Linhagens raras ou pouco conhecidas" loading="lazy">
           <img class="core-objective-photo" src="figures/objetivos/linhagens_raras_02.jpg" alt="Identificação taxonômica em campo" loading="lazy">
-          <img class="core-objective-photo" src="figures/objetivos/metagenomica_01.jpg" alt="Tecnologias metagenômicas de ponta" loading="lazy">
-          <img class="core-objective-photo" src="figures/objetivos/metagenomica_02.jpg" alt="Leitura molecular da biodiversidade" loading="lazy">
         </div>
         <div class="core-objective-body">
           <span class="core-objective-number">02</span>
@@ -6448,6 +6444,10 @@ document.addEventListener("DOMContentLoaded", function () {
   <div class="section-title">
     <h2>Projeto Tsiino Hiiwiida na mídia</h2>
   </div>
+
+  <p class="lead">
+    Acompanhe a circulação pública do projeto Tsiino Hiiwiida.
+  </p>
 ```
 
 ```{r divulgacao-dinamica}
@@ -6682,7 +6682,7 @@ if (is.null(media_items) || nrow(media_items) == 0) {
 
         <article class="researcher-card">
           <span class="agency-pill">FAPESP</span>
-          <h4>Denilson Peralta</h4>
+          <h4>Denilson Fernandes Peralta</h4>
           <p>Instituto de Pesquisas Ambientais — IPA</p>
         </article>
 
@@ -6809,13 +6809,15 @@ if (nrow(institutions) == 0) {
 ```{=html}
 <style>
 /* ======================================================================
-   AJUSTE FINAL — OBJETIVOS DO PROJETO EM CARROSSEL FULL-BLEED
+   OBJETIVOS — carrossel full-bleed estável, com primeiro card centralizado
    ----------------------------------------------------------------------
-   Escopo restrito ao #objetivos. Mantém o restante da página intacto.
-   Remove o card branco da seção, mantém o título direto sobre o background,
-   usa cards mais largos, fotos mais altas e corpo com texto sem corte.
-   O trilho ocupa 100vw: os cards entram pela extremidade direita da tela
-   e saem também pela borda direita conforme a navegação avança.
+   Escopo restrito ao #objetivos.
+   - Primeiro card inicia no centro, com vazio à esquerda.
+   - Após 5s visível na tela, avança sozinho se a pessoa não interagir.
+   - A passagem é sempre da direita para a esquerda.
+   - Cards entram pela borda direita e saem pela borda esquerda, sem respiro.
+   - Largura dos cards é estável para evitar bugs de salto na transição.
+   - Fotos mais altas; Objetivo 02 usa apenas suas 2 imagens e não corta a flor.
    ====================================================================== */
 
 #objetivos.objectives-section.core-objectives-section {
@@ -6824,18 +6826,12 @@ if (nrow(institutions) == 0) {
   right: auto !important;
   transform: translateX(-50%) !important;
 
-  inline-size: 100vw !important;
   width: 100vw !important;
-  max-inline-size: 100vw !important;
   max-width: 100vw !important;
-  min-inline-size: 0 !important;
   min-width: 0 !important;
 
-  margin: clamp(2.35rem, 4.4vw, 4.2rem) 0 0 !important;
-  padding:
-    clamp(0.95rem, 2.5vw, 2.45rem)
-    0
-    clamp(1.15rem, 3.4vw, 3.25rem) !important;
+  margin: clamp(2.2rem, 4vw, 4rem) 0 0 !important;
+  padding: clamp(0.55rem, 1.4vw, 1.3rem) 0 clamp(1.25rem, 3vw, 2.75rem) !important;
 
   background: transparent !important;
   border: 0 !important;
@@ -6844,6 +6840,14 @@ if (nrow(institutions) == 0) {
   box-shadow: none !important;
   overflow: hidden !important;
   isolation: isolate;
+}
+
+#objetivos.reveal-ready {
+  transform: translateX(-50%) translateY(44px) !important;
+}
+
+#objetivos.reveal-ready.is-visible {
+  transform: translateX(-50%) translateY(0) !important;
 }
 
 #objetivos.core-objectives-section::before,
@@ -6860,22 +6864,22 @@ if (nrow(institutions) == 0) {
 
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto !important;
-  gap: clamp(0.9rem, 2.2vw, 2rem) !important;
+  gap: clamp(0.8rem, 2vw, 1.8rem) !important;
   align-items: end !important;
 }
 
 #objetivos .core-objectives-title-wrap {
   min-width: 0 !important;
-  max-width: 1040px !important;
+  max-width: 980px !important;
 }
 
 #objetivos .core-objectives-eyebrow {
   width: fit-content !important;
   max-width: 100% !important;
-  margin-bottom: clamp(0.45rem, 0.9vw, 0.75rem) !important;
+  margin-bottom: clamp(0.3rem, 0.65vw, 0.58rem) !important;
   padding: 0.34rem 0.78rem !important;
   border-radius: 999px !important;
-  background: rgba(246,241,232,0.74) !important;
+  background: rgba(246,241,232,0.76) !important;
   color: var(--green-dark) !important;
   border: 1px solid rgba(98,106,56,0.28) !important;
   box-shadow: 0 6px 14px rgba(0,0,0,0.06) !important;
@@ -6896,13 +6900,13 @@ if (nrow(institutions) == 0) {
 
   color: var(--ink) !important;
   font-family: 'Montserrat', Arial, sans-serif !important;
-  font-size: clamp(2.75rem, 6.35vw, 7.25rem) !important;
-  line-height: 0.80 !important;
+  font-size: clamp(2.25rem, 5.55vw, 6.15rem) !important;
+  line-height: 0.78 !important;
   font-weight: 950 !important;
   letter-spacing: -0.092em !important;
   text-transform: none !important;
   font-style: normal !important;
-  transform: rotate(-1.15deg) !important;
+  transform: rotate(-1.1deg) !important;
   transform-origin: left center !important;
   text-wrap: balance;
 }
@@ -6921,8 +6925,8 @@ if (nrow(institutions) == 0) {
 
 #objetivos .core-title-line-b {
   width: fit-content !important;
-  margin-left: clamp(1.1rem, 7.5vw, 7.2rem) !important;
-  margin-top: 0.01em !important;
+  margin-left: clamp(1rem, 7.2vw, 6.6rem) !important;
+  margin-top: -0.02em !important;
   color: var(--red-dark) !important;
   position: relative !important;
 }
@@ -6940,18 +6944,13 @@ if (nrow(institutions) == 0) {
   z-index: -1;
 }
 
-#objetivos .core-title-ribbon {
-  display: none !important;
-}
-
+/* O texto introdutório foi removido para aproximar título e cards. */
 #objetivos .core-objectives-lead {
-  max-width: 820px !important;
-  margin: clamp(0.75rem, 1.35vw, 1.1rem) 0 0 0 !important;
-  color: var(--muted) !important;
-  font-family: 'Montserrat', Arial, sans-serif !important;
-  font-size: clamp(0.9rem, 1vw, 1.04rem) !important;
-  line-height: 1.56 !important;
-  font-weight: 500 !important;
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 #objetivos .core-objectives-controls {
@@ -6961,7 +6960,8 @@ if (nrow(institutions) == 0) {
   gap: 0.72rem !important;
   max-width: none !important;
   min-width: 0 !important;
-  margin-bottom: clamp(0.05rem, 0.5vw, 0.4rem) !important;
+  margin-bottom: clamp(0.1rem, 0.5vw, 0.35rem) !important;
+  z-index: 20 !important;
 }
 
 #objetivos .core-objectives-arrow {
@@ -6976,15 +6976,11 @@ if (nrow(institutions) == 0) {
   font-size: clamp(1.08rem, 1.45vw, 1.32rem) !important;
   line-height: 1 !important;
   font-weight: 900 !important;
-  transition:
-    transform 180ms ease,
-    background 180ms ease,
-    color 180ms ease,
-    box-shadow 180ms ease !important;
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease !important;
 }
 
 #objetivos .core-objectives-prev {
-  background: rgba(246,241,232,0.76) !important;
+  background: rgba(246,241,232,0.80) !important;
   color: var(--green-dark) !important;
 }
 
@@ -7010,8 +7006,8 @@ if (nrow(institutions) == 0) {
   width: 100vw !important;
   max-width: 100vw !important;
   min-width: 0 !important;
-  margin: clamp(1.05rem, 2vw, 1.85rem) 0 0 !important;
-  padding: 0 0 clamp(0.45rem, 1vw, 0.85rem) !important;
+  margin: clamp(0.26rem, 0.78vw, 0.72rem) 0 0 !important;
+  padding: 0 0 clamp(0.55rem, 1.1vw, 1rem) !important;
   overflow: hidden !important;
   outline: none !important;
   cursor: grab;
@@ -7023,147 +7019,77 @@ if (nrow(institutions) == 0) {
 }
 
 #objetivos .core-objectives-track {
+  --obj-gap: clamp(0.9rem, 1.7vw, 1.75rem);
+  --obj-card-w: clamp(700px, 49vw, 940px);
+  --obj-photo-h: clamp(390px, 32vw, 540px);
+
   width: max-content !important;
   max-width: none !important;
   min-width: 0 !important;
   display: flex !important;
   flex-wrap: nowrap !important;
-  align-items: flex-end !important;
-  gap: clamp(0.9rem, 1.7vw, 1.75rem) !important;
-
-  /* Sem margem lateral: os cards entram e saem pela borda real da tela. */
-  padding:
-    clamp(0.15rem, 0.55vw, 0.5rem)
-    100vw
-    clamp(0.55rem, 1.2vw, 1rem)
-    0 !important;
+  align-items: flex-start !important;
+  gap: var(--obj-gap) !important;
+  padding: clamp(0.15rem, 0.55vw, 0.5rem) 0 clamp(0.75rem, 1.25vw, 1.05rem) 0 !important;
 
   transform: translate3d(0,0,0);
-  transition: transform 620ms cubic-bezier(.2,.75,.18,1) !important;
+  transition: transform 720ms cubic-bezier(.2,.75,.18,1) !important;
   will-change: transform;
 }
 
 #objetivos .core-objective-card {
-  --objective-photo-height: clamp(220px, 18vw, 290px);
-
   position: relative !important;
-  flex: 0 0 clamp(500px, 34vw, 650px) !important;
-  width: auto !important;
+  flex: 0 0 var(--obj-card-w) !important;
+  width: var(--obj-card-w) !important;
   max-width: none !important;
   min-width: 0 !important;
-  min-height: clamp(405px, 29vw, 500px) !important;
   height: auto !important;
+  min-height: 0 !important;
 
   display: grid !important;
-  grid-template-rows: var(--objective-photo-height) auto !important;
+  grid-template-rows: var(--obj-photo-h) auto !important;
 
   overflow: hidden !important;
   border: 1px solid rgba(98,106,56,0.20) !important;
   border-radius: 0 !important;
-  background:
-    radial-gradient(circle at 26% 8%, rgba(255,255,255,0.38), transparent 25%),
-    linear-gradient(135deg, rgba(98,106,56,0.18), rgba(217,154,39,0.16)),
-    rgba(255,253,247,0.91) !important;
+  background: rgba(255,253,247,0.92) !important;
   box-shadow: 0 15px 30px rgba(0,0,0,0.11) !important;
-  opacity: 0.56;
-  transform: translateY(42px);
+  opacity: 0.36;
+  transform: translateY(34px) !important;
   transform-origin: bottom left;
   cursor: pointer;
-  transition:
-    flex-basis 520ms cubic-bezier(.2,.75,.18,1),
-    min-height 520ms cubic-bezier(.2,.75,.18,1),
-    opacity 260ms ease,
-    transform 520ms cubic-bezier(.2,.75,.18,1),
-    box-shadow 260ms ease,
-    filter 260ms ease !important;
-}
-
-#objetivos .core-objective-card:nth-child(1) {
-  background:
-    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.32), transparent 26%),
-    linear-gradient(135deg, rgba(217,154,39,0.24), rgba(98,106,56,0.18)),
-    rgba(255,253,247,0.92) !important;
-}
-
-#objetivos .core-objective-card:nth-child(2) {
-  background:
-    radial-gradient(circle at 26% 8%, rgba(255,255,255,0.36), transparent 26%),
-    linear-gradient(135deg, rgba(169,54,50,0.16), rgba(217,154,39,0.14)),
-    rgba(255,253,247,0.92) !important;
-}
-
-#objetivos .core-objective-card:nth-child(3) {
-  background:
-    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.30), transparent 24%),
-    linear-gradient(135deg, rgba(46,59,36,0.16), rgba(98,106,56,0.16)),
-    rgba(255,253,247,0.92) !important;
-}
-
-#objetivos .core-objective-card:nth-child(4) {
-  background:
-    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.35), transparent 26%),
-    linear-gradient(135deg, rgba(217,154,39,0.19), rgba(169,54,50,0.13)),
-    rgba(255,253,247,0.92) !important;
-}
-
-#objetivos .core-objective-card:nth-child(5) {
-  background:
-    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.33), transparent 26%),
-    linear-gradient(135deg, rgba(98,106,56,0.22), rgba(215,221,197,0.45)),
-    rgba(255,253,247,0.92) !important;
-}
-
-#objetivos .core-objective-card:nth-child(6) {
-  background:
-    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.33), transparent 26%),
-    linear-gradient(135deg, rgba(46,59,36,0.15), rgba(217,154,39,0.16)),
-    rgba(255,253,247,0.92) !important;
-}
-
-#objetivos .core-objective-card:nth-child(7) {
-  background:
-    radial-gradient(circle at 24% 8%, rgba(255,255,255,0.32), transparent 26%),
-    linear-gradient(135deg, rgba(169,54,50,0.14), rgba(98,106,56,0.16)),
-    rgba(255,253,247,0.92) !important;
-}
-
-#objetivos .core-objective-card:hover {
-  opacity: 1;
-  filter: saturate(1.03);
+  transition: opacity 260ms ease, transform 520ms cubic-bezier(.2,.75,.18,1), box-shadow 260ms ease, filter 260ms ease !important;
+  z-index: 1;
 }
 
 #objetivos .core-objective-card.is-active {
-  --objective-photo-height: clamp(250px, 22vw, 350px);
-  flex-basis: clamp(720px, 54vw, 1040px) !important;
-  min-height: clamp(455px, 35vw, 575px) !important;
-  opacity: 1;
-  transform: translateY(0);
+  opacity: 1 !important;
+  transform: translateY(0) !important;
   box-shadow: 0 23px 48px rgba(0,0,0,0.16) !important;
   z-index: 8;
 }
 
 #objetivos .core-objective-card.is-next {
-  --objective-photo-height: clamp(235px, 19.5vw, 315px);
-  flex-basis: clamp(500px, 38vw, 720px) !important;
-  min-height: clamp(420px, 31vw, 525px) !important;
-  opacity: 0.92;
-  transform: translateY(24px);
+  opacity: 0.82 !important;
+  transform: translateY(18px) !important;
   z-index: 5;
+}
+
+#objetivos .core-objective-card.is-before {
+  opacity: 0.26 !important;
+  transform: translateY(34px) !important;
+  z-index: 2;
 }
 
 #objetivos .core-objective-card.is-far,
 #objetivos .core-objective-card.is-after {
-  --objective-photo-height: clamp(190px, 15vw, 250px);
-  flex-basis: clamp(320px, 25vw, 520px) !important;
-  min-height: clamp(320px, 25vw, 430px) !important;
-  opacity: 0.74;
-  transform: translateY(50px);
-  z-index: 4;
+  opacity: 0.46 !important;
+  transform: translateY(28px) !important;
+  z-index: 3;
 }
 
-#objetivos .core-objective-card.is-before {
-  opacity: 0.38;
-  transform: translateY(54px);
+#objetivos .core-objective-card:hover {
+  filter: saturate(1.03);
 }
 
 #objetivos .core-objective-media {
@@ -7171,8 +7097,8 @@ if (nrow(institutions) == 0) {
   width: 100% !important;
   max-width: none !important;
   min-width: 0 !important;
-  height: var(--objective-photo-height) !important;
-  min-height: var(--objective-photo-height) !important;
+  height: var(--obj-photo-h) !important;
+  min-height: var(--obj-photo-h) !important;
   overflow: hidden !important;
   background: rgba(46,59,36,0.14) !important;
 }
@@ -7181,8 +7107,8 @@ if (nrow(institutions) == 0) {
   content: "";
   position: absolute;
   inset: auto 0 0 0;
-  height: 34%;
-  background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.18));
+  height: 28%;
+  background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.12));
   pointer-events: none;
   z-index: 2;
 }
@@ -7195,7 +7121,7 @@ if (nrow(institutions) == 0) {
   object-fit: cover !important;
   object-position: center center !important;
   opacity: 0;
-  transform: scale(1.025);
+  transform: scale(1.015);
   transition: opacity 520ms ease, transform 900ms ease !important;
 }
 
@@ -7204,15 +7130,26 @@ if (nrow(institutions) == 0) {
   transform: scale(1);
 }
 
+/* Objetivo 02: imagem de detalhe floral sem amputar pétalas. */
+#objetivos .core-objective-card[data-objective-index="1"] .core-objective-media {
+  background: #070706 !important;
+}
+
+#objetivos .core-objective-card[data-objective-index="1"] .core-objective-photo {
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: #070706 !important;
+}
+
 #objetivos .core-objective-body {
   position: relative !important;
   width: 100% !important;
   max-width: none !important;
   min-width: 0 !important;
-  padding: clamp(1rem, 1.55vw, 1.45rem) clamp(1rem, 1.75vw, 1.65rem) clamp(1.05rem, 1.65vw, 1.55rem) !important;
-  background: rgba(255,253,247,0.92) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  height: auto !important;
+  min-height: 0 !important;
+  padding: clamp(1.02rem, 1.45vw, 1.45rem) clamp(1.08rem, 1.85vw, 1.75rem) clamp(1.1rem, 1.65vw, 1.65rem) !important;
+  background: rgba(255,253,247,0.94) !important;
   overflow: visible !important;
 }
 
@@ -7247,7 +7184,7 @@ if (nrow(institutions) == 0) {
   margin: 0 !important;
   color: var(--ink) !important;
   font-family: 'Montserrat', Arial, sans-serif !important;
-  font-size: clamp(1.22rem, 1.75vw, 2.05rem) !important;
+  font-size: clamp(1.45rem, 2vw, 2.32rem) !important;
   line-height: 1.06 !important;
   font-weight: 900 !important;
   letter-spacing: -0.055em !important;
@@ -7255,32 +7192,32 @@ if (nrow(institutions) == 0) {
 }
 
 #objetivos .core-objective-card p {
-  margin: 0.55rem 0 0 0 !important;
+  display: block !important;
+  margin: 0.58rem 0 0 0 !important;
   color: var(--muted) !important;
   font-family: 'Montserrat', Arial, sans-serif !important;
-  font-size: clamp(0.84rem, 0.92vw, 0.98rem) !important;
+  font-size: clamp(0.86rem, 0.95vw, 1.02rem) !important;
   line-height: 1.42 !important;
   font-weight: 500 !important;
   overflow: visible !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
 }
 
-#objetivos .core-objective-card:not(.is-active):not(.is-next) p {
+/* Cards laterais ficam mais limpos, mas o card ativo nunca corta texto. */
+#objetivos .core-objective-card:not(.is-active) p {
   display: none !important;
 }
 
-#objetivos .core-objective-card.is-after .core-objective-kicker,
-#objetivos .core-objective-card.is-before .core-objective-kicker {
+#objetivos .core-objective-card:not(.is-active) .core-objective-kicker {
   display: none !important;
 }
 
-#objetivos .core-objective-card.is-far h3,
-#objetivos .core-objective-card.is-after h3,
-#objetivos .core-objective-card.is-before h3 {
-  font-size: clamp(0.98rem, 1.2vw, 1.18rem) !important;
+#objetivos .core-objective-card:not(.is-active) h3 {
+  font-size: clamp(1rem, 1.2vw, 1.24rem) !important;
   line-height: 1.08 !important;
 }
 
-/* Notebook menor / meia tela */
 @media (max-width: 1180px) {
   #objetivos .core-objectives-head {
     width: calc(100vw - 2rem) !important;
@@ -7288,41 +7225,26 @@ if (nrow(institutions) == 0) {
   }
 
   #objetivos .core-objectives-title {
-    font-size: clamp(2.35rem, 7.1vw, 5.45rem) !important;
+    font-size: clamp(2.15rem, 6.4vw, 4.95rem) !important;
   }
 
-  #objetivos .core-objective-card.is-active {
-    --objective-photo-height: clamp(245px, 24vw, 320px);
-    flex-basis: clamp(650px, 62vw, 800px) !important;
-    min-height: clamp(450px, 43vw, 560px) !important;
-  }
-
-  #objetivos .core-objective-card.is-next {
-    --objective-photo-height: clamp(225px, 21vw, 290px);
-    flex-basis: clamp(430px, 41vw, 570px) !important;
-    min-height: clamp(405px, 38vw, 510px) !important;
-  }
-
-  #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after {
-    --objective-photo-height: clamp(185px, 17vw, 235px);
-    flex-basis: clamp(300px, 29vw, 405px) !important;
-    min-height: clamp(315px, 31vw, 420px) !important;
+  #objetivos .core-objectives-track {
+    --obj-card-w: clamp(610px, 62vw, 820px);
+    --obj-photo-h: clamp(360px, 34vw, 470px);
   }
 }
 
-/* Tablet */
 @media (max-width: 900px) {
   #objetivos.objectives-section.core-objectives-section {
-    padding-top: clamp(1.15rem, 4.2vw, 2.25rem) !important;
+    padding-top: clamp(0.7rem, 3vw, 1.4rem) !important;
   }
 
   #objetivos .core-objectives-head {
     grid-template-columns: 1fr !important;
-    gap: 0.9rem !important;
+    gap: 0.8rem !important;
     align-items: start !important;
-    width: calc(100vw - 1.35rem) !important;
-    max-width: calc(100vw - 1.35rem) !important;
+    width: calc(100vw - 1.25rem) !important;
+    max-width: calc(100vw - 1.25rem) !important;
   }
 
   #objetivos .core-objectives-controls {
@@ -7331,72 +7253,35 @@ if (nrow(institutions) == 0) {
   }
 
   #objetivos .core-objectives-title {
-    font-size: clamp(2.2rem, 9.6vw, 4.25rem) !important;
+    font-size: clamp(2.05rem, 8.6vw, 4rem) !important;
     line-height: 0.82 !important;
     transform: rotate(-1deg) !important;
   }
 
   #objetivos .core-title-line-b {
-    margin-left: clamp(0.9rem, 10vw, 4.4rem) !important;
-  }
-
-  #objetivos .core-objectives-lead {
-    max-width: 100% !important;
-  }
-
-  #objetivos .core-objectives-viewport {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    margin-top: clamp(1rem, 3vw, 1.7rem) !important;
+    margin-left: clamp(0.75rem, 9vw, 4rem) !important;
   }
 
   #objetivos .core-objectives-track {
-    gap: 0.9rem !important;
-    padding-right: 100vw !important;
-    padding-left: 0 !important;
+    --obj-card-w: min(90vw, 680px);
+    --obj-photo-h: clamp(315px, 52vw, 455px);
+    --obj-gap: 0.9rem;
   }
 
   #objetivos .core-objective-card,
   #objetivos .core-objective-card.is-active,
   #objetivos .core-objective-card.is-next,
   #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after {
-    --objective-photo-height: clamp(245px, 42vw, 335px);
-    flex-basis: min(88vw, 650px) !important;
-    min-height: auto !important;
-  }
-
-  #objetivos .core-objective-card.is-active {
+  #objetivos .core-objective-card.is-after,
+  #objetivos .core-objective-card.is-before {
     transform: translateY(0) !important;
-  }
-
-  #objetivos .core-objective-card.is-next {
-    transform: translateY(18px) !important;
-  }
-
-  #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after {
-    transform: translateY(34px) !important;
-  }
-
-  #objetivos .core-objective-card p,
-  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
-    display: block !important;
-    font-size: 0.86rem !important;
-    line-height: 1.42 !important;
-  }
-
-  #objetivos .core-objective-card.is-after .core-objective-kicker,
-  #objetivos .core-objective-card.is-before .core-objective-kicker {
-    display: block !important;
   }
 }
 
-/* Celular */
 @media (max-width: 620px) {
   #objetivos.objectives-section.core-objectives-section {
-    margin-top: 2.2rem !important;
-    padding-top: 1.15rem !important;
+    margin-top: 2.1rem !important;
+    padding-top: 0.8rem !important;
     padding-bottom: 1.8rem !important;
   }
 
@@ -7406,18 +7291,13 @@ if (nrow(institutions) == 0) {
   }
 
   #objetivos .core-objectives-title {
-    font-size: clamp(2rem, 13vw, 3.38rem) !important;
-    line-height: 0.85 !important;
+    font-size: clamp(1.9rem, 12.2vw, 3.2rem) !important;
+    line-height: 0.84 !important;
     letter-spacing: -0.085em !important;
   }
 
   #objetivos .core-title-line-b {
-    margin-left: clamp(0.7rem, 9vw, 2.3rem) !important;
-  }
-
-  #objetivos .core-objectives-lead {
-    font-size: 0.86rem !important;
-    line-height: 1.5 !important;
+    margin-left: clamp(0.65rem, 8vw, 2.2rem) !important;
   }
 
   #objetivos .core-objectives-controls {
@@ -7429,74 +7309,37 @@ if (nrow(institutions) == 0) {
     block-size: 42px !important;
   }
 
-  #objetivos .core-objectives-viewport {
-    margin-top: 1rem !important;
-  }
-
   #objetivos .core-objectives-track {
-    gap: 0.75rem !important;
-    padding: 0 100vw 0.8rem 0 !important;
-  }
-
-  #objetivos .core-objective-card,
-  #objetivos .core-objective-card.is-active,
-  #objetivos .core-objective-card.is-next,
-  #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after,
-  #objetivos .core-objective-card.is-before {
-    --objective-photo-height: clamp(250px, 62vw, 350px);
-    flex-basis: calc(100vw - 0.75rem) !important;
-    min-height: auto !important;
-    opacity: 1 !important;
-    transform: translateY(0) !important;
+    --obj-card-w: calc(100vw - 0.75rem);
+    --obj-photo-h: clamp(300px, 76vw, 430px);
+    --obj-gap: 0.75rem;
   }
 
   #objetivos .core-objective-body {
     padding: 0.98rem 1rem 1.05rem !important;
   }
 
-  #objetivos .core-objective-card h3,
-  #objetivos .core-objective-card.is-far h3,
-  #objetivos .core-objective-card.is-after h3,
-  #objetivos .core-objective-card.is-before h3 {
-    font-size: clamp(1.28rem, 6.4vw, 1.72rem) !important;
-    line-height: 1.06 !important;
+  #objetivos .core-objective-card h3 {
+    font-size: clamp(1.25rem, 6.2vw, 1.72rem) !important;
   }
 
-  #objetivos .core-objective-card p,
-  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
-    display: block !important;
-    overflow: visible !important;
-    -webkit-line-clamp: unset !important;
+  #objetivos .core-objective-card p {
     font-size: 0.84rem !important;
     line-height: 1.42 !important;
   }
-
-  #objetivos .core-objective-card.is-after .core-objective-kicker,
-  #objetivos .core-objective-card.is-before .core-objective-kicker {
-    display: block !important;
-  }
 }
 
-/* Celular muito estreito */
 @media (max-width: 380px) {
-  #objetivos .core-objective-card,
-  #objetivos .core-objective-card.is-active,
-  #objetivos .core-objective-card.is-next,
-  #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after,
-  #objetivos .core-objective-card.is-before {
-    --objective-photo-height: 235px;
+  #objetivos .core-objectives-track {
+    --obj-photo-h: 285px;
   }
 
-  #objetivos .core-objective-card p,
-  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
-    font-size: 0.81rem !important;
-    line-height: 1.38 !important;
+  #objetivos .core-objective-card p {
+    font-size: 0.80rem !important;
+    line-height: 1.34 !important;
   }
 }
 
-/* Movimento reduzido: mantém navegação sem transições longas. */
 @media (prefers-reduced-motion: reduce) {
   #objetivos .core-objectives-track,
   #objetivos .core-objective-card,
@@ -7511,7 +7354,8 @@ if (nrow(institutions) == 0) {
 (function () {
   document.addEventListener("DOMContentLoaded", function () {
     const root = document.getElementById("objetivos");
-    if (!root) return;
+    if (!root || root.dataset.objectivesCarouselReady === "1") return;
+    root.dataset.objectivesCarouselReady = "1";
 
     const viewport = root.querySelector(".core-objectives-viewport");
     const track = root.querySelector(".core-objectives-track");
@@ -7523,12 +7367,54 @@ if (nrow(institutions) == 0) {
 
     let activeIndex = 0;
     let photoTimer = null;
+    let autoTimer = null;
     let ticking = false;
     let pointerStartX = null;
     let pointerStartY = null;
+    let carouselHasEnteredViewport = false;
+
+    const AUTO_DELAY = 5000;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     function wrap(index) {
       return (index + cards.length) % cards.length;
+    }
+
+    function stopAuto() {
+      if (autoTimer) {
+        clearTimeout(autoTimer);
+        autoTimer = null;
+      }
+    }
+
+    function scheduleAuto() {
+      stopAuto();
+      if (!carouselHasEnteredViewport || prefersReducedMotion.matches || cards.length <= 1) return;
+
+      autoTimer = setTimeout(function () {
+        setActive(activeIndex + 1, false, "auto");
+      }, AUTO_DELAY);
+    }
+
+    function getGap() {
+      const styles = window.getComputedStyle(track);
+      const gapValue = styles.columnGap || styles.gap || "0";
+      return Number.parseFloat(gapValue) || 0;
+    }
+
+    function classifyCards() {
+      cards.forEach(function (card, i) {
+        const distance = i - activeIndex;
+
+        card.classList.toggle("is-active", distance === 0);
+        card.classList.toggle("is-next", distance === 1);
+        card.classList.toggle("is-far", distance === 2);
+        card.classList.toggle("is-after", distance > 2);
+        card.classList.toggle("is-before", distance < 0);
+
+        card.setAttribute("aria-current", distance === 0 ? "true" : "false");
+        card.setAttribute("tabindex", distance === 0 ? "0" : "-1");
+      });
     }
 
     function resetPhotos(card) {
@@ -7546,7 +7432,7 @@ if (nrow(institutions) == 0) {
       }
 
       const activePhotos = Array.from(card.querySelectorAll(".core-objective-photo"));
-      if (activePhotos.length <= 1 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (activePhotos.length <= 1 || prefersReducedMotion.matches) return;
 
       photoTimer = setInterval(function () {
         const current = Number(card.dataset.photoIndex || 0);
@@ -7559,33 +7445,22 @@ if (nrow(institutions) == 0) {
       }, 3600);
     }
 
-    function classifyCards() {
-      cards.forEach(function (card, i) {
-        const distance = i - activeIndex;
-
-        card.classList.toggle("is-active", distance === 0);
-        card.classList.toggle("is-next", distance === 1);
-        card.classList.toggle("is-far", distance === 2);
-        card.classList.toggle("is-after", distance > 2);
-        card.classList.toggle("is-before", distance < 0);
-        card.setAttribute("aria-current", distance === 0 ? "true" : "false");
-        card.setAttribute("tabindex", distance === 0 ? "0" : "-1");
-      });
-    }
-
     function alignActiveCard() {
       const activeCard = cards[activeIndex];
       if (!activeCard) return;
 
       const viewportWidth = viewport.clientWidth;
-      const maxShift = Math.max(0, track.scrollWidth - viewportWidth);
-      const isMobile = window.matchMedia("(max-width: 620px)").matches;
-      const leftBreath = isMobile ? 0 : 0;
+      const activeWidth = activeCard.getBoundingClientRect().width || activeCard.offsetWidth;
 
-      const desired = Math.max(0, activeCard.offsetLeft - leftBreath);
-      const shift = Math.min(maxShift, desired);
-
-      track.style.transform = "translate3d(" + (-shift) + "px, 0, 0)";
+      /*
+        Alinhamento estável:
+        - index 0: card centralizado, com vazio à esquerda.
+        - index > 0: o ativo também se centraliza; o card anterior toca/sai pela
+          borda esquerda e o próximo entra pela borda direita, sem padding lateral.
+        Como a largura dos cards não muda por classe, não há salto no meio da transição.
+      */
+      const target = (viewportWidth - activeWidth) / 2 - activeCard.offsetLeft;
+      track.style.transform = "translate3d(" + target + "px, 0, 0)";
     }
 
     function requestAlign() {
@@ -7597,61 +7472,83 @@ if (nrow(institutions) == 0) {
       });
     }
 
-    function setActive(index, shouldFocus) {
+    function setActive(index, shouldFocus, source) {
+      const previous = activeIndex;
       activeIndex = wrap(index);
+
+      /* Evita a volta animada longa do último para o primeiro. */
+      if (source === "auto" && previous === cards.length - 1 && activeIndex === 0) {
+        track.style.transition = "none";
+        classifyCards();
+        resetPhotos(cards[activeIndex]);
+        alignActiveCard();
+        window.requestAnimationFrame(function () {
+          track.style.transition = "";
+        });
+        scheduleAuto();
+        return;
+      }
+
       classifyCards();
       resetPhotos(cards[activeIndex]);
       requestAlign();
 
-      if (shouldFocus) {
-        cards[activeIndex].focus({ preventScroll: true });
-      }
+      if (shouldFocus) cards[activeIndex].focus({ preventScroll: true });
+      scheduleAuto();
     }
 
     cards.forEach(function (card, i) {
       card.addEventListener("click", function () {
-        setActive(i, false);
+        carouselHasEnteredViewport = true;
+        setActive(i, false, "click-card");
       });
 
       card.addEventListener("keydown", function (event) {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          setActive(i, true);
+          carouselHasEnteredViewport = true;
+          setActive(i, true, "keyboard-card");
         }
       });
     });
 
     if (prev) {
       prev.addEventListener("click", function () {
-        setActive(activeIndex - 1, false);
+        carouselHasEnteredViewport = true;
+        setActive(activeIndex - 1, false, "prev");
       });
     }
 
     if (next) {
       next.addEventListener("click", function () {
-        setActive(activeIndex + 1, false);
+        carouselHasEnteredViewport = true;
+        setActive(activeIndex + 1, false, "next");
       });
     }
 
     viewport.addEventListener("keydown", function (event) {
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        setActive(activeIndex + 1, false);
+        carouselHasEnteredViewport = true;
+        setActive(activeIndex + 1, false, "keyboard-next");
       }
 
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        setActive(activeIndex - 1, false);
+        carouselHasEnteredViewport = true;
+        setActive(activeIndex - 1, false, "keyboard-prev");
       }
 
       if (event.key === "Home") {
         event.preventDefault();
-        setActive(0, false);
+        carouselHasEnteredViewport = true;
+        setActive(0, false, "keyboard-home");
       }
 
       if (event.key === "End") {
         event.preventDefault();
-        setActive(cards.length - 1, false);
+        carouselHasEnteredViewport = true;
+        setActive(cards.length - 1, false, "keyboard-end");
       }
     });
 
@@ -7659,21 +7556,25 @@ if (nrow(institutions) == 0) {
       pointerStartX = event.clientX;
       pointerStartY = event.clientY;
       viewport.classList.add("is-dragging");
+      stopAuto();
     }, { passive: true });
 
     viewport.addEventListener("pointerup", function (event) {
       if (pointerStartX === null || pointerStartY === null) {
         viewport.classList.remove("is-dragging");
+        scheduleAuto();
         return;
       }
 
       const dx = event.clientX - pointerStartX;
       const dy = event.clientY - pointerStartY;
-
       viewport.classList.remove("is-dragging");
 
-      if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-        setActive(activeIndex + (dx < 0 ? 1 : -1), false);
+      if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+        carouselHasEnteredViewport = true;
+        setActive(activeIndex + (dx < 0 ? 1 : -1), false, "swipe");
+      } else {
+        scheduleAuto();
       }
 
       pointerStartX = null;
@@ -7684,6 +7585,7 @@ if (nrow(institutions) == 0) {
       pointerStartX = null;
       pointerStartY = null;
       viewport.classList.remove("is-dragging");
+      scheduleAuto();
     }, { passive: true });
 
     window.addEventListener("resize", requestAlign, { passive: true });
@@ -7699,1170 +7601,31 @@ if (nrow(institutions) == 0) {
       document.fonts.ready.then(requestAlign);
     }
 
+    if ("IntersectionObserver" in window) {
+      const autoObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            carouselHasEnteredViewport = true;
+            scheduleAuto();
+          } else {
+            stopAuto();
+          }
+        });
+      }, {
+        threshold: 0.35,
+        rootMargin: "0px 0px -8% 0px"
+      });
+      autoObserver.observe(root);
+    } else {
+      carouselHasEnteredViewport = true;
+      scheduleAuto();
+    }
+
     window.addEventListener("load", requestAlign);
 
-    setActive(0, false);
-  });
-})();
-</script>
-```
-
-
-```{=html}
-<style>
-/* ======================================================================
-   AJUSTE FINAL FINO — OBJETIVOS MAIS COMPACTOS NO MESMO FRAME
-   ----------------------------------------------------------------------
-   Escopo apenas #objetivos. Reduz o respiro vertical entre título, lead e
-   carrossel; aumenta a área útil das fotos; mantém os cards saindo/entrando
-   pelas extremidades da tela; impede corte do texto no card ativo.
-   ====================================================================== */
-
-#objetivos.objectives-section.core-objectives-section {
-  margin-top: clamp(1.35rem, 2.6vw, 2.8rem) !important;
-  padding-top: clamp(0.2rem, 0.75vw, 0.7rem) !important;
-  padding-bottom: clamp(0.65rem, 1.6vw, 1.35rem) !important;
-  min-height: 0 !important;
-}
-
-#objetivos .core-objectives-head {
-  width: min(1480px, calc(100vw - clamp(1rem, 4.2vw, 5.4rem))) !important;
-  max-width: calc(100vw - clamp(1rem, 4.2vw, 5.4rem)) !important;
-  margin-bottom: 0 !important;
-  gap: clamp(0.65rem, 1.5vw, 1.45rem) !important;
-  align-items: end !important;
-}
-
-#objetivos .core-objectives-title-wrap {
-  max-width: 960px !important;
-}
-
-#objetivos .core-objectives-eyebrow {
-  margin-bottom: clamp(0.22rem, 0.45vw, 0.42rem) !important;
-  padding: 0.28rem 0.68rem !important;
-  font-size: clamp(0.58rem, 0.68vw, 0.68rem) !important;
-  line-height: 1.05 !important;
-}
-
-#objetivos .core-objectives-title {
-  font-size: clamp(2.25rem, 4.75vw, 5.35rem) !important;
-  line-height: 0.74 !important;
-  letter-spacing: -0.098em !important;
-  transform: rotate(-0.85deg) !important;
-}
-
-#objetivos .core-title-line {
-  letter-spacing: -0.102em !important;
-  text-shadow:
-    1px 1px 0 rgba(217,154,39,0.34),
-    0 10px 22px rgba(0,0,0,0.055) !important;
-}
-
-#objetivos .core-title-line-b {
-  margin-left: clamp(0.75rem, 5.2vw, 5rem) !important;
-  margin-top: -0.02em !important;
-}
-
-#objetivos .core-title-line-b::after {
-  bottom: 0.015em !important;
-  height: 0.105em !important;
-}
-
-#objetivos .core-objectives-lead {
-  max-width: 760px !important;
-  margin-top: clamp(0.3rem, 0.65vw, 0.52rem) !important;
-  font-size: clamp(0.84rem, 0.88vw, 0.96rem) !important;
-  line-height: 1.42 !important;
-}
-
-#objetivos .core-objectives-controls {
-  margin-bottom: clamp(0.15rem, 1.6vw, 1.35rem) !important;
-  gap: 0.58rem !important;
-}
-
-#objetivos .core-objectives-arrow {
-  inline-size: clamp(40px, 3vw, 50px) !important;
-  block-size: clamp(40px, 3vw, 50px) !important;
-}
-
-#objetivos .core-objectives-viewport {
-  margin-top: clamp(0.15rem, 0.7vw, 0.62rem) !important;
-  padding-bottom: clamp(0.25rem, 0.8vw, 0.65rem) !important;
-}
-
-#objetivos .core-objectives-track {
-  align-items: flex-start !important;
-  gap: clamp(0.75rem, 1.35vw, 1.35rem) !important;
-  padding-top: 0 !important;
-  padding-bottom: clamp(0.35rem, 0.9vw, 0.75rem) !important;
-}
-
-/* Cards: mais largos, fotos mais altas, corpo mais compacto e sem corte no ativo. */
-#objetivos .core-objective-card {
-  --objective-photo-height: clamp(285px, 33vh, 360px);
-
-  flex-basis: clamp(560px, 40vw, 760px) !important;
-  min-height: 0 !important;
-  height: auto !important;
-  grid-template-rows: var(--objective-photo-height) minmax(150px, auto) !important;
-  transform: translateY(28px) !important;
-  overflow: hidden !important;
-}
-
-#objetivos .core-objective-card.is-active {
-  --objective-photo-height: clamp(305px, 35vh, 380px);
-
-  flex-basis: clamp(760px, 60vw, 1080px) !important;
-  min-height: 0 !important;
-  height: auto !important;
-  grid-template-rows: var(--objective-photo-height) minmax(165px, auto) !important;
-  transform: translateY(0) !important;
-}
-
-#objetivos .core-objective-card.is-next {
-  --objective-photo-height: clamp(292px, 33vh, 365px);
-
-  flex-basis: clamp(620px, 47vw, 860px) !important;
-  min-height: 0 !important;
-  height: auto !important;
-  grid-template-rows: var(--objective-photo-height) minmax(150px, auto) !important;
-  transform: translateY(14px) !important;
-}
-
-#objetivos .core-objective-card.is-far,
-#objetivos .core-objective-card.is-after {
-  --objective-photo-height: clamp(260px, 30vh, 330px);
-
-  flex-basis: clamp(430px, 33vw, 650px) !important;
-  min-height: 0 !important;
-  height: auto !important;
-  grid-template-rows: var(--objective-photo-height) minmax(118px, auto) !important;
-  transform: translateY(28px) !important;
-}
-
-#objetivos .core-objective-card.is-before {
-  transform: translateY(32px) !important;
-}
-
-#objetivos .core-objective-media {
-  height: var(--objective-photo-height) !important;
-  min-height: var(--objective-photo-height) !important;
-}
-
-#objetivos .core-objective-photo {
-  object-fit: cover !important;
-  object-position: center 45% !important;
-}
-
-#objetivos .core-objective-body {
-  padding:
-    clamp(0.78rem, 1.1vw, 1.08rem)
-    clamp(0.9rem, 1.25vw, 1.22rem)
-    clamp(0.85rem, 1.15vw, 1.1rem) !important;
-  overflow: visible !important;
-}
-
-#objetivos .core-objective-number {
-  width: clamp(1.82rem, 2vw, 2.18rem) !important;
-  height: clamp(1.82rem, 2vw, 2.18rem) !important;
-  margin-bottom: 0.42rem !important;
-  font-size: clamp(0.6rem, 0.72vw, 0.72rem) !important;
-}
-
-#objetivos .core-objective-kicker {
-  margin-bottom: 0.32rem !important;
-  font-size: clamp(0.54rem, 0.6vw, 0.66rem) !important;
-  line-height: 1.16 !important;
-}
-
-#objetivos .core-objective-card h3 {
-  font-size: clamp(1.22rem, 1.68vw, 2rem) !important;
-  line-height: 1.03 !important;
-  letter-spacing: -0.06em !important;
-}
-
-#objetivos .core-objective-card p {
-  margin-top: 0.46rem !important;
-  font-size: clamp(0.8rem, 0.84vw, 0.94rem) !important;
-  line-height: 1.34 !important;
-  overflow: visible !important;
-}
-
-#objetivos .core-objective-card.is-active p,
-#objetivos .core-objective-card.is-next p {
-  display: block !important;
-  -webkit-line-clamp: unset !important;
-  -webkit-box-orient: unset !important;
-  overflow: visible !important;
-}
-
-/* Notebook menor e meia tela: mantém o bloco inteiro mais congestionado. */
-@media (max-width: 1180px) {
-  #objetivos.objectives-section.core-objectives-section {
-    padding-top: 0.35rem !important;
-  }
-
-  #objetivos .core-objectives-head {
-    width: calc(100vw - 1.4rem) !important;
-    max-width: calc(100vw - 1.4rem) !important;
-    gap: 0.7rem !important;
-  }
-
-  #objetivos .core-objectives-title {
-    font-size: clamp(2.05rem, 6.2vw, 4.7rem) !important;
-    line-height: 0.76 !important;
-  }
-
-  #objetivos .core-objectives-lead {
-    margin-top: 0.35rem !important;
-    font-size: clamp(0.82rem, 1.15vw, 0.94rem) !important;
-    line-height: 1.38 !important;
-  }
-
-  #objetivos .core-objectives-viewport {
-    margin-top: 0.35rem !important;
-  }
-
-  #objetivos .core-objective-card.is-active {
-    --objective-photo-height: clamp(285px, 34vh, 350px);
-    flex-basis: clamp(660px, 68vw, 860px) !important;
-    grid-template-rows: var(--objective-photo-height) minmax(160px, auto) !important;
-  }
-
-  #objetivos .core-objective-card.is-next {
-    --objective-photo-height: clamp(270px, 32vh, 330px);
-    flex-basis: clamp(520px, 52vw, 680px) !important;
-  }
-
-  #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after {
-    --objective-photo-height: clamp(245px, 30vh, 305px);
-    flex-basis: clamp(360px, 38vw, 500px) !important;
-  }
-}
-
-/* Tablet: evita corte horizontal e mantém cards amplos. */
-@media (max-width: 900px) {
-  #objetivos.objectives-section.core-objectives-section {
-    padding-top: 0.55rem !important;
-  }
-
-  #objetivos .core-objectives-head {
-    grid-template-columns: 1fr !important;
-    gap: 0.55rem !important;
-  }
-
-  #objetivos .core-objectives-controls {
-    justify-content: flex-start !important;
-    margin-bottom: 0 !important;
-  }
-
-  #objetivos .core-objectives-title {
-    font-size: clamp(2.15rem, 9vw, 4.1rem) !important;
-    line-height: 0.8 !important;
-  }
-
-  #objetivos .core-objectives-viewport {
-    margin-top: 0.45rem !important;
-  }
-
-  #objetivos .core-objective-card,
-  #objetivos .core-objective-card.is-active,
-  #objetivos .core-objective-card.is-next,
-  #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after {
-    --objective-photo-height: clamp(260px, 42vw, 350px);
-    flex-basis: min(86vw, 680px) !important;
-    grid-template-rows: var(--objective-photo-height) auto !important;
-    transform: translateY(0) !important;
-  }
-}
-
-/* Celular: mantém leitura vertical, sem tentar forçar tudo no mesmo frame. */
-@media (max-width: 620px) {
-  #objetivos.objectives-section.core-objectives-section {
-    margin-top: 2rem !important;
-    padding-top: 0.65rem !important;
-  }
-
-  #objetivos .core-objectives-head {
-    width: calc(100vw - 1rem) !important;
-    max-width: calc(100vw - 1rem) !important;
-  }
-
-  #objetivos .core-objectives-title {
-    font-size: clamp(2rem, 13vw, 3.2rem) !important;
-    line-height: 0.83 !important;
-  }
-
-  #objetivos .core-objectives-lead {
-    font-size: 0.84rem !important;
-  }
-
-  #objetivos .core-objective-card,
-  #objetivos .core-objective-card.is-active,
-  #objetivos .core-objective-card.is-next,
-  #objetivos .core-objective-card.is-far,
-  #objetivos .core-objective-card.is-after,
-  #objetivos .core-objective-card.is-before {
-    --objective-photo-height: clamp(245px, 70vw, 360px);
-    flex-basis: calc(100vw - 1.4rem) !important;
-  }
-
-  #objetivos .core-objective-card h3 {
-    font-size: clamp(1.28rem, 6.6vw, 1.78rem) !important;
-  }
-
-  #objetivos .core-objective-card p,
-  #objetivos .core-objective-card:not(.is-active):not(.is-next) p {
-    display: block !important;
-    overflow: visible !important;
-  }
-}
-</style>
-```
-
-
-```{=html}
-<style>
-/* ======================================================================
-   AJUSTE FINAL — OBJETIVOS COM 3 CARDS VISÍVEIS E CARD ATIVO CENTRAL
-   ----------------------------------------------------------------------
-   Escopo exclusivo: #objetivos.
-   Funcionamento:
-   - card ativo sempre centralizado;
-   - card anterior menor e mais baixo à esquerda;
-   - card seguinte menor e mais baixo à direita;
-   - no primeiro objetivo, a esquerda fica vazia e o próximo aparece à direita;
-   - cards entram e saem pelas extremidades laterais da tela;
-   - bloco mais compacto verticalmente para caber melhor no frame.
-   ====================================================================== */
-
-#objetivos.objectives-section.core-objectives-section {
-  position: relative !important;
-  left: 50% !important;
-  right: auto !important;
-  transform: translateX(-50%) !important;
-
-  width: 100vw !important;
-  max-width: 100vw !important;
-  min-width: 0 !important;
-
-  margin: clamp(1rem, 1.8vw, 2rem) 0 0 0 !important;
-  padding:
-    clamp(0.25rem, 0.75vw, 0.75rem)
-    0
-    clamp(0.8rem, 1.4vw, 1.25rem)
-    0 !important;
-
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  overflow: hidden !important;
-  isolation: isolate;
-
-  --objective-active-w: 680px;
-  --objective-side-w: 460px;
-  --objective-active-h: 450px;
-  --objective-side-h: 392px;
-  --objective-active-photo-h: 270px;
-  --objective-side-photo-h: 245px;
-  --objective-offset: 600px;
-  --objective-side-y: 46px;
-  --objective-viewport-h: 500px;
-}
-
-#objetivos.objectives-section.core-objectives-section.reveal-ready {
-  transform: translateX(-50%) translateY(44px) !important;
-}
-
-#objetivos.objectives-section.core-objectives-section.reveal-ready.is-visible {
-  transform: translateX(-50%) translateY(0) !important;
-}
-
-#objetivos.core-objectives-section::before {
-  display: none !important;
-  content: none !important;
-}
-
-/* Cabeçalho mais compacto */
-#objetivos .core-objectives-head {
-  width: min(1400px, calc(100vw - clamp(1rem, 5vw, 7rem))) !important;
-  max-width: calc(100vw - clamp(1rem, 5vw, 7rem)) !important;
-  margin: 0 auto !important;
-
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto !important;
-  gap: clamp(0.55rem, 1.4vw, 1.25rem) !important;
-  align-items: end !important;
-}
-
-#objetivos .core-objectives-title-wrap {
-  min-width: 0 !important;
-  max-width: 860px !important;
-}
-
-#objetivos .core-objectives-eyebrow {
-  margin: 0 0 clamp(0.12rem, 0.3vw, 0.28rem) 0 !important;
-  padding: 0.25rem 0.62rem !important;
-  line-height: 1.05 !important;
-  font-size: clamp(0.56rem, 0.66vw, 0.68rem) !important;
-  letter-spacing: 0.12em !important;
-}
-
-#objetivos .core-objectives-title {
-  margin: 0 !important;
-  max-width: none !important;
-
-  font-family: 'Montserrat', Arial, sans-serif !important;
-  font-size: clamp(2.2rem, 4.9vw, 5.35rem) !important;
-  line-height: 0.72 !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.105em !important;
-
-  color: var(--ink) !important;
-  transform: rotate(-0.7deg) !important;
-  transform-origin: left center !important;
-}
-
-#objetivos .core-title-line {
-  display: block !important;
-  max-width: 100% !important;
-  white-space: nowrap !important;
-  text-shadow:
-    1px 1px 0 rgba(217,154,39,0.32),
-    0 10px 22px rgba(0,0,0,0.055) !important;
-}
-
-#objetivos .core-title-line-b {
-  position: relative !important;
-  display: inline-block !important;
-  margin-left: clamp(0.75rem, 5.2vw, 5.2rem) !important;
-  margin-top: -0.015em !important;
-  color: var(--red-dark) !important;
-}
-
-#objetivos .core-title-line-b::after {
-  content: "" !important;
-  position: absolute !important;
-  left: -0.04em !important;
-  right: -0.05em !important;
-  bottom: 0.02em !important;
-  height: 0.1em !important;
-  background: rgba(217,154,39,0.72) !important;
-  z-index: -1 !important;
-}
-
-#objetivos .core-objectives-lead {
-  max-width: 690px !important;
-  margin: clamp(0.22rem, 0.55vw, 0.45rem) 0 0 0 !important;
-  padding: 0 !important;
-
-  color: var(--muted) !important;
-  font-size: clamp(0.82rem, 0.9vw, 0.95rem) !important;
-  line-height: 1.32 !important;
-}
-
-#objetivos .core-objectives-controls {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 0.58rem !important;
-  margin: 0 0 clamp(0.25rem, 0.8vw, 0.75rem) 0 !important;
-  z-index: 12 !important;
-}
-
-#objetivos .core-objectives-arrow {
-  inline-size: clamp(40px, 3vw, 50px) !important;
-  block-size: clamp(40px, 3vw, 50px) !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(98,106,56,0.22) !important;
-  display: grid !important;
-  place-items: center !important;
-  cursor: pointer !important;
-  font-size: clamp(1rem, 1.3vw, 1.25rem) !important;
-  line-height: 1 !important;
-  font-weight: 900 !important;
-  transition:
-    transform 180ms ease,
-    background 180ms ease,
-    color 180ms ease,
-    opacity 180ms ease,
-    box-shadow 180ms ease !important;
-}
-
-#objetivos .core-objectives-prev {
-  background: rgba(246,241,232,0.72) !important;
-  color: var(--green-dark) !important;
-}
-
-#objetivos .core-objectives-next {
-  background: var(--green-dark) !important;
-  color: var(--cream) !important;
-  box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
-}
-
-#objetivos .core-objectives-arrow:hover,
-#objetivos .core-objectives-arrow:focus-visible {
-  transform: translateY(-2px) !important;
-  background: var(--red) !important;
-  color: #fff !important;
-  outline: none !important;
-}
-
-#objetivos .core-objectives-arrow.is-disabled,
-#objetivos .core-objectives-arrow:disabled {
-  opacity: 0.34 !important;
-  cursor: default !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* Palco dos cards: altura controlada via JS */
-#objetivos .core-objectives-viewport {
-  position: relative !important;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  min-width: 0 !important;
-
-  height: var(--objective-viewport-h) !important;
-  margin: clamp(0.3rem, 0.75vw, 0.65rem) 0 0 0 !important;
-  padding: 0 !important;
-
-  overflow: hidden !important;
-  outline: none !important;
-  cursor: grab !important;
-  touch-action: pan-y !important;
-}
-
-#objetivos .core-objectives-viewport.is-dragging {
-  cursor: grabbing !important;
-}
-
-#objetivos .core-objectives-track {
-  position: relative !important;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  height: var(--objective-viewport-h) !important;
-  min-width: 0 !important;
-
-  display: block !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: visible !important;
-  transform: none !important;
-  transition: none !important;
-  will-change: auto !important;
-}
-
-/* Estado base: todos saem pela direita até receberem uma classe visível */
-#objetivos .core-objective-card {
-  position: absolute !important;
-  top: 0 !important;
-  left: 50% !important;
-
-  width: var(--objective-side-w) !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  height: var(--objective-side-h) !important;
-
-  display: grid !important;
-  grid-template-rows: var(--objective-side-photo-h) minmax(0, 1fr) !important;
-  grid-template-columns: 1fr !important;
-  flex: none !important;
-
-  overflow: hidden !important;
-  border-radius: 0 !important;
-  border: 1px solid rgba(98,106,56,0.18) !important;
-  background:
-    linear-gradient(180deg, rgba(255,253,247,0.98), rgba(246,241,232,0.90)) !important;
-  box-shadow: 0 16px 30px rgba(0,0,0,0.10) !important;
-
-  opacity: 0 !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
-
-  transform:
-    translate3d(calc(-50% + 100vw), var(--objective-side-y), 0)
-    scale(0.88) !important;
-  transform-origin: center bottom !important;
-
-  transition:
-    transform 620ms cubic-bezier(.2,.78,.18,1),
-    opacity 260ms ease,
-    width 420ms cubic-bezier(.2,.78,.18,1),
-    height 420ms cubic-bezier(.2,.78,.18,1),
-    box-shadow 260ms ease,
-    filter 260ms ease !important;
-}
-
-#objetivos .core-objective-card.is-current {
-  width: var(--objective-active-w) !important;
-  height: var(--objective-active-h) !important;
-  grid-template-rows: var(--objective-active-photo-h) minmax(0, 1fr) !important;
-
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: 8 !important;
-
-  transform: translate3d(-50%, 0, 0) scale(1) !important;
-  box-shadow: 0 24px 50px rgba(0,0,0,0.16) !important;
-  filter: saturate(1.02) contrast(1.02) !important;
-}
-
-#objetivos .core-objective-card.is-prev {
-  opacity: 0.86 !important;
-  pointer-events: auto !important;
-  z-index: 5 !important;
-  transform:
-    translate3d(calc(-50% - var(--objective-offset)), var(--objective-side-y), 0)
-    scale(0.94) !important;
-}
-
-#objetivos .core-objective-card.is-next {
-  opacity: 0.92 !important;
-  pointer-events: auto !important;
-  z-index: 5 !important;
-  transform:
-    translate3d(calc(-50% + var(--objective-offset)), var(--objective-side-y), 0)
-    scale(0.94) !important;
-}
-
-#objetivos .core-objective-card.is-hidden-left {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform:
-    translate3d(calc(-50% - 100vw), var(--objective-side-y), 0)
-    scale(0.82) !important;
-}
-
-#objetivos .core-objective-card.is-hidden-right {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform:
-    translate3d(calc(-50% + 100vw), var(--objective-side-y), 0)
-    scale(0.82) !important;
-}
-
-/* Imagens: mais altas, sem achatamento */
-#objetivos .core-objective-media {
-  position: relative !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  overflow: hidden !important;
-  background:
-    linear-gradient(135deg, rgba(46,59,36,0.18), rgba(217,154,39,0.12)),
-    var(--green-soft) !important;
-}
-
-#objetivos .core-objective-media::after {
-  display: none !important;
-  content: none !important;
-}
-
-#objetivos .core-objective-photo {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-
-  object-fit: cover !important;
-  object-position: center center !important;
-
-  opacity: 0 !important;
-  transform: scale(1.025) !important;
-  transition: opacity 520ms ease, transform 900ms ease !important;
-}
-
-#objetivos .core-objective-photo.is-photo-active {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-}
-
-/* Corpo do card */
-#objetivos .core-objective-body {
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-
-  padding:
-    clamp(0.82rem, 1vw, 1.05rem)
-    clamp(0.9rem, 1.25vw, 1.25rem)
-    clamp(0.86rem, 1.05vw, 1.15rem) !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,253,247,0.96), rgba(246,241,232,0.92)) !important;
-  color: var(--ink) !important;
-  overflow: hidden !important;
-}
-
-#objetivos .core-objective-number {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  width: clamp(1.9rem, 2.1vw, 2.3rem) !important;
-  height: clamp(1.9rem, 2.1vw, 2.3rem) !important;
-  margin: 0 0 0.42rem 0 !important;
-  border-radius: 50% !important;
-
-  background: var(--green-dark) !important;
-  color: var(--cream) !important;
-
-  font-family: 'Space Mono', monospace !important;
-  font-size: clamp(0.62rem, 0.7vw, 0.75rem) !important;
-  font-weight: 900 !important;
-  line-height: 1 !important;
-}
-
-#objetivos .core-objective-kicker {
-  display: block !important;
-  margin: 0 0 0.34rem 0 !important;
-
-  color: var(--red-dark) !important;
-  font-family: 'Space Mono', monospace !important;
-  font-size: clamp(0.54rem, 0.62vw, 0.69rem) !important;
-  line-height: 1.16 !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-}
-
-#objetivos .core-objective-card h3 {
-  margin: 0 !important;
-  color: var(--ink) !important;
-  font-family: 'Montserrat', Arial, sans-serif !important;
-  font-size: clamp(1.16rem, 1.48vw, 1.85rem) !important;
-  line-height: 1.02 !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.065em !important;
-  text-wrap: balance;
-  overflow-wrap: normal !important;
-}
-
-#objetivos .core-objective-card p {
-  margin: 0.42rem 0 0 0 !important;
-  color: var(--muted) !important;
-  font-size: clamp(0.78rem, 0.84vw, 0.92rem) !important;
-  line-height: 1.3 !important;
-  font-weight: 500 !important;
-  display: block !important;
-  overflow: visible !important;
-  -webkit-line-clamp: unset !important;
-  -webkit-box-orient: unset !important;
-}
-
-/* Cards laterais: texto mais resumido para manter a leitura sem cortar */
-#objetivos .core-objective-card.is-prev .core-objective-number,
-#objetivos .core-objective-card.is-next .core-objective-number {
-  width: clamp(1.75rem, 1.9vw, 2.05rem) !important;
-  height: clamp(1.75rem, 1.9vw, 2.05rem) !important;
-  margin-bottom: 0.34rem !important;
-  font-size: clamp(0.56rem, 0.66vw, 0.68rem) !important;
-}
-
-#objetivos .core-objective-card.is-prev .core-objective-kicker,
-#objetivos .core-objective-card.is-next .core-objective-kicker {
-  font-size: clamp(0.49rem, 0.56vw, 0.62rem) !important;
-  margin-bottom: 0.26rem !important;
-}
-
-#objetivos .core-objective-card.is-prev h3,
-#objetivos .core-objective-card.is-next h3 {
-  font-size: clamp(1rem, 1.16vw, 1.35rem) !important;
-  line-height: 1.03 !important;
-}
-
-#objetivos .core-objective-card.is-prev p,
-#objetivos .core-objective-card.is-next p {
-  margin-top: 0.35rem !important;
-  font-size: clamp(0.72rem, 0.75vw, 0.82rem) !important;
-  line-height: 1.25 !important;
-
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
-  overflow: hidden !important;
-}
-
-/* Tablet: mantém o ativo central e mostra laterais menores/parciais */
-@media (max-width: 900px) {
-  #objetivos.objectives-section.core-objectives-section {
-    padding-top: 0.5rem !important;
-  }
-
-  #objetivos .core-objectives-head {
-    grid-template-columns: 1fr !important;
-    width: calc(100vw - 1.1rem) !important;
-    max-width: calc(100vw - 1.1rem) !important;
-  }
-
-  #objetivos .core-objectives-controls {
-    justify-content: flex-start !important;
-    margin-top: 0.25rem !important;
-  }
-
-  #objetivos .core-objectives-title {
-    font-size: clamp(2.05rem, 9vw, 4.2rem) !important;
-  }
-
-  #objetivos .core-objectives-lead {
-    max-width: 100% !important;
-  }
-}
-
-/* Celular: prioriza um card central legível, com vizinhos sugeridos nas bordas. */
-@media (max-width: 620px) {
-  #objetivos.objectives-section.core-objectives-section {
-    margin-top: 1.6rem !important;
-  }
-
-  #objetivos .core-objectives-head {
-    width: calc(100vw - 1rem) !important;
-    max-width: calc(100vw - 1rem) !important;
-  }
-
-  #objetivos .core-objectives-eyebrow {
-    font-size: 0.56rem !important;
-  }
-
-  #objetivos .core-objectives-title {
-    font-size: clamp(2rem, 13vw, 3.25rem) !important;
-    line-height: 0.78 !important;
-  }
-
-  #objetivos .core-title-line-b {
-    margin-left: 0.7rem !important;
-  }
-
-  #objetivos .core-objectives-lead {
-    font-size: 0.82rem !important;
-    line-height: 1.34 !important;
-  }
-
-  #objetivos .core-objective-card h3 {
-    font-size: clamp(1.15rem, 5.9vw, 1.62rem) !important;
-  }
-
-  #objetivos .core-objective-card p {
-    font-size: 0.78rem !important;
-    line-height: 1.34 !important;
-  }
-
-  #objetivos .core-objective-card.is-prev p,
-  #objetivos .core-objective-card.is-next p,
-  #objetivos .core-objective-card.is-prev .core-objective-kicker,
-  #objetivos .core-objective-card.is-next .core-objective-kicker {
-    display: none !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #objetivos .core-objective-card,
-  #objetivos .core-objective-photo,
-  #objetivos .core-objectives-arrow {
-    transition: none !important;
-  }
-}
-</style>
-
-<script>
-(function () {
-  document.addEventListener("DOMContentLoaded", function () {
-    const root = document.getElementById("objetivos");
-    if (!root) return;
-
-    const viewport = root.querySelector(".core-objectives-viewport");
-    const track = root.querySelector(".core-objectives-track");
-    const cards = Array.from(root.querySelectorAll(".core-objective-card"));
-    const prevBtn = root.querySelector(".core-objectives-prev");
-    const nextBtn = root.querySelector(".core-objectives-next");
-
-    if (!viewport || !track || !cards.length) return;
-
-    let activeIndex = 0;
-    let photoTimer = null;
-    let startX = null;
-    let startY = null;
-    let isDragging = false;
-
-    function clamp(value, min, max) {
-      return Math.min(Math.max(value, min), max);
-    }
-
-    function measure() {
-      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-      const isMobile = vw <= 620;
-      const isTablet = vw > 620 && vw <= 900;
-
-      let gap;
-      let activeW;
-      let sideW;
-      let activeH;
-
-      if (isMobile) {
-        gap = clamp(vw * 0.035, 14, 22);
-        activeW = clamp(vw * 0.84, 300, vw - 34);
-        sideW = clamp(vw * 0.66, 230, vw * 0.72);
-        activeH = clamp(vh * 0.50, 390, 470);
-      } else if (isTablet) {
-        gap = clamp(vw * 0.022, 18, 28);
-        activeW = clamp(vw * 0.62, 470, 600);
-        sideW = clamp(vw * 0.39, 300, 410);
-        activeH = clamp(vh * 0.50, 405, 500);
-      } else {
-        gap = clamp(vw * 0.018, 22, 36);
-        activeW = clamp(vw * 0.40, 560, 720);
-
-        const sideBase = clamp(vw * 0.285, 380, 500);
-        const sideMaxThatStillFits = Math.max(300, (vw - activeW - (2 * gap) - 32) / 2);
-        sideW = Math.min(sideBase, sideMaxThatStillFits);
-
-        activeH = clamp(vh * 0.52, 410, 505);
-      }
-
-      const sideH = isMobile ? activeH * 0.88 : activeH * 0.86;
-      const activePhotoH = activeH * (isMobile ? 0.60 : 0.61);
-      const sidePhotoH = sideH * (isMobile ? 0.62 : 0.63);
-      const sideY = isMobile ? 38 : clamp(vh * 0.055, 36, 58);
-      const offset = (activeW / 2) + gap + (sideW / 2);
-      const viewportH = activeH + sideY + (isMobile ? 16 : 18);
-
-      root.style.setProperty("--objective-active-w", Math.round(activeW) + "px");
-      root.style.setProperty("--objective-side-w", Math.round(sideW) + "px");
-      root.style.setProperty("--objective-active-h", Math.round(activeH) + "px");
-      root.style.setProperty("--objective-side-h", Math.round(sideH) + "px");
-      root.style.setProperty("--objective-active-photo-h", Math.round(activePhotoH) + "px");
-      root.style.setProperty("--objective-side-photo-h", Math.round(sidePhotoH) + "px");
-      root.style.setProperty("--objective-offset", Math.round(offset) + "px");
-      root.style.setProperty("--objective-side-y", Math.round(sideY) + "px");
-      root.style.setProperty("--objective-viewport-h", Math.round(viewportH) + "px");
-
-      track.style.transform = "none";
-      viewport.style.height = Math.round(viewportH) + "px";
-      track.style.height = Math.round(viewportH) + "px";
-
-      render();
-    }
-
-    function resetPhotos(card) {
-      cards.forEach(function (item) {
-        const photos = Array.from(item.querySelectorAll(".core-objective-photo"));
-        photos.forEach(function (photo, i) {
-          photo.classList.toggle("is-photo-active", i === 0);
-        });
-        item.dataset.photoIndex = "0";
-      });
-
-      if (photoTimer) {
-        clearInterval(photoTimer);
-        photoTimer = null;
-      }
-
-      const photos = Array.from(card.querySelectorAll(".core-objective-photo"));
-      if (photos.length <= 1 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-      photoTimer = setInterval(function () {
-        const current = Number(card.dataset.photoIndex || 0);
-        const nextPhoto = (current + 1) % photos.length;
-        card.dataset.photoIndex = String(nextPhoto);
-
-        photos.forEach(function (photo, i) {
-          photo.classList.toggle("is-photo-active", i === nextPhoto);
-        });
-      }, 3600);
-    }
-
-    function render() {
-      cards.forEach(function (card, i) {
-        card.classList.remove(
-          "is-active",
-          "is-current",
-          "is-prev",
-          "is-next",
-          "is-far",
-          "is-after",
-          "is-before",
-          "is-hidden-left",
-          "is-hidden-right"
-        );
-
-        if (i === activeIndex) {
-          card.classList.add("is-current");
-          card.setAttribute("aria-current", "true");
-          card.setAttribute("tabindex", "0");
-        } else if (i === activeIndex - 1) {
-          card.classList.add("is-prev");
-          card.setAttribute("aria-current", "false");
-          card.setAttribute("tabindex", "-1");
-        } else if (i === activeIndex + 1) {
-          card.classList.add("is-next");
-          card.setAttribute("aria-current", "false");
-          card.setAttribute("tabindex", "-1");
-        } else if (i < activeIndex - 1) {
-          card.classList.add("is-hidden-left");
-          card.setAttribute("aria-current", "false");
-          card.setAttribute("tabindex", "-1");
-        } else {
-          card.classList.add("is-hidden-right");
-          card.setAttribute("aria-current", "false");
-          card.setAttribute("tabindex", "-1");
-        }
-      });
-
-      if (prevBtn) {
-        const disabled = activeIndex === 0;
-        prevBtn.classList.toggle("is-disabled", disabled);
-        prevBtn.disabled = disabled;
-        prevBtn.setAttribute("aria-disabled", disabled ? "true" : "false");
-      }
-
-      if (nextBtn) {
-        const disabled = activeIndex === cards.length - 1;
-        nextBtn.classList.toggle("is-disabled", disabled);
-        nextBtn.disabled = disabled;
-        nextBtn.setAttribute("aria-disabled", disabled ? "true" : "false");
-      }
-    }
-
-    function setActive(index, shouldFocus) {
-      const nextIndex = clamp(index, 0, cards.length - 1);
-      if (nextIndex === activeIndex) {
-        render();
-        return;
-      }
-
-      activeIndex = nextIndex;
-      render();
-      resetPhotos(cards[activeIndex]);
-
-      if (shouldFocus && cards[activeIndex]) {
-        cards[activeIndex].focus({ preventScroll: true });
-      }
-    }
-
-    function captureButton(event, direction) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof event.stopImmediatePropagation === "function") {
-        event.stopImmediatePropagation();
-      }
-
-      setActive(activeIndex + direction, false);
-    }
-
-    if (prevBtn) {
-      prevBtn.addEventListener("click", function (event) {
-        captureButton(event, -1);
-      }, true);
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener("click", function (event) {
-        captureButton(event, 1);
-      }, true);
-    }
-
-    cards.forEach(function (card, i) {
-      card.addEventListener("click", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (typeof event.stopImmediatePropagation === "function") {
-          event.stopImmediatePropagation();
-        }
-        setActive(i, false);
-      }, true);
-
-      card.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          setActive(i, true);
-        }
-      }, true);
-    });
-
-    viewport.addEventListener("keydown", function (event) {
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        setActive(activeIndex + 1, false);
-      }
-
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        setActive(activeIndex - 1, false);
-      }
-
-      if (event.key === "Home") {
-        event.preventDefault();
-        setActive(0, false);
-      }
-
-      if (event.key === "End") {
-        event.preventDefault();
-        setActive(cards.length - 1, false);
-      }
-    }, true);
-
-    viewport.addEventListener("pointerdown", function (event) {
-      startX = event.clientX;
-      startY = event.clientY;
-      isDragging = true;
-      viewport.classList.add("is-dragging");
-    }, { passive: true });
-
-    viewport.addEventListener("pointerup", function (event) {
-      if (!isDragging || startX === null || startY === null) {
-        viewport.classList.remove("is-dragging");
-        return;
-      }
-
-      const dx = event.clientX - startX;
-      const dy = event.clientY - startY;
-
-      viewport.classList.remove("is-dragging");
-      isDragging = false;
-
-      if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-        setActive(activeIndex + (dx < 0 ? 1 : -1), false);
-      }
-
-      startX = null;
-      startY = null;
-    }, { passive: true });
-
-    viewport.addEventListener("pointercancel", function () {
-      isDragging = false;
-      startX = null;
-      startY = null;
-      viewport.classList.remove("is-dragging");
-    }, { passive: true });
-
-    window.addEventListener("resize", function () {
-      window.requestAnimationFrame(measure);
-    }, { passive: true });
-
-    if (window.ResizeObserver) {
-      const observer = new ResizeObserver(function () {
-        window.requestAnimationFrame(measure);
-      });
-      observer.observe(root);
-      observer.observe(viewport);
-    }
-
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(measure);
-    }
-
-    window.addEventListener("load", measure);
-
-    activeIndex = 0;
+    classifyCards();
     resetPhotos(cards[activeIndex]);
-    measure();
-    render();
+    requestAlign();
   });
 })();
 </script>
