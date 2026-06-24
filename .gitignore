@@ -53,3 +53,5 @@ __pycache__/
 # Dados locais grandes ou sensiveis: descomente manualmente se necessario
 # _input_data/
 # figures/
+
+**/*.quarto_ipynb

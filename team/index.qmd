@@ -168,7 +168,7 @@ team_data <- team_data |>
 responsible_names <- c(
   "Charles Zartman",
   "Domingos Cardoso",
-  "Sandra Knapp",
+  "Sandra Diane Knapp",
   "Anna Luiza Ilkiu-Borges",
   "Clistenes Williams Araújo do Nascimento",
   "Dirce Komura",
