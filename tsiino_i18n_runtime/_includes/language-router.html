@@ -1,0 +1,28 @@
+<!-- Tsiino Hiiwiida language runtime loader.
+     Mantém caminhos funcionando em páginas na raiz e em subpastas do Quarto. -->
+<script>
+(function () {
+  "use strict";
+
+  function getSitePrefix() {
+    var favicon = document.querySelector('link[rel~="icon"][href*="figures/tsiino_hex_sticker.png"]');
+    if (!favicon) return "";
+
+    var href = favicon.getAttribute("href") || "";
+    return href.replace(/figures\/tsiino_hex_sticker\.png(?:[?#].*)?$/, "");
+  }
+
+  function loadScript(src, callback) {
+    var script = document.createElement("script");
+    script.src = src;
+    script.defer = false;
+    if (callback) script.onload = callback;
+    document.head.appendChild(script);
+  }
+
+  var prefix = getSitePrefix();
+  loadScript(prefix + "js/translate.js", function () {
+    loadScript(prefix + "js/language.js");
+  });
+})();
+</script>
