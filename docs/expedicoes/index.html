@@ -84,7 +84,6 @@ ul.task-list li input[type="checkbox"] {
 
 
 <link rel="stylesheet" href="../styles.css">
-<link rel="stylesheet" href="../css/language-toggle.css">
 </head>
 
 <body class="nav-fixed quarto-light">
@@ -122,10 +121,6 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link" href="../team/index.html"> 
 <span class="menu-text">Equipe</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../en/"> 
-<span class="menu-text">EN</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -1347,128 +1342,34 @@ Curicuriari janeiro 2026
 })();
 
 </script>
+<!-- Tsiino Hiiwiida language runtime loader.
+     Mantém caminhos funcionando em páginas na raiz e em subpastas do Quarto. -->
 <script>
-
 (function () {
+  "use strict";
 
-  const ROUTES = {
+  function getSitePrefix() {
+    var favicon = document.querySelector('link[rel~="icon"][href*="figures/tsiino_hex_sticker.png"]');
+    if (!favicon) return "";
 
-    '/': '/en/',
-
-    '/index.html': '/en/',
-
-    '/acesso/': '/en/data-access/',
-
-    '/acesso/index.html': '/en/data-access/',
-
-    '/expedicoes/': '/en/expeditions/',
-
-    '/expedicoes/index.html': '/en/expeditions/',
-
-    '/team/': '/en/team/',
-
-    '/team/index.html': '/en/team/',
-
-    '/en/': '/',
-
-    '/en/index.html': '/',
-
-    '/en/data-access/': '/acesso/',
-
-    '/en/data-access/index.html': '/acesso/',
-
-    '/en/expeditions/': '/expedicoes/',
-
-    '/en/expeditions/index.html': '/expedicoes/',
-
-    '/en/team/': '/team/',
-
-    '/en/team/index.html': '/team/'
-
-  };
-
-
-
-  const EN_NAV = [
-
-    { text: 'About', href: '/en/' },
-
-    { text: 'Expeditions', href: '/en/expeditions/' },
-
-    { text: 'Data Access', href: '/en/data-access/' },
-
-    { text: 'Team', href: '/en/team/' },
-
-    { text: 'PT', href: '/' }
-
-  ];
-
-
-
-  function clean(path) {
-
-    let out = path || '/';
-
-    out = out.replace(/\/+/g, '/');
-
-    out = out.replace(/index\.html$/, '');
-
-    if (!out.endsWith('/')) out += '/';
-
-    return out;
-
+    var href = favicon.getAttribute("href") || "";
+    return href.replace(/figures\/tsiino_hex_sticker\.png(?:[?#].*)?$/, "");
   }
 
-
-
-  function resolveTarget(pathname) {
-
-    const cleanPath = clean(pathname);
-
-    return ROUTES[pathname] || ROUTES[cleanPath] || (cleanPath.startsWith('/en/') ? '/' : '/en/');
-
+  function loadScript(src, callback) {
+    var script = document.createElement("script");
+    script.src = src;
+    script.defer = false;
+    if (callback) script.onload = callback;
+    document.head.appendChild(script);
   }
 
-
-
-  function isEnPage() {
-
-    return clean(window.location.pathname).startsWith('/en/');
-
-  }
-
-
-
-  document.addEventListener('DOMContentLoaded', function () {
-
-    const toggle = document.getElementById('language-toggle-link') || document.querySelector('.tsiino-language-button');
-
-    if (toggle) toggle.setAttribute('href', resolveTarget(window.location.pathname));
-
-
-
-    if (isEnPage()) {
-
-      const links = Array.from(document.querySelectorAll('#quarto-header .navbar-nav .nav-link'));
-
-      EN_NAV.forEach(function (item, idx) {
-
-        if (!links[idx]) return;
-
-        links[idx].textContent = item.text;
-
-        links[idx].setAttribute('href', item.href);
-
-      });
-
-    }
-
+  var prefix = getSitePrefix();
+  loadScript(prefix + "js/translate.js", function () {
+    loadScript(prefix + "js/language.js");
   });
-
 })();
-
 </script>
-
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

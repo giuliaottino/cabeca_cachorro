@@ -6,10 +6,6 @@ project:
     - acesso/index.qmd
     - expedicoes/index.qmd
     - team/index.qmd
-    - en/index.qmd
-    - en/data-access/index.qmd
-    - en/expeditions/index.qmd
-    - en/team/index.qmd
   resources:
     - figures/**
     - js/**
@@ -37,8 +33,6 @@ website:
         href: acesso/index.qmd
       - text: "Equipe"
         href: team/index.qmd
-      - text: "EN"
-        href: en/
 
 format:
   html:
@@ -50,7 +44,6 @@ format:
     code-tools: false
     css:
       - styles.css
-      - css/language-toggle.css
     eval: true
     theme: [spacelab, theme.scss]
     include-in-header: gtm-head.html
