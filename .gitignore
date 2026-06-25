@@ -55,4 +55,3 @@ __pycache__/
 # figures/
 
 **/*.quarto_ipynb
-**/.~lock.*#
