@@ -5341,7 +5341,7 @@ section#pesquisadores-responsaveis {
     </figure>
 
     <figure class="exp-collage-item exp-photo-3" data-label="Expedição 3">
-      <img src="figures/exp_3.png" alt="Foto da expedição 3" loading="lazy"
+      <img src="figures/exp_3.jpg" alt="Foto da expedição 3" loading="lazy"
            onerror="this.parentElement.classList.add('is-missing'); this.remove();">
     </figure>
 
