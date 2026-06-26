@@ -6781,7 +6781,7 @@ if (is.null(media_items) || nrow(media_items) == 0) {
 
         <article class="researcher-card">
           <span class="agency-pill">FACEPE</span>
-          <h4>Clistenes Nascimento</h4>
+          <h4>Clístenes Nascimento</h4>
           <p>Universidade Federal Rural de Pernambuco — UFRPE</p>
         </article>
 
