@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: tsiino_validator_db
+    environment:
+      POSTGRES_DB: tsiino_validator
+      POSTGRES_USER: tsiino
+      POSTGRES_PASSWORD: tsiino_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tsiino -d tsiino_validator"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    container_name: tsiino_validator_api
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://tsiino:tsiino_dev_password@db:5432/tsiino_validator
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+volumes:
+  pgdata:

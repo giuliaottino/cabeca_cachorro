@@ -5,11 +5,14 @@ project:
     - index.qmd
     - acesso/index.qmd
     - expedicoes/index.qmd
+    - ferramentas/validador-herbario/index.qmd
     - team/index.qmd
   resources:
     - figures/**
     - js/**
     - css/**
+    - assets/**
+    - test_data/**
 
 website:
   title: "Tsiino Hiwiida"
@@ -31,6 +34,10 @@ website:
         href: expedicoes/index.qmd
       - text: "Acesso aos dados"
         href: acesso/index.qmd
+      - text: "Ferramentas"
+        menu:
+          - text: "Validador de planilha de herbário"
+            href: ferramentas/validador-herbario/index.qmd
       - text: "Equipe"
         href: team/index.qmd
 

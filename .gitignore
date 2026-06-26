@@ -56,3 +56,9 @@ __pycache__/
 
 **/*.quarto_ipynb
 **/.~lock.*#
+backend/.venv/
+*.egg-info/
+*.pyc
+.tsiino-validator-backups/
+RELATORIO_ARQUIVOS_PROJETO.txt
+backend/.env

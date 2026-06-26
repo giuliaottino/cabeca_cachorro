@@ -1,0 +1,156 @@
+---
+title: "Validador de planilha de herbário"
+subtitle: "Planilha anotada célula a célula"
+format:
+  html:
+    toc: false
+    page-layout: full
+    embed-resources: false
+    self-contained: false
+    code-copy: true
+    title-prefix: "Tsiino Hiiwiida"
+    css:
+      - ../../styles.css
+      - ../../assets/css/herb-validator.css
+execute:
+  echo: false
+  eval: false
+  freeze: false
+  warning: false
+  message: false
+resources:
+  - ../../assets/
+  - ../../figures/
+---
+
+```{=html}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<section class="hv-hero" aria-label="Abertura do validador de planilha de herbário">
+  <div class="hv-hero-inner">
+    <p class="hv-kicker">Ferramentas · Curadoria de herbário</p>
+    <h1 class="hv-title">
+      <span>Validador de</span>
+      <span>planilhas de</span>
+      <span>herbário.</span>
+    </h1>
+    <p class="hv-hero-text">
+      Envie uma planilha padrão INPA/BRAHMS. O sistema reproduz a planilha no navegador, marca erros e alertas diretamente nas células, mostra os pontos de coleta no mapa e gera uma cópia .xlsx anotada para correção.
+    </p>
+  </div>
+</section>
+
+<main class="hv-page" id="hv-page">
+  <section class="hv-panel hv-intro-panel" aria-label="Como funciona o validador">
+    <div class="hv-section-title">
+      <span></span>
+      <h2>Validação curatorial</h2>
+    </div>
+
+    <div class="hv-feature-grid">
+      <article>
+        <b>Template INPA/BRAHMS</b>
+        <p>Reconhece os nomes técnicos reais das colunas e pequenas variações de cabeçalho.</p>
+      </article>
+      <article>
+        <b>Planilha anotada</b>
+        <p>Mostra a própria planilha com diagnóstico dentro da célula onde o problema foi detectado.</p>
+      </article>
+      <article>
+        <b>Mapa e download</b>
+        <p>Exibe os pontos de coleta e baixa uma cópia colorida com erros e alertas para revisão.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="hv-panel hv-upload-panel" aria-label="Envio da planilha">
+    <div class="hv-section-title">
+      <span></span>
+      <h2>Enviar planilha</h2>
+    </div>
+
+    <form id="herb-validator-form" class="hv-form">
+      <div class="hv-form-grid">
+        <label>
+          <span>Coleção botânica</span>
+          <select id="collection" name="collection">
+            <option value="INPA">INPA — Herbário INPA</option>
+            <option value="RB">RB — Exsicata</option>
+            <option value="CUSTOM">Outro / customizado</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Aba da planilha, opcional</span>
+          <input type="text" id="sheet-name" name="sheet_name" placeholder="Ex.: Espécimes">
+        </label>
+      </div>
+
+      <div class="hv-checks">
+        <label><input type="checkbox" id="validate-taxonomy" checked> Validar nomes na Flora e Funga do Brasil</label>
+        <label><input type="checkbox" id="validate-geography" checked> Validar coordenadas e localidade</label>
+      </div>
+
+      <label class="hv-file-label">
+        <span>Planilha</span>
+        <input type="file" id="spreadsheet-file" accept=".xlsx,.xlsm" required>
+      </label>
+
+      <div class="hv-actions">
+        <button class="hv-primary" id="validate-button" type="submit">Validar planilha</button>
+        <a class="hv-secondary is-disabled" id="download-annotated" href="#" aria-disabled="true">Baixar planilha anotada</a>
+        <button class="hv-secondary is-disabled" id="map-button" type="button" aria-disabled="true">Mapa de coleta</button>
+      </div>
+
+      <p id="validator-status" class="hv-status" role="status">Selecione uma planilha e clique em <strong>Validar planilha</strong>.</p>
+    </form>
+  </section>
+
+  <section id="validator-results" class="hv-results" hidden aria-label="Resultado da validação">
+    <div class="hv-section-title hv-result-title">
+      <span></span>
+      <h2>Resultado da validação</h2>
+    </div>
+
+    <div class="hv-summary" id="validator-summary"></div>
+
+    <div class="hv-toolbar" aria-label="Filtros da planilha anotada">
+      <button type="button" class="hv-filter is-active" data-filter="all">Todos</button>
+      <button type="button" class="hv-filter" data-filter="error">Só erros</button>
+      <button type="button" class="hv-filter" data-filter="warning">Só alertas</button>
+      <button type="button" class="hv-filter" data-filter="clear">Sem problemas</button>
+    </div>
+
+    <section id="validator-map-panel" class="hv-map-panel" hidden aria-label="Mapa de coleta">
+      <div class="hv-map-heading">
+        <div>
+          <strong>Mapa de coleta</strong>
+          <span>Visualização simples dos pontos enviados na planilha. Pontos com erro aparecem destacados.</span>
+        </div>
+        <button type="button" class="hv-map-close" id="map-close">Fechar mapa</button>
+      </div>
+      <div id="validator-map" class="hv-map"></div>
+    </section>
+
+    <div class="hv-sheet-caption">
+      <strong>Planilha anotada</strong>
+      <span>As mensagens aparecem dentro da célula onde o problema foi detectado.</span>
+    </div>
+
+    <div class="hv-sheet-wrap" aria-label="Planilha anotada">
+      <table id="validator-sheet" class="hv-sheet"></table>
+    </div>
+
+    <details class="hv-issues-details">
+      <summary>Lista auxiliar de erros e alertas</summary>
+      <div class="hv-issues-wrap">
+        <table id="validator-issues" class="hv-issues-table"></table>
+      </div>
+    </details>
+  </section>
+</main>
+
+<script src="../../assets/js/herb-validator.js?v=20260626-wide-map-v2"></script>
+```

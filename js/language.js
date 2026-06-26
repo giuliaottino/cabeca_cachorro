@@ -374,7 +374,7 @@
       .tsiino-language-control{
         position: fixed;
         right: clamp(0.75rem, 1.6vw, 1.25rem);
-        bottom: clamp(0.75rem, 1.6vw, 1.25rem);
+        bottom: calc(clamp(0.75rem, 1.6vw, 1.25rem) + 2cm);
         z-index: 2147483000;
         display: inline-flex;
         align-items: center;
