@@ -17,6 +17,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from app.schemas.issues import ValidationIssue
 from app.services.rule_engine import issue, validate_basic_row, validate_structure
 from app.services.spreadsheet_reader import parse_xlsx
+from app.services.geography_ibge_sqlite import reference_status as ibge_reference_status, validate_geography_ibge
 from app.services.taxonomy_ffb_sqlite import reference_status as ffb_reference_status, validate_taxonomy_ffb
 
 router = APIRouter()
@@ -272,11 +273,7 @@ def status() -> dict[str, Any]:
     return {
         "mode": "local-development",
         "taxonomy": taxonomy,
-        "geography": {
-            "mode": "fixture_local",
-            "status": "development_fixture",
-            "message": "Fixture geográfico local de desenvolvimento; será substituído pela base IBGE na próxima fase.",
-        },
+        "geography": ibge_reference_status(),
     }
 
 @router.post("/upload")
@@ -308,7 +305,7 @@ async def upload_spreadsheet(
         if validate_taxonomy:
             all_issues.extend(validate_taxonomy_ffb(record))
         if validate_geography:
-            all_issues.extend(_local_geography(record))
+            all_issues.extend(validate_geography_ibge(record))
 
     if validate_taxonomy:
         all_issues.append(issue(None, None, "info", "TAXONOMY_LOCAL_FIXTURE", "Modo local: validação taxonômica demonstrativa com fixture pequeno. No deploy, usar Flora e Funga do Brasil importada em PostgreSQL.", source="Tsiino local mode"))
