@@ -1,8 +1,11 @@
 (function () {
-  const LOCAL_API = 'http://127.0.0.1:8000/api/validator';
-  const host = window.location.hostname;
-  const isLocal = !host || host === '127.0.0.1' || host === 'localhost';
-  const API_BASE = window.TSIINO_VALIDATOR_API || (isLocal ? LOCAL_API : '/api/validator');
+const LOCAL_API = 'http://127.0.0.1:8000/api/validator';
+const PROD_API = 'https://api.tsiinohiiwiida.net/api/validator';
+
+const host = window.location.hostname;
+const isLocal = !host || host === '127.0.0.1' || host === 'localhost';
+
+const API_BASE = isLocal ? LOCAL_API : PROD_API;
 
   const COLUMN_ALIASES = {
     numtombo: 'accession', tombo: 'accession', coletor: 'collector', coletores: 'collector', numero: 'number',
@@ -390,7 +393,7 @@
       configureMap(currentJobId);
       setStatus('Validação concluída. Corrija as células destacadas ou baixe a cópia .xlsx anotada.', 'ok');
     } catch (error) {
-      setStatus(`Não foi possível validar: ${escapeHtml(error.message)}. Em teste local, confirme se a API está rodando em http://127.0.0.1:8000 e se o site foi aberto por http://127.0.0.1:5500.`, 'error');
+      setStatus(`Não foi possível validar: ${escapeHtml(error.message)}. Não foi possível validar. Em teste local, confirme se a API está rodando em http://127.0.0.1:8000. No site publicado, a API deve responder em https://api.tsiinohiiwiida.net/health.`, 'error');
     } finally {
       setBusy(false);
     }
