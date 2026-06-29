@@ -183,7 +183,7 @@ def insert_state_aliases(con: sqlite3.Connection) -> None:
 
 
 def import_admin(con: sqlite3.Connection, zip_path: Path, level: str) -> int:
-    with tempfile.TemporaryDirectory() as tmp:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
         extract_dir = extract_zip(zip_path, Path(tmp) / level)
         shp = find_shp(extract_dir)
         print(f"Lendo {level}: {shp.name}")
@@ -240,7 +240,7 @@ def import_admin(con: sqlite3.Connection, zip_path: Path, level: str) -> int:
                     str(code) if code is not None else None,
                     str(name),
                     norm(name),
-                    str(uf_code).zfill(2) if uf_code is not None and str(uf_code).strip() else None,
+                    str(locals().get("uf_code")).zfill(2) if locals().get("uf_code") is not None and str(locals().get("uf_code")).strip() else None,
                     uf_sigla,
                     uf_name,
                     norm(uf_name),
