@@ -17,6 +17,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from app.schemas.issues import ValidationIssue
 from app.services.rule_engine import issue, validate_basic_row, validate_structure
 from app.services.spreadsheet_reader import parse_xlsx
+from app.services.taxonomy_ffb_sqlite import reference_status as ffb_reference_status, validate_taxonomy_ffb
 
 router = APIRouter()
 LOCAL_JOBS: dict[str, dict[str, Any]] = {}
@@ -267,12 +268,16 @@ def _annotated_workbook(job: dict[str, Any]) -> BytesIO:
 
 @router.get("/status")
 def status() -> dict[str, Any]:
+    taxonomy = ffb_reference_status()
     return {
         "mode": "local-development",
-        "taxonomy": "fixture local de desenvolvimento; substitua por PostgreSQL com Flora e Funga importada no deploy",
-        "geography": "fixture local de desenvolvimento; substitua por PostGIS com malhas no deploy",
+        "taxonomy": taxonomy,
+        "geography": {
+            "mode": "fixture_local",
+            "status": "development_fixture",
+            "message": "Fixture geográfico local de desenvolvimento; será substituído pela base IBGE na próxima fase.",
+        },
     }
-
 
 @router.post("/upload")
 async def upload_spreadsheet(
@@ -301,7 +306,7 @@ async def upload_spreadsheet(
     for record in parsed.records:
         all_issues.extend(validate_basic_row(record))
         if validate_taxonomy:
-            all_issues.extend(_local_taxonomy(record))
+            all_issues.extend(validate_taxonomy_ffb(record))
         if validate_geography:
             all_issues.extend(_local_geography(record))
 
