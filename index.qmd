@@ -5251,7 +5251,7 @@ section#pesquisadores-responsaveis {
         </p>
 
         <p>
-          Essa trilha de salvaguardas explicita a origem dos dados e amostras, fortalece a rastreabilidade científica, previne usos indevidos e orienta as devolutivas, a comunicação pública e eventuais repartições de benefícios quando aplicáveis.
+          Essas salvaguardas explicitam a origem dos dados e amostras, fortalece a rastreabilidade científica, previne usos indevidos e orienta as devolutivas, a comunicação pública e eventuais repartições de benefícios quando aplicáveis.
         </p>
       </div>
 
