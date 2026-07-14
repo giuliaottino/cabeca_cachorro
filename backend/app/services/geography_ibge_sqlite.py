@@ -320,3 +320,299 @@ def validate_geography_ibge(record: dict[str, Any]) -> list[ValidationIssue]:
             ))
 
     return issues
+
+# TSIINO_COMPAT_GEOGRAPHY_ALIASES
+if "reference_status" not in globals():
+    def reference_status():
+        for name in ("ibge_reference_status", "geography_reference_status", "get_reference_status", "status"):
+            fn = globals().get(name)
+            if callable(fn):
+                return fn()
+        return {"mode": "ibge_sqlite", "status": "unknown"}
+
+if "validate_geography_ibge" not in globals():
+    def validate_geography_ibge(*args, **kwargs):
+        for name in ("validate_geography", "validate_row_geography", "validate_ibge_geography", "validate_location"):
+            fn = globals().get(name)
+            if callable(fn):
+                return fn(*args, **kwargs)
+        return []
+
+# TSIINO_GEOGRAPHY_MUNICIPALITY_SUGGESTION_V35
+# Sugere o município/UF onde a coordenada cai quando ela não coincide com o município informado.
+# Implementação conservadora: não substitui a validação IBGE existente;
+# apenas acrescenta uma mensagem orientativa quando há evidência espacial suficiente.
+try:
+    from functools import lru_cache as _tsiino_v35_lru_cache
+except Exception:  # pragma: no cover
+    _tsiino_v35_lru_cache = None
+
+
+def _tsiino_v35_clean(value):
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def _tsiino_v35_norm(value):
+    try:
+        return _norm(value)
+    except Exception:
+        import unicodedata
+        s = _tsiino_v35_clean(value).lower()
+        s = "".join(ch for ch in unicodedata.normalize("NFKD", s) if not unicodedata.combining(ch))
+        return " ".join(s.replace("-", " ").split())
+
+
+def _tsiino_v35_row_value(row, *keys):
+    if not isinstance(row, dict):
+        return None
+    norm_keys = {_tsiino_v35_norm(k): k for k in row.keys()}
+    for key in keys:
+        if key in row and row.get(key) not in (None, ""):
+            return row.get(key)
+        nk = _tsiino_v35_norm(key)
+        if nk in norm_keys and row.get(norm_keys[nk]) not in (None, ""):
+            return row.get(norm_keys[nk])
+    return None
+
+
+def _tsiino_v35_float(value):
+    try:
+        return _as_float(value)
+    except Exception:
+        pass
+    if value is None or value == "":
+        return None
+    try:
+        return float(str(value).replace(",", ".").strip())
+    except Exception:
+        return None
+
+
+def _tsiino_v35_lat_lon_from_row(row):
+    lat = _tsiino_v35_float(_tsiino_v35_row_value(row, "lat", "latitude", "Lat", "Latitude"))
+    lon = _tsiino_v35_float(_tsiino_v35_row_value(row, "long", "lon", "longitude", "Long", "Longitude"))
+    if lat is None or lon is None:
+        return None, None
+    ns = _tsiino_v35_norm(_tsiino_v35_row_value(row, "NS", "ns", "hemisferio latitude", "hemisphere_lat") or "")
+    ew = _tsiino_v35_norm(_tsiino_v35_row_value(row, "EW", "ew", "hemisferio longitude", "hemisphere_lon") or "")
+    if ns in {"s", "sul", "south"} and lat > 0:
+        lat = -lat
+    elif ns in {"n", "norte", "north"} and lat < 0:
+        lat = abs(lat)
+    if ew in {"w", "o", "oeste", "west"} and lon > 0:
+        lon = -lon
+    elif ew in {"e", "l", "este", "east"} and lon < 0:
+        lon = abs(lon)
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        return None, None
+    return lat, lon
+
+
+def _tsiino_v35_result_name(result, *keys):
+    if result is None:
+        return ""
+    if isinstance(result, (list, tuple)) and result and not isinstance(result, str):
+        if isinstance(result[0], dict):
+            result = result[0]
+    if isinstance(result, dict):
+        lower = {str(k).lower(): v for k, v in result.items()}
+        norm = {_tsiino_v35_norm(k): v for k, v in result.items()}
+        for key in keys:
+            if key in result and result.get(key):
+                return _tsiino_v35_clean(result.get(key))
+            lk = key.lower()
+            if lk in lower and lower[lk]:
+                return _tsiino_v35_clean(lower[lk])
+            nk = _tsiino_v35_norm(key)
+            if nk in norm and norm[nk]:
+                return _tsiino_v35_clean(norm[nk])
+    return ""
+
+
+def _tsiino_v35_normalize_containing_result(result):
+    if result is None:
+        return None
+    if isinstance(result, (list, tuple)) and result and isinstance(result[0], dict):
+        result = result[0]
+    municipality = _tsiino_v35_result_name(
+        result,
+        "municipality", "municipio", "minorarea", "name", "nome", "nome_municipio",
+        "nm_mun", "NM_MUN", "municipality_name", "mun_name",
+    )
+    state = _tsiino_v35_result_name(
+        result,
+        "state", "uf", "majorarea", "sigla_uf", "uf_sigla", "NM_UF", "nm_uf",
+        "state_name", "nome_uf", "uf_name",
+    )
+    if not municipality and isinstance(result, (list, tuple)):
+        vals = [_tsiino_v35_clean(v) for v in result if _tsiino_v35_clean(v)]
+        if len(vals) >= 2:
+            vals_sorted = sorted(vals[:2], key=len, reverse=True)
+            municipality = vals_sorted[0]
+            state = vals_sorted[1]
+    if municipality:
+        return {"municipality": municipality, "state": state}
+    return None
+
+
+def _tsiino_v35_try_find_containing(lat, lon):
+    fn = globals().get("_find_containing")
+    if not callable(fn):
+        return None
+    calls = [
+        (lat, lon),
+        (lon, lat),
+        ("municipality", lat, lon),
+        ("municipality", lon, lat),
+        ("municipalities", lat, lon),
+        ("municipalities", lon, lat),
+        ("municipio", lat, lon),
+        ("municipio", lon, lat),
+    ]
+    for args in calls:
+        try:
+            result = fn(*args)
+            normalized = _tsiino_v35_normalize_containing_result(result)
+            if normalized:
+                return normalized
+        except TypeError:
+            continue
+        except Exception:
+            continue
+    return None
+
+
+if _tsiino_v35_lru_cache:
+    @_tsiino_v35_lru_cache(maxsize=4096)
+    def _tsiino_v35_find_municipality_cached(lat_rounded, lon_rounded):
+        return _tsiino_v35_try_find_containing(float(lat_rounded), float(lon_rounded))
+else:
+    def _tsiino_v35_find_municipality_cached(lat_rounded, lon_rounded):
+        return _tsiino_v35_try_find_containing(float(lat_rounded), float(lon_rounded))
+
+
+def _tsiino_v35_find_municipality(lat, lon):
+    if lat is None or lon is None:
+        return None
+    return _tsiino_v35_find_municipality_cached(round(float(lat), 6), round(float(lon), 6))
+
+
+def _tsiino_v35_issue_text(item):
+    if isinstance(item, dict):
+        return _tsiino_v35_clean(item.get("message") or item.get("msg") or "")
+    return _tsiino_v35_clean(getattr(item, "message", "") or getattr(item, "msg", "") or "")
+
+
+def _tsiino_v35_issue_code(item):
+    if isinstance(item, dict):
+        return _tsiino_v35_clean(item.get("code") or "")
+    return _tsiino_v35_clean(getattr(item, "code", "") or "")
+
+
+def _tsiino_v35_make_issue(row_number, message):
+    code = "GEOGRAPHY_COORDINATE_MUNICIPALITY_SUGGESTION"
+    field = "minorarea"
+    fn = globals().get("issue")
+    if callable(fn):
+        attempts = (
+            lambda: fn(row_number=row_number, field=field, severity="warning", code=code, message=message),
+            lambda: fn(row_number=row_number, column=field, severity="warning", code=code, message=message),
+            lambda: fn(row_number, field, "warning", code, message),
+            lambda: fn(row_number, field, code, message, severity="warning"),
+            lambda: fn(row_number, field, message, severity="warning", code=code),
+        )
+        for attempt in attempts:
+            try:
+                return attempt()
+            except Exception:
+                pass
+    cls = globals().get("ValidationIssue")
+    if cls is not None:
+        payloads = (
+            dict(row_number=row_number, field=field, severity="warning", code=code, message=message),
+            dict(row=row_number, column=field, severity="warning", code=code, message=message),
+            dict(row_number=row_number, column=field, severity="warning", code=code, message=message),
+        )
+        for payload in payloads:
+            try:
+                return cls(**payload)
+            except Exception:
+                pass
+    return {"row_number": row_number, "field": field, "severity": "warning", "code": code, "message": message}
+
+
+def _tsiino_v35_dedupe_issues(items):
+    out = []
+    seen = set()
+    for item in items or []:
+        if isinstance(item, dict):
+            row = item.get("row_number") or item.get("row") or item.get("linha")
+            field = item.get("field") or item.get("column") or ""
+        else:
+            row = getattr(item, "row_number", None) or getattr(item, "row", None) or getattr(item, "linha", None)
+            field = getattr(item, "field", "") or getattr(item, "column", "") or ""
+        key = (row, field, _tsiino_v35_issue_code(item), _tsiino_v35_issue_text(item))
+        if key not in seen:
+            seen.add(key)
+            out.append(item)
+    return out
+
+
+_tsiino_v35_original_validate_geography_ibge = validate_geography_ibge
+
+
+def validate_geography_ibge(*args, **kwargs):
+    issues = list(_tsiino_v35_original_validate_geography_ibge(*args, **kwargs) or [])
+    row = None
+    for arg in args:
+        if isinstance(arg, dict):
+            row = arg
+            break
+    if row is None:
+        row = kwargs.get("row") or kwargs.get("record") or kwargs.get("data")
+    if not isinstance(row, dict):
+        return _tsiino_v35_dedupe_issues(issues)
+
+    row_number = kwargs.get("row_number") or kwargs.get("row") or row.get("_ROW_NUMBER") or row.get("row_number") or row.get("linha")
+    lat, lon = _tsiino_v35_lat_lon_from_row(row)
+    if lat is None or lon is None:
+        return _tsiino_v35_dedupe_issues(issues)
+
+    informed_mun = _tsiino_v35_clean(_tsiino_v35_row_value(row, "minorarea", "municipio", "município", "municipality"))
+    informed_state = _tsiino_v35_clean(_tsiino_v35_row_value(row, "majorarea", "estado", "uf", "state"))
+    if not informed_mun:
+        return _tsiino_v35_dedupe_issues(issues)
+
+    found = _tsiino_v35_find_municipality(lat, lon)
+    if not found or not found.get("municipality"):
+        return _tsiino_v35_dedupe_issues(issues)
+
+    suggested_mun = _tsiino_v35_clean(found.get("municipality"))
+    suggested_state = _tsiino_v35_clean(found.get("state"))
+    same_mun = _tsiino_v35_norm(informed_mun) == _tsiino_v35_norm(suggested_mun)
+    same_state = (not informed_state or not suggested_state or _tsiino_v35_norm(informed_state) == _tsiino_v35_norm(suggested_state))
+    if same_mun and same_state:
+        return _tsiino_v35_dedupe_issues(issues)
+
+    previous_text = "\n".join(_tsiino_v35_issue_text(i).lower() for i in issues)
+    has_geo_mismatch = any(token in previous_text for token in ("município", "municipio", "coordenada", "fora", "localidade"))
+    if not has_geo_mismatch and same_state:
+        return _tsiino_v35_dedupe_issues(issues)
+
+    if suggested_state:
+        msg = (
+            f"A coordenada informada cai em {suggested_mun} ({suggested_state}), "
+            f"não em {informed_mun}" + (f" ({informed_state})" if informed_state else "") + ". "
+            "Confira município/UF ou latitude/longitude."
+        )
+    else:
+        msg = (
+            f"A coordenada informada cai em {suggested_mun}, não em {informed_mun}. "
+            "Confira município/UF ou latitude/longitude."
+        )
+    if not any("coordenada informada cai em" in _tsiino_v35_issue_text(i).lower() for i in issues):
+        issues.append(_tsiino_v35_make_issue(row_number, msg))
+    return _tsiino_v35_dedupe_issues(issues)
+

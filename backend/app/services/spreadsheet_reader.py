@@ -167,3 +167,42 @@ def parse_xlsx(path: Path, sheet_name: str | None = None) -> ParsedSpreadsheet:
         records.append(canonical)
 
     return ParsedSpreadsheet(header=header, records=records)
+
+# TSIINO_SPREADSHEET_READER_DETECTOR_V34
+def _detect_header_from_rows(rows, max_scan_rows: int = 20):
+    try:
+        from app.services.schema_detector import _tsiino_detect_header_from_values_v34
+        return _tsiino_detect_header_from_values_v34(rows, max_scan_rows=max_scan_rows)
+    except Exception:
+        best = None
+        best_score = -1
+        for row_idx, row in enumerate(rows[:max_scan_rows], start=1):
+            raw_headers = [clean_cell(v) or '' for v in row]
+            mapped = {}
+            unknown = []
+            for raw in raw_headers:
+                if not raw:
+                    continue
+                canonical = _map_header(raw)
+                if canonical:
+                    mapped.setdefault(raw, canonical)
+                else:
+                    unknown.append(raw)
+            score = len(set(mapped.values()) & set(REQUIRED_MINIMUM)) + len(set(mapped.values()) & set(CANONICAL_COLUMNS))
+            if score > best_score:
+                missing = [col for col in REQUIRED_MINIMUM if col not in set(mapped.values())]
+                best = HeaderDetection(row_idx, mapped, raw_headers, missing, unknown)
+                best_score = score
+        if best is None or best_score < 3:
+            raise ValueError('Não foi possível detectar a linha de cabeçalho da planilha.')
+        return best
+
+# TSIINO_STANDARD_READER_DETECTOR_V36
+def _detect_header_from_rows(rows, max_scan_rows: int = 25):
+    try:
+        from app.services.schema_detector import _tsiino_v36_detect_header_from_values
+        return _tsiino_v36_detect_header_from_values(rows, max_scan_rows=max_scan_rows)
+    except Exception as exc:
+        # Propaga a falha para o fluxo de mapeamento, sem aceitar cabeçalhos descritivos como padrão.
+        raise ValueError(str(exc))
+

@@ -19,6 +19,7 @@ from app.services.rule_engine import issue, validate_basic_row, validate_structu
 from app.services.spreadsheet_reader import parse_xlsx
 from app.services.geography_ibge_sqlite import reference_status as ibge_reference_status, validate_geography_ibge
 from app.services.taxonomy_ffb_sqlite import reference_status as ffb_reference_status, validate_taxonomy_ffb
+from app.services.issue_postprocess import postprocess_issues
 
 router = APIRouter()
 LOCAL_JOBS: dict[str, dict[str, Any]] = {}
@@ -307,11 +308,6 @@ async def upload_spreadsheet(
         if validate_geography:
             all_issues.extend(validate_geography_ibge(record))
 
-    if validate_taxonomy:
-        all_issues.append(issue(None, None, "info", "TAXONOMY_LOCAL_FIXTURE", "Modo local: validação taxonômica demonstrativa com fixture pequeno. No deploy, usar Flora e Funga do Brasil importada em PostgreSQL.", source="Tsiino local mode"))
-    if validate_geography:
-        all_issues.append(issue(None, None, "info", "GEOGRAPHY_LOCAL_FIXTURE", "Modo local: validação geográfica demonstrativa com caixas aproximadas. No deploy, usar PostGIS com malhas oficiais.", source="Tsiino local mode"))
-
     issue_dicts = [_issue_to_dict(item) for item in all_issues]
     error_count = sum(1 for item in issue_dicts if item.get("severity") == "error")
     warning_count = sum(1 for item in issue_dicts if item.get("severity") == "warning")
@@ -353,7 +349,7 @@ def get_issues(job_id: str) -> list[dict[str, Any]]:
     job = LOCAL_JOBS.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado.")
-    return job["issues"]
+    return postprocess_issues(job.get('issues', []), job.get('table', []))
 
 
 @router.get("/jobs/{job_id}/table")

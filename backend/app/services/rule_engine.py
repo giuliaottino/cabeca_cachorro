@@ -109,3 +109,71 @@ def validate_basic_row(record: dict[str, Any]) -> list[ValidationIssue]:
     issues.extend(validate_date(record))
     issues.extend(validate_coordinates(record))
     return issues
+
+# TSIINO_RULE_ENGINE_DEDUPE_V25
+# Dedupe de mensagens repetidas por campo/linha e supressao de alertas taxonomicos amplos
+# para identificacao vazia. Nao altera validacao geografica real.
+def _tsiino_re_norm_v25(value):
+    import re as _re
+    import unicodedata as _unicodedata
+    if value is None:
+        return ""
+    s = str(value).strip()
+    s = _unicodedata.normalize("NFKD", s)
+    s = "".join(ch for ch in s if not _unicodedata.combining(ch))
+    s = _re.sub(r"\s+", " ", s).strip().lower()
+    return s
+
+
+def _tsiino_re_issue_text_v25(obj):
+    bits = []
+    for name in ("message", "detail", "description", "code", "field", "column"):
+        try:
+            value = getattr(obj, name, None)
+        except Exception:
+            value = None
+        if value:
+            bits.append(str(value))
+    if isinstance(obj, dict):
+        for name in ("message", "detail", "description", "code", "field", "column"):
+            value = obj.get(name)
+            if value:
+                bits.append(str(value))
+    return " | ".join(bits)
+
+
+def _tsiino_re_issue_field_v25(obj):
+    for name in ("field", "column"):
+        try:
+            value = getattr(obj, name, None)
+        except Exception:
+            value = None
+        if value:
+            return str(value)
+    if isinstance(obj, dict):
+        return str(obj.get("field") or obj.get("column") or "")
+    return ""
+
+
+def _tsiino_re_dedupe_v25(items):
+    out = []
+    seen = set()
+    for item in items or []:
+        text = _tsiino_re_norm_v25(_tsiino_re_issue_text_v25(item))
+        field = _tsiino_re_norm_v25(_tsiino_re_issue_field_v25(item))
+        # Evita repetir "Longitude é obrigatória" 4-5 vezes na mesma celula.
+        key = (field, text)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(item)
+    return out
+
+for _tsiino_name_v25 in ("validate_basic_row", "validate_structure", "validate_required_fields", "validate_coordinates"):
+    if _tsiino_name_v25 in globals():
+        _tsiino_original = globals()[_tsiino_name_v25]
+        def _tsiino_make_wrapper_v25(fn):
+            def _wrapper(*args, **kwargs):
+                return _tsiino_re_dedupe_v25(fn(*args, **kwargs))
+            return _wrapper
+        globals()[_tsiino_name_v25] = _tsiino_make_wrapper_v25(_tsiino_original)
