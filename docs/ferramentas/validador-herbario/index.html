@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Validador de planilha de herbÃ¡rio â€“ Tsiino Hiiwiida</title>
+<title>Validador de planilha de herbário – Tsiino Hiiwiida</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -91,7 +91,7 @@ ul.task-list li input[type="checkbox"] {
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../expedicoes/index.html"> 
-<span class="menu-text">ExpediÃ§Ãµes</span></a>
+<span class="menu-text">Expedições</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../acesso/index.html"> 
@@ -104,7 +104,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="dropdown-menu" aria-labelledby="nav-menu-ferramentas">    
         <li>
     <a class="dropdown-item" href="../../ferramentas/validador-herbario/index.html">
- <span class="dropdown-text">Validador de planilha de herbÃ¡rio</span></a>
+ <span class="dropdown-text">Validador de planilha de herbário</span></a>
   </li>  
     </ul>
   </li>
@@ -132,8 +132,8 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Validador de planilha de herbÃ¡rio</h1>
-<p class="subtitle lead">ValidaÃ§Ã£o, conversÃ£o e anotaÃ§Ã£o de planilhas de herbÃ¡rio</p>
+<h1 class="title">Validador de planilha de herbário</h1>
+<p class="subtitle lead">Validação, conversão e anotação de planilhas de herbário</p>
 </div>
 
 
@@ -152,7 +152,7 @@ ul.task-list li input[type="checkbox"] {
 
 <style>
 /* TSIINO_INDEX_LEFT_CARD_V15
-   Ajusta hero e transforma a explicaÃ§Ã£o do validador em card minimalista. */
+   Ajusta hero e transforma a explicação do validador em card minimalista. */
 html body .hv-site-hero,
 html body .hv-hero,
 html body .validator-hero {
@@ -468,7 +468,7 @@ body .hv-hero-text{
 </style>
 
 <style>
-/* Skin visual do validador alinhada Ã  estÃ©tica principal do site Tsiino. */
+/* Skin visual do validador alinhada à estética principal do site Tsiino. */
 :root{
   --tsiino-ink:#2E3B24;
   --tsiino-moss:#626A38;
@@ -750,14 +750,14 @@ body{ background: var(--tsiino-cream); }
 </style>
 
 <div class="hv-modern-page">
-  <section class="hv-site-hero" aria-label="Abertura do validador de planilha de herbÃ¡rio">
+  <section class="hv-site-hero" aria-label="Abertura do validador de planilha de herbário">
     <div class="hv-site-hero-inner">
 <h1 class="hv-site-title">
         <span>Validador de</span>
-        <span>planilha de herbÃ¡rio</span>
+        <span>planilha de herbário</span>
       </h1>
       <p class="hv-site-deck">
-        Valide planilhas de herbÃ¡rio, confira nomes botÃ¢nicos e coordenadas e converta arquivos fora do padrÃ£o para o formato INPA/BRAHMS.
+        Valide planilhas de herbário, confira nomes botânicos e coordenadas e converta arquivos fora do padrão para o formato INPA/BRAHMS.
       </p>
 </div>
   </section>
@@ -765,9 +765,9 @@ body{ background: var(--tsiino-cream); }
   <main class="hv-modern-main" id="hv-page">
     <section class="hv-clean-overview tsiino-validator-intro-card" aria-label="Como funciona o validador">
   <div class="tsiino-validator-intro-card__content">
-    <h2 class="anchored">ValidaÃ§Ã£o de planilha de coleta</h2>
-    <p>O validador confere planilhas de herbÃ¡rio no padrÃ£o INPA/BRAHMS, verifica nomes botÃ¢nicos com a Flora e Funga do Brasil e cruza coordenadas, UF e municÃ­pio com a base do IBGE.</p>
-    <p>Quando o arquivo nÃ£o estÃ¡ no padrÃ£o, o sistema abre um mapeamento de colunas para confirmar as correspondÃªncias antes da validaÃ§Ã£o e do download da planilha convertida ou anotada.</p>
+    <h2 class="anchored">Validação de planilha de coleta</h2>
+    <p>O validador confere planilhas de herbário no padrão INPA/BRAHMS, verifica nomes botânicos com a Flora e Funga do Brasil e cruza coordenadas, UF e município com a base do IBGE.</p>
+    <p>Quando o arquivo não está no padrão, o sistema abre um mapeamento de colunas para confirmar as correspondências antes da validação e do download da planilha convertida ou anotada.</p>
   </div>
 </section>
 
@@ -781,17 +781,17 @@ body{ background: var(--tsiino-cream); }
       <form id="herb-validator-form" class="hv-form">
         <div class="hv-form-grid">
           <label>
-            <span>ColeÃ§Ã£o botÃ¢nica</span>
+            <span>Coleção botânica</span>
             <select id="collection" name="collection">
-              <option value="INPA">INPA â€” HerbÃ¡rio INPA</option>
-              <option value="RB">RB â€” Exsicata</option>
+              <option value="INPA">INPA — Herbário INPA</option>
+              <option value="RB">RB — Exsicata</option>
               <option value="CUSTOM">Outro / customizado</option>
             </select>
           </label>
 
           <label>
             <span>Aba da planilha, opcional</span>
-            <input type="text" id="sheet-name" name="sheet_name" placeholder="Ex.: EspÃ©cimes">
+            <input type="text" id="sheet-name" name="sheet_name" placeholder="Ex.: Espécimes">
           </label>
         </div>
 
@@ -815,18 +815,18 @@ body{ background: var(--tsiino-cream); }
       </form>
     </section>
 
-    <section id="validator-results" class="hv-results" hidden="" aria-label="Resultado da validaÃ§Ã£o">
+    <section id="validator-results" class="hv-results" hidden="" aria-label="Resultado da validação">
       <div class="hv-section-title hv-result-title">
         <span></span>
-        <h2 class="anchored">Resultado da validaÃ§Ã£o</h2>
+        <h2 class="anchored">Resultado da validação</h2>
       </div>
 
       <div class="hv-summary" id="validator-summary"></div>
 
       <div class="hv-toolbar" aria-label="Filtros da planilha anotada">
         <button type="button" class="hv-filter is-active" data-filter="all">Todos</button>
-        <button type="button" class="hv-filter" data-filter="error">SÃ³ erros</button>
-        <button type="button" class="hv-filter" data-filter="warning">SÃ³ alertas</button>
+        <button type="button" class="hv-filter" data-filter="error">Só erros</button>
+        <button type="button" class="hv-filter" data-filter="warning">Só alertas</button>
         <button type="button" class="hv-filter" data-filter="clear">Sem problemas</button>
       </div>
 
@@ -834,7 +834,7 @@ body{ background: var(--tsiino-cream); }
         <div class="hv-map-heading">
           <div>
             <strong>Mapa de coleta</strong>
-            <span>VisualizaÃ§Ã£o simples dos pontos enviados na planilha. Pontos com erro aparecem destacados.</span>
+            <span>Visualização simples dos pontos enviados na planilha. Pontos com erro aparecem destacados.</span>
           </div>
           <button type="button" class="hv-map-close" id="map-close">Fechar mapa</button>
         </div>
@@ -843,7 +843,7 @@ body{ background: var(--tsiino-cream); }
 
       <div class="hv-sheet-caption">
         <strong>Planilha anotada</strong>
-        <span>As mensagens aparecem dentro da cÃ©lula onde o problema foi detectado.</span>
+        <span>As mensagens aparecem dentro da célula onde o problema foi detectado.</span>
       </div>
 
       <div class="hv-sheet-wrap" aria-label="Planilha anotada">
@@ -860,6 +860,7 @@ body{ background: var(--tsiino-cream); }
   </main>
 </div>
 <!-- TSIINO_VALIDATOR_SCRIPTS -->
+
 <style>
 /* TSIINO_VALIDATOR_INDEX_REWRITE_V14_INLINE */
 .hv-site-hero-inner, .hv-hero-inner, .validator-hero-inner { text-align: left !important; margin-left: clamp(30px, 6vw, 96px) !important; margin-right: auto !important; width: min(620px, 44vw) !important; max-width: 620px !important; transform: none !important; left: auto !important; right: auto !important; }
@@ -887,7 +888,7 @@ body{ background: var(--tsiino-cream); }
 
 
 </main> <!-- /main -->
-<footer class="tsiino-site-footer" aria-label="RodapÃ© do site Tsiino Hiiwiida">
+<footer class="tsiino-site-footer" aria-label="Rodapé do site Tsiino Hiiwiida">
 
   <div class="tsiino-footer-inner">
 
@@ -895,7 +896,7 @@ body{ background: var(--tsiino-cream); }
 
     <div class="tsiino-footer-logos">
 
-      <a class="tsiino-footer-home" href="index.html" aria-label="PÃ¡gina inicial do Tsiino Hiiwiida">
+      <a class="tsiino-footer-home" href="index.html" aria-label="Página inicial do Tsiino Hiiwiida">
 
         <img class="tsiino-footer-logo tsiino-footer-logo-project" data-src="figures/tsiino_hex_sticker.png" alt="Tsiino Hiiwiida">
 
@@ -903,9 +904,9 @@ body{ background: var(--tsiino-cream); }
 
 
 
-      <a href="https://www.amazoniamaisdez.org.br/" target="_blank" rel="noopener" aria-label="Iniciativa AmazÃ´nia+10">
+      <a href="https://www.amazoniamaisdez.org.br/" target="_blank" rel="noopener" aria-label="Iniciativa Amazônia+10">
 
-        <img class="tsiino-footer-logo tsiino-footer-logo-amazonia" data-src="figures/amazoniamais10.png" alt="Iniciativa AmazÃ´nia+10">
+        <img class="tsiino-footer-logo tsiino-footer-logo-amazonia" data-src="figures/amazoniamais10.png" alt="Iniciativa Amazônia+10">
 
       </a>
 
@@ -1125,7 +1126,7 @@ body{ background: var(--tsiino-cream); }
 
 </script>
 <!-- Tsiino Hiiwiida language runtime loader.
-     MantÃ©m caminhos funcionando em pÃ¡ginas na raiz e em subpastas do Quarto. -->
+     Mantém caminhos funcionando em páginas na raiz e em subpastas do Quarto. -->
 <script>
 (function () {
   "use strict";
@@ -1154,7 +1155,7 @@ body{ background: var(--tsiino-cream); }
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
-    const icon = "î§‹";
+    const icon = "";
     const anchorJS = new window.AnchorJS();
     anchorJS.options = {
       placement: 'right',
@@ -1558,5 +1559,3 @@ body{ background: var(--tsiino-cream); }
 
 
 </body></html>
-
-
