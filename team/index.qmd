@@ -120,13 +120,39 @@ get_value <- function(row, possible_names, default = "") {
   default
 }
 
-make_photo_filename <- function(member_name) {
-  x <- tolower(member_name)
+normalize_photo_stem <- function(x) {
+  x <- basename(as.character(x))
+  x <- tools::file_path_sans_ext(x)
   x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- tolower(x)
   x <- gsub("[^a-z0-9]+", "_", x)
   x <- gsub("_+", "_", x)
   x <- gsub("^_|_$", "", x)
-  paste0(x, ".jpg")
+  x
+}
+
+find_photo_filename <- function(member_name, photo_dir) {
+
+  files <- list.files(
+    photo_dir,
+    pattern = "\\.(jpg|jpeg|png)$",
+    ignore.case = TRUE
+  )
+
+  if (length(files) == 0) {
+    return(NA_character_)
+  }
+
+  member_key <- normalize_photo_stem(member_name)
+  file_keys <- normalize_photo_stem(files)
+
+  hit <- files[file_keys == member_key]
+
+  if (length(hit) == 0) {
+    return(NA_character_)
+  }
+
+  hit[1]
 }
 
 team_path <- find_up(file.path("_input_data", "tsiino_hiiwiida_team.xlsx"))
@@ -156,9 +182,16 @@ team_data <- team_data |>
     member_key = normalize_name(Member),
     member_slug = slugify(Member),
     first_letter = toupper(substr(normalize_name(Member), 1, 1)),
-    photo_file = make_photo_filename(Member),
+    
+    photo_file = vapply(
+      Member,
+      find_photo_filename,
+      character(1),
+      photo_dir = photo_dir_abs
+    ),
+    
     photo_path = ifelse(
-      file.exists(file.path(photo_dir_abs, photo_file)),
+      !is.na(photo_file),
       file.path(photo_dir_html, photo_file),
       file.path(photo_dir_html, default_file)
     ) |>
