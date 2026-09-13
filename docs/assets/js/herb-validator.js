@@ -580,8 +580,7 @@ configureMap(currentJobId);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const form = $('herb-validator-form');
-    if (form) form.addEventListener('submit', validateSpreadsheet);
+
     setupFilters();
     const mapButton = $('map-button');
     if (mapButton) mapButton.addEventListener('click', openMap);

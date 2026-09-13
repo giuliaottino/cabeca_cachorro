@@ -142,6 +142,7 @@ async function openMapper(file) {
 
   await open.call(mapper, file);
 }
+
 async function handleSubmit(event) {
   const form = event.target;
 
@@ -179,10 +180,6 @@ async function handleSubmit(event) {
   }
 
   try {
-    /*
-     * CUSTOM:
-     * qualquer planilha deve ir diretamente para o mapper.
-     */
     if (collection === 'CUSTOM') {
       setStatus(
         'Leia as colunas da planilha e confirme o mapeamento para o padrão INPA/BRAHMS.',
@@ -190,14 +187,9 @@ async function handleSubmit(event) {
       );
 
       await openMapper(file);
-
       return false;
     }
 
-    /*
-     * INPA:
-     * primeiro verifica se realmente é uma planilha padrão.
-     */
     setStatus(
       'Verificando estrutura da planilha...',
       'info'
@@ -208,10 +200,6 @@ async function handleSubmit(event) {
       buildFormData(file)
     );
 
-    /*
-     * Não é padrão:
-     * abre mapper.
-     */
     if (!standard || !standard.detected_standard) {
       setStatus(
         'Planilha fora do padrão INPA/BRAHMS. Confira o mapeamento das colunas.',
@@ -219,14 +207,9 @@ async function handleSubmit(event) {
       );
 
       await openMapper(file);
-
       return false;
     }
 
-    /*
-     * É padrão:
-     * valida diretamente.
-     */
     setStatus(
       'Planilha padrão INPA/BRAHMS reconhecida. Validando...',
       'info'

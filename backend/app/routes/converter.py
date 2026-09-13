@@ -10,6 +10,7 @@ from app.services.spreadsheet_converter import (
     build_template_workbook,
     convert_spreadsheet,
     preview_spreadsheet,
+    select_sheet,
 )
 
 router = APIRouter(prefix='/converter', tags=['converter'])
@@ -606,7 +607,7 @@ async def tsiino_convert_tolerant_v24(request: _TsiinoRequest, file: _TsiinoUplo
             raise _TsiinoHTTPException(status_code=400, detail='Arquivo vazio.')
         wb = _tsiino_load_workbook(_TsiinoBytesIO(content), data_only=True)
         sheet_name = form.get('sheet') or form.get('sheet_name') or None
-        ws = wb[sheet_name] if sheet_name and sheet_name in wb.sheetnames else wb[wb.sheetnames[0]]
+        ws = select_sheet(wb, sheet_name)
         header_row = _tsiino_detect_header_row_v24(ws)
         headers, source_rows = _tsiino_build_source_tables_v24(ws, header_row)
         submitted_mapping = _tsiino_parse_mapping_v24(form)
