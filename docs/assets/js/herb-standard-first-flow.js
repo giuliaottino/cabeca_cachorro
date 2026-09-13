@@ -267,7 +267,7 @@ async function handleSubmit(event) {
   }
 
   return false;
-}y
+}
 
   document.addEventListener('submit', handleSubmit, true);
   document.addEventListener('DOMContentLoaded', moveDownloadButton);
