@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
 const LOCAL_API = 'http://127.0.0.1:8000/api/validator';
 const PROD_API = 'https://api.tsiinohiiwiida.net/api/validator';
 
@@ -537,9 +537,13 @@ const API_BASE = isLocal ? LOCAL_API : PROD_API;
       document.querySelectorAll('.hv-filter').forEach((b) => b.classList.toggle('is-active', b.dataset.filter === 'all'));
       renderResults(summary);
       configureDownload(currentJobId);
-      const annotatedLink = $('download-annotated');
-      if (annotatedLink) annotatedLink.textContent = options.converted ? 'Baixar planilha convertida e anotada' : 'Baixar planilha anotada';
-      configureMap(currentJobId);
+const annotatedLink = $('download-annotated');
+
+if (annotatedLink) {
+  annotatedLink.textContent = 'Baixar planilha anotada';
+}
+
+configureMap(currentJobId);
       setStatus('ValidaÃƒÂ§ÃƒÂ£o concluÃƒÂ­da. Corrija as cÃƒÂ©lulas destacadas ou baixe a cÃƒÂ³pia .xlsx anotada.', 'ok');
     } catch (error) {
       const mappingFile = document.getElementById('spreadsheet-file')?.files?.[0];
@@ -585,64 +589,63 @@ const API_BASE = isLocal ? LOCAL_API : PROD_API;
     if (mapClose) mapClose.addEventListener('click', () => { const panel = $('validator-map-panel'); if (panel) panel.hidden = true; });
   });
 
-  window.TsiinoValidatorBridge = {
-    apiBase: API_BASE,
-    setStatus,
-    setBusy,
-    async applyJob(jobId, options = {}) {
-      currentJobId = jobId;
-      const [summaryResponse, issuesResponse, tableResponse] = await Promise.all([
-        safeFetch(`${API_BASE}/jobs/${currentJobId}`),
-        safeFetch(`${API_BASE}/jobs/${currentJobId}/issues`),
-        safeFetch(`${API_BASE}/jobs/${currentJobId}/table`)
-      ]);
-      const summary = await summaryResponse.json();
-      issues = (await issuesResponse.json()).filter((item) => !["TAXONOMY_LOCAL_FIXTURE", "GEOGRAPHY_LOCAL_FIXTURE"].includes(item.code));
-      records = await tableResponse.json();
-      currentGeojson = null;
-      
-      const download = $('download-annotated');
-      if (download) {
-        download.href = `${API_BASE}/jobs/${currentJobId}/download.xlsx`;
-        download.classList.remove('is-disabled');
-        download.setAttribute('aria-disabled', 'false');
-        download.textContent = options.converted ? 'Baixar planilha convertida e anotada' : 'Baixar planilha anotada';
-      }
-      const mapButton = $('map-button');
-      if (mapButton) {
-        mapButton.classList.remove('is-disabled');
-        mapButton.setAttribute('aria-disabled', 'false');
-      }
-      setStatus(options.statusMessage || 'ValidaÃ§Ã£o concluÃ­da. Corrija as cÃ©lulas destacadas ou baixe a cÃ³pia .xlsx anotada.', 'ok');
-      return summary;
-    },
-    async validateFile(file, options = {}) {
-      if (!file) throw new Error('Nenhum arquivo informado para validaÃ§Ã£o.');
-      setBusy(true);
-      setStatus(options.loadingMessage || 'Validando planilha convertida...', 'loading');
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        const collection = $('collection')?.value || 'INPA';
-        const sheetName = options.sheetName ?? ($('sheet-name')?.value || '');
-        formData.append('collection', collection);
-        if (sheetName) formData.append('sheet_name', sheetName);
-        formData.append('validate_taxonomy', $('validate-taxonomy')?.checked ? 'true' : 'false');
-        formData.append('validate_geography', $('validate-geography')?.checked ? 'true' : 'false');
-        const uploadResponse = await safeFetch(`${API_BASE}/jobs`, { method: 'POST', body: formData });
-        const upload = await uploadResponse.json();
-        const jobId = upload.job_id || upload.id || upload.jobId;
-        if (!jobId) throw new Error('A API nÃ£o retornou job_id.');
-        return await this.applyJob(jobId, options);
-      } finally {
-        setBusy(false);
-      }
+window.TsiinoValidatorBridge = {
+  apiBase: API_BASE,
+  setStatus,
+  setBusy,
+
+  async applyJob(jobId, options = {}) {
+    currentJobId = jobId;
+
+    const [summaryResponse, issuesResponse, tableResponse] = await Promise.all([
+      safeFetch(`${API_BASE}/jobs/${currentJobId}`),
+      safeFetch(`${API_BASE}/jobs/${currentJobId}/issues`),
+      safeFetch(`${API_BASE}/jobs/${currentJobId}/table`)
+    ]);
+
+    const summary = await summaryResponse.json();
+
+    issues = (await issuesResponse.json()).filter(
+      (item) =>
+        ![
+          "TAXONOMY_LOCAL_FIXTURE",
+          "GEOGRAPHY_LOCAL_FIXTURE"
+        ].includes(item.code)
+    );
+
+    records = await tableResponse.json();
+
+    currentGeojson = null;
+    currentFilter = 'all';
+
+    document.querySelectorAll('.hv-filter').forEach((button) => {
+      button.classList.toggle(
+        'is-active',
+        button.dataset.filter === 'all'
+      );
+    });
+
+    // Renderiza e exibe efetivamente o resultado da validação.
+    renderResults(summary);
+
+    configureDownload(currentJobId);
+    configureMap(currentJobId);
+
+    const download = $('download-annotated');
+    if (download) {
+      download.textContent = options.converted
+        ? 'Baixar planilha convertida e anotada'
+        : 'Baixar planilha anotada';
     }
-  };
+
+    setStatus(
+      options.statusMessage ||
+        'Validação concluída. Corrija as células destacadas ou baixe a cópia .xlsx anotada.',
+      'ok'
+    );
+
+    return summary;
+  }
+};
 
 })();
-
-
-
-
-

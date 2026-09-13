@@ -35,6 +35,7 @@ def validate_structure(records: list[dict[str, Any]], missing_minimum: list[str]
 
 def validate_required_fields(record: dict[str, Any]) -> list[ValidationIssue]:
     row = record['_row_number']
+
     required = {
         'collector': 'Coletor é obrigatório.',
         'number': 'Número de coleta é obrigatório.',
@@ -46,15 +47,47 @@ def validate_required_fields(record: dict[str, Any]) -> list[ValidationIssue]:
         'minorarea': 'Município/área menor é obrigatório.',
         'lat': 'Latitude é obrigatória.',
         'long': 'Longitude é obrigatória.',
-        'plantdesc': 'Descrição da planta é obrigatória.',
     }
+
     issues: list[ValidationIssue] = []
+
     for col, message in required.items():
         if _is_blank(record.get(col)):
-            issues.append(issue(row, col, 'error', f'{col.upper()}_REQUIRED', message, record.get(col)))
+            issues.append(
+                issue(
+                    row,
+                    col,
+                    'error',
+                    f'{col.upper()}_REQUIRED',
+                    message,
+                    record.get(col),
+                )
+            )
+
+    # plantdesc é recomendado, mas não obrigatório.
+    if _is_blank(record.get('plantdesc')):
+        issues.append(
+            issue(
+                row,
+                'plantdesc',
+                'warning',
+                'PLANTDESC_EMPTY',
+                'Descrição da planta está vazia; recomenda-se preencher este campo.',
+                record.get('plantdesc'),
+            )
+        )
 
     if _is_blank(record.get('genus')) and _is_blank(record.get('family')):
-        issues.append(issue(row, 'genus', 'warning', 'TAXON_EMPTY', 'Família e gênero estão vazios; a determinação ficará incompleta.'))
+        issues.append(
+            issue(
+                row,
+                'genus',
+                'warning',
+                'TAXON_EMPTY',
+                'Família e gênero estão vazios; a determinação ficará incompleta.',
+            )
+        )
+
     return issues
 
 

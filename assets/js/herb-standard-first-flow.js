@@ -75,83 +75,199 @@
       filters.appendChild(btn);
     }
   }
-  async function renderJob(job) {
-    const jobId = job && (job.job_id || job.id || job.jobId || (job.job && (job.job.job_id || job.job.id)));
-    if (!jobId) throw new Error('A API validou, mas não retornou job_id.');
-    hideMapper();
-    if (typeof window.TsiinoRenderResultFromJobResponse === 'function') {
-      await window.TsiinoRenderResultFromJobResponse({ job_id: jobId, id: jobId });
-    } else if (window.TsiinoValidatorBridge && typeof window.TsiinoValidatorBridge.applyJob === 'function') {
-      await window.TsiinoValidatorBridge.applyJob(jobId);
-    } else {
-      const results = $('validator-results');
-      if (results) results.hidden = false;
-    }
-    hideMapper();
-    moveDownloadButton();
-    const results = $('validator-results') || document.querySelector('#resultado-da-validacao') || document.querySelector('.hv-results');
-    if (results && typeof results.scrollIntoView === 'function') {
-      results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-  async function openMapper(file) {
-    const fd = buildFormData(file);
-    const preview = await postJson(API_BASE + '/converter/preview', fd);
-    const mapper = window.TsiinoConverterIntegration || window.TsiinoConverter;
-    const open = mapper && (mapper.open || mapper.openAfterValidationFailure || mapper.showFromFile || mapper.openFromPreview || mapper.openMapper);
-    if (typeof open !== 'function') throw new Error('O mapeador de colunas não carregou.');
-    await open.call(mapper, preview, file);
-  }
-  async function handleSubmit(event) {
-    const form = event.target;
-    if (!form || form.id !== 'herb-validator-form') return;
-    event.preventDefault();
-    event.stopPropagation();
-    if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+async function renderJob(job) {
+  const jobId =
+    job &&
+    (
+      job.job_id ||
+      job.id ||
+      job.jobId ||
+      (job.job && (job.job.job_id || job.job.id))
+    );
 
-    const file = selectedFile();
-    if (!file) {
-      setStatus('Selecione uma planilha .xlsx ou .xlsm.', 'error');
+  if (!jobId) {
+    throw new Error('A API validou, mas não retornou job_id.');
+  }
+
+  console.log('[Tsiino] Renderizando job:', jobId);
+
+  hideMapper();
+
+  if (
+    !window.TsiinoValidatorBridge ||
+    typeof window.TsiinoValidatorBridge.applyJob !== 'function'
+  ) {
+    throw new Error(
+      'TsiinoValidatorBridge.applyJob não está disponível.'
+    );
+  }
+
+  await window.TsiinoValidatorBridge.applyJob(jobId);
+
+  hideMapper();
+  moveDownloadButton();
+
+  const results =
+    $('validator-results') ||
+    document.querySelector('#resultado-da-validacao') ||
+    document.querySelector('.hv-results');
+
+  if (results) {
+    results.hidden = false;
+    results.removeAttribute('hidden');
+
+    if (typeof results.scrollIntoView === 'function') {
+      results.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }
+}
+async function openMapper(file) {
+  const mapper =
+    window.TsiinoConverterIntegration ||
+    window.TsiinoConverter;
+
+  const open = mapper && (
+    mapper.open ||
+    mapper.showFromFile ||
+    mapper.openAfterValidationFailure ||
+    mapper.openMapper
+  );
+
+  if (typeof open !== 'function') {
+    throw new Error('O mapeador de colunas não carregou.');
+  }
+
+  await open.call(mapper, file);
+}
+async function handleSubmit(event) {
+  const form = event.target;
+
+  if (!form || form.id !== 'herb-validator-form') {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (typeof event.stopImmediatePropagation === 'function') {
+    event.stopImmediatePropagation();
+  }
+
+  const file = selectedFile();
+
+  if (!file) {
+    setStatus('Selecione uma planilha .xlsx ou .xlsm.', 'error');
+    return false;
+  }
+
+  const collection =
+    formValue('collection') ||
+    formValue('collection-code') ||
+    'INPA';
+
+  const submit =
+    form.querySelector('[type="submit"]') ||
+    $('validate-button');
+
+  if (submit) {
+    submit.disabled = true;
+    submit.dataset.oldText = submit.textContent || '';
+    submit.textContent = 'Processando...';
+  }
+
+  try {
+    /*
+     * CUSTOM:
+     * qualquer planilha deve ir diretamente para o mapper.
+     */
+    if (collection === 'CUSTOM') {
+      setStatus(
+        'Leia as colunas da planilha e confirme o mapeamento para o padrão INPA/BRAHMS.',
+        'info'
+      );
+
+      await openMapper(file);
+
       return false;
     }
 
-    const submit = form.querySelector('[type="submit"]') || $('validate-button');
-    if (submit) {
-      submit.disabled = true;
-      submit.dataset.oldText = submit.textContent || '';
-      submit.textContent = 'Validando...';
+    /*
+     * INPA:
+     * primeiro verifica se realmente é uma planilha padrão.
+     */
+    setStatus(
+      'Verificando estrutura da planilha...',
+      'info'
+    );
+
+    const standard = await postJson(
+      API_BASE + '/converter/standard_check',
+      buildFormData(file)
+    );
+
+    /*
+     * Não é padrão:
+     * abre mapper.
+     */
+    if (!standard || !standard.detected_standard) {
+      setStatus(
+        'Planilha fora do padrão INPA/BRAHMS. Confira o mapeamento das colunas.',
+        'warning'
+      );
+
+      await openMapper(file);
+
+      return false;
     }
 
-    try {
-      setStatus('Validando planilha...', 'info');
-      // Estratégia profissional: tentar a validação direta primeiro. Se a planilha for padrão,
-      // ela passa aqui e nunca abre o mapeador. Se não for padrão, o backend rejeita e o mapeador abre.
-      const job = await postJson(API_BASE + '/upload', buildFormData(file));
-      setStatus('Validação concluída. Corrija as células destacadas ou baixe a cópia .xlsx anotada.', 'ok');
-      await renderJob(job);
-    } catch (directError) {
-      console.warn('[Tsiino v36] Validação direta falhou; abrindo mapeador se for schema fora do padrão.', directError);
-      try {
-        // Checagem explícita: se mesmo assim o backend reconhecer como padrão, mostramos o erro real,
-        // porque não deve cair no mapeador.
-        const standard = await postJson(API_BASE + '/converter/standard_check', buildFormData(file));
-        if (standard && standard.detected_standard) {
-          throw directError;
-        }
-      } catch (checkError) {
-        if (checkError === directError) throw checkError;
-        // Se a checagem falhar, ainda tentamos abrir mapeador, que é o fallback seguro.
-      }
-      setStatus('Planilha fora do padrão detectada. Faça o mapeamento das colunas e valide a versão convertida.', 'warning');
-      await openMapper(file);
-    } finally {
-      if (submit) {
-        submit.disabled = false;
-        if (submit.dataset.oldText) submit.textContent = submit.dataset.oldText;
+    /*
+     * É padrão:
+     * valida diretamente.
+     */
+    setStatus(
+      'Planilha padrão INPA/BRAHMS reconhecida. Validando...',
+      'info'
+    );
+
+    const job = await postJson(
+      API_BASE + '/upload',
+      buildFormData(file)
+    );
+
+    await renderJob(job);
+
+    setStatus(
+      'Validação concluída. Corrija as células destacadas ou baixe a cópia .xlsx anotada.',
+      'ok'
+    );
+
+  } catch (error) {
+    console.error(
+      '[Tsiino] Falha no fluxo do validador:',
+      error
+    );
+
+    setStatus(
+      'Não foi possível processar a planilha: ' +
+        (error.message || String(error)),
+      'error'
+    );
+
+  } finally {
+    if (submit) {
+      submit.disabled = false;
+
+      if (submit.dataset.oldText) {
+        submit.textContent = submit.dataset.oldText;
       }
     }
-    return false;
   }
+
+  return false;
+}y
 
   document.addEventListener('submit', handleSubmit, true);
   document.addEventListener('DOMContentLoaded', moveDownloadButton);

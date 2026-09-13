@@ -62,8 +62,18 @@ COLUMN_ALIASES = {
 }
 
 REQUIRED_MINIMUM = [
-    'collector', 'number', 'colldd', 'collmm', 'collyy', 'family', 'genus',
-    'country', 'majorarea', 'minorarea', 'lat', 'long', 'plantdesc'
+    'collector',
+    'number',
+    'colldd',
+    'collmm',
+    'collyy',
+    'family',
+    'genus',
+    'country',
+    'majorarea',
+    'minorarea',
+    'lat',
+    'long',
 ]
 
 

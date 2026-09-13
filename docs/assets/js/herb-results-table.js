@@ -255,10 +255,19 @@
     return issues.filter((issue) => issue.row_number === rn);
   }
 
-  function ensureResultsContainer() {
-    const results = document.getElementById('validator-results') || document.querySelector('[id*="result"], .hv-results, .validator-results');
-    if (!results) return null;
-    results.classList.add('tsiino-v37-active');
+function ensureResultsContainer() {
+  const results =
+    document.getElementById('validator-results') ||
+    document.querySelector('[id*="result"], .hv-results, .validator-results');
+
+  if (!results) return null;
+
+  // Garante que a seção de resultados esteja visível.
+  results.hidden = false;
+  results.removeAttribute('hidden');
+  results.setAttribute('aria-hidden', 'false');
+
+  results.classList.add('tsiino-v37-active');
     let box = document.getElementById('tsiino-results-stable-v37');
     if (!box) {
       box = document.createElement('div');

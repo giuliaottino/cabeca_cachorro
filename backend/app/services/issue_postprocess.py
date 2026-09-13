@@ -221,6 +221,39 @@ def _drop_obvious_wrong_taxon(data: dict[str, Any], table_by_row: dict[int, dict
             return True
     return False
 
+def _row_has_plantdesc(row: dict[str, Any]) -> bool:
+    if not isinstance(row, dict):
+        return False
+
+    # Primeiro verifica o campo canônico.
+    value = row.get("plantdesc")
+    if value is not None and str(value).strip():
+        return True
+
+    # Depois verifica os dados originais da planilha.
+    raw = row.get("_raw") or row.get("_RAW") or {}
+
+    if not isinstance(raw, dict):
+        return False
+
+    accepted_headers = {
+        "plantdesc",
+        "descricao",
+        "descricao planta",
+        "descricao da planta",
+    }
+
+    for key, value in raw.items():
+        normalized_key = _norm_text(key)
+
+        if (
+            normalized_key in accepted_headers
+            and value is not None
+            and str(value).strip()
+        ):
+            return True
+
+    return False
 
 def postprocess_issues(issues: list[Any], table: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
     table_by_row = _table_index(table or [])
@@ -240,6 +273,13 @@ def postprocess_issues(issues: list[Any], table: list[dict[str, Any]] | None = N
 
         row = _row_number(data)
         col = _field(data)
+        
+                # Segurança contra falso positivo em descrição preenchida.
+        if code in {"PLANTDESC_REQUIRED", "PLANTDESC_EMPTY"} and row is not None:
+            record = table_by_row.get(row, {})
+
+            if _row_has_plantdesc(record):
+                continue
 
         if _is_taxon_or_geo(code, msg) and row is None:
             continue

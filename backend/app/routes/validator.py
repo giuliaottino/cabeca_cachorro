@@ -286,7 +286,28 @@ async def upload_spreadsheet(
 ) -> dict[str, str]:
     if not file.filename or not file.filename.lower().endswith((".xlsx", ".xlsm")):
         raise HTTPException(status_code=400, detail="Envie uma planilha .xlsx ou .xlsm.")
+    taxonomy_status = ffb_reference_status()
+    geography_status = ibge_reference_status()
 
+    if validate_taxonomy and taxonomy_status.get("status") != "ready":
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "A validação taxonômica foi solicitada, mas a base da "
+                "Flora e Funga do Brasil não está pronta. "
+                f"Status: {taxonomy_status.get('status')}."
+            ),
+        )
+
+    if validate_geography and geography_status.get("status") != "ready":
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "A validação geográfica foi solicitada, mas a base do "
+                "IBGE não está pronta. "
+                f"Status: {geography_status.get('status')}."
+            ),
+        )
     job_id = str(uuid.uuid4())
     content = await file.read()
 
@@ -308,9 +329,23 @@ async def upload_spreadsheet(
         if validate_geography:
             all_issues.extend(validate_geography_ibge(record))
 
-    issue_dicts = [_issue_to_dict(item) for item in all_issues]
-    error_count = sum(1 for item in issue_dicts if item.get("severity") == "error")
-    warning_count = sum(1 for item in issue_dicts if item.get("severity") == "warning")
+    raw_issue_dicts = [_issue_to_dict(item) for item in all_issues]
+
+    # Normaliza, remove duplicatas e falsos positivos antes de calcular o resumo.
+    issue_dicts = postprocess_issues(
+        raw_issue_dicts,
+        parsed.records,
+    )
+
+    error_count = sum(
+        1 for item in issue_dicts
+        if item.get("severity") == "error"
+    )
+
+    warning_count = sum(
+        1 for item in issue_dicts
+        if item.get("severity") == "warning"
+    )
 
     summary = {
         "id": job_id,
@@ -333,8 +368,10 @@ async def upload_spreadsheet(
         "raw_headers": parsed.header.raw_headers,
     }
 
-    return {"job_id": job_id, "status_url": f"/api/validator/jobs/{job_id}"}
-
+    return {
+        "job_id": job_id,
+        "status_url": f"/api/validator/jobs/{job_id}",
+    }
 
 @router.get("/jobs/{job_id}")
 def get_job(job_id: str) -> dict[str, Any]:
@@ -347,9 +384,14 @@ def get_job(job_id: str) -> dict[str, Any]:
 @router.get("/jobs/{job_id}/issues")
 def get_issues(job_id: str) -> list[dict[str, Any]]:
     job = LOCAL_JOBS.get(job_id)
+
     if not job:
-        raise HTTPException(status_code=404, detail="Job não encontrado.")
-    return postprocess_issues(job.get('issues', []), job.get('table', []))
+        raise HTTPException(
+            status_code=404,
+            detail="Job não encontrado.",
+        )
+
+    return job.get("issues", [])
 
 
 @router.get("/jobs/{job_id}/table")
