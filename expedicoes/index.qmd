@@ -8,7 +8,7 @@ format:
 execute:
   echo: false
   eval: true
-  freeze: auto
+  freeze: false
   cache: false
   warning: false
   message: false
