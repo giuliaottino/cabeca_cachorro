@@ -1,4 +1,4 @@
-/* Tsiino Hiiwiida language switcher — full-site runtime v2
+/* Tsiino Hiiwiida language switcher — full-site runtime v3
  * Source language: Portuguese (pt-BR). Target: English.
  * Designed for Quarto static pages, R-generated HTML widgets, Leaflet popups,
  * Plotly/SVG labels, and dynamically inserted content.
@@ -6,23 +6,25 @@
 (function () {
   "use strict";
 
-  window.TSIINO_TRANSLATION_RUNTIME_VERSION = "full-site-v2-2026-06-25";
+  window.TSIINO_TRANSLATION_RUNTIME_VERSION = "full-site-v3-2026-09-21";
   if (window.TSIINO_TRANSLATION_RUNTIME_ACTIVE) return;
   window.TSIINO_TRANSLATION_RUNTIME_ACTIVE = true;
 
-  const config = window.TsiinoTranslations || {};
-  const strings = config.strings || {};
-  const phrases = config.phrases || {};
-  const prefixes = config.prefixes || {};
-  const regexRules = config.regex || {};
-  const labels = config.labels || { pt: "Português", en: "English" };
-  const available = config.availableLanguages || ["pt", "en"];
-  const defaultLanguage = config.defaultLanguage || "pt";
-  const storageKey = config.storageKey || "tsiino-language";
+  let config = window.TsiinoTranslations || {};
+  let strings = config.strings || {};
+  let phrases = config.phrases || {};
+  let prefixes = config.prefixes || {};
+  let regexRules = config.regex || {};
+  let labels = config.labels || { pt: "Português", en: "English" };
+  let available = config.availableLanguages || ["pt", "en"];
+  let defaultLanguage = config.defaultLanguage || "pt";
+  let storageKey = config.storageKey || "tsiino-language";
 
   const excludedSelector = [
     "script", "style", "code", "pre", "kbd", "samp", "textarea", "noscript",
-    "template", ".tsiino-language-control", ".MathJax", ".sourceCode"
+    "template", ".tsiino-language-control", ".MathJax", ".sourceCode",
+    "[translate=\"no\"]", ".notranslate", ".team-name", ".popup-taxon",
+    ".species-taxon-trigger em", ".taxon-record-popup > strong"
   ].join(",");
 
   const attrsToTranslate = ["placeholder", "title", "aria-label", "alt", "data-label", "value"];
@@ -30,6 +32,7 @@
     "data-i18n-alt": "alt",
     "data-i18n-title": "title",
     "data-i18n-label": "aria-label",
+    "data-i18n-aria": "aria-label",
     "data-i18n-placeholder": "placeholder"
   };
 
@@ -102,8 +105,8 @@
     const ordered = Object.keys(languagePrefixes).sort((a, b) => b.length - a.length);
     for (const sourcePrefix of ordered) {
       const normalizedPrefix = normalize(sourcePrefix);
-      if (key.startsWith(normalizedPrefix)) {
-        return languagePrefixes[sourcePrefix] + key.slice(normalizedPrefix.length);
+      if (key === normalizedPrefix || (key.startsWith(normalizedPrefix) && (!/[\p{L}\p{N}]$/u.test(normalizedPrefix) || /^[\s:]/.test(key.slice(normalizedPrefix.length))))) {
+        return languagePrefixes[sourcePrefix] + translateValue(key.slice(normalizedPrefix.length).trimStart(), language);
       }
     }
     return null;
@@ -111,27 +114,35 @@
 
   function applyPhraseReplacements(value, language) {
     const languagePhrases = phrases[language] || {};
-    let out = String(value || "");
+    const protectedValues = [];
+    let out = String(value || "").replace(/https?:\/\/[^\s<>]+|(?:[A-Za-z]:[\\/]|\.\.?[\\/]|_input_data[\\/])[^\s<>;]+|[^\s<>/]+\.(?:xlsx|xlsm|xls|csv|tsv|qmd|js|png|jpg|jpeg)\b/g, match => {
+      protectedValues.push(match);
+      return "\uE000" + (protectedValues.length - 1) + "\uE001";
+    });
     const ordered = Object.keys(languagePhrases).sort((a, b) => b.length - a.length);
 
-    for (const source of ordered) {
-      const target = languagePhrases[source];
-      if (!source || target === undefined || target === null) continue;
-      out = out.split(source).join(target);
-    }
+    const sources = ordered.filter(source => source && languagePhrases[source] != null);
+    if (!sources.length) return String(value || "");
+    const pattern = sources.map(source => {
+      const left = /^[\p{L}\p{N}]/u.test(source) ? "(?<![\\p{L}\\p{N}_])" : "";
+      const right = /[\p{L}\p{N}]$/u.test(source) ? "(?![\\p{L}\\p{N}_])" : "";
+      return left + escapeRegExp(source) + right;
+    }).join("|");
+    out = out.replace(new RegExp(pattern, "gu"), source => languagePhrases[source]);
 
-    return out;
+    return out.replace(/\uE000(\d+)\uE001/g, (_, i) => protectedValues[Number(i)]);
   }
 
-  function applyRegexRules(value, language) {
+  function applyRegexRules(value, language, terminalOnly = false) {
     const rules = regexRules[language] || [];
     let out = String(value || "");
 
     for (const rule of rules) {
+      if (terminalOnly && !rule.terminal) continue;
       try {
         const pattern = rule.pattern || rule[0];
         const replacement = rule.replacement || rule[1] || "";
-        const flags = rule.flags || rule[2] || "g";
+        const flags = rule.flags ?? rule[2] ?? "g";
         out = out.replace(new RegExp(pattern, flags), replacement);
       } catch (error) {
         // Ignore malformed optional rules.
@@ -148,6 +159,9 @@
 
     const exact = lookupExact(raw, language);
     if (exact !== null) return preserveSpacing(raw, exact);
+
+    const matchedRule = applyRegexRules(raw, language, true);
+    if (matchedRule !== raw) return matchedRule;
 
     const prefixed = applyPrefix(raw, language);
     if (prefixed !== null) return preserveSpacing(raw, prefixed);
@@ -190,17 +204,17 @@
 
   function translateDataI18nElement(element, language) {
     if (!element || isExcluded(element)) return;
-    const key = element.getAttribute("data-i18n");
-    if (!key) return;
+    const key = element.getAttribute("data-i18n") || element.getAttribute("data-i18n-html");
+    if (!key || element.children.length) return;
 
     const original = getOriginalElementText(element);
     if (language === defaultLanguage) {
-      element.textContent = original;
+      if (element.textContent !== original) element.textContent = original;
       return;
     }
 
-    const translated = lookupExact(key, language) || lookupExact(original, language);
-    if (translated !== null) element.textContent = translated;
+    const translated = lookupExact(key, language) ?? lookupExact(original, language);
+    if (translated !== null && element.textContent !== translated) element.textContent = translated;
   }
 
   function translateDataI18nAttributes(element, language) {
@@ -215,7 +229,7 @@
         if (original) element.setAttribute(attr, original);
         return;
       }
-      const translated = lookupExact(key, language) || lookupExact(original, language);
+      const translated = lookupExact(key, language) ?? lookupExact(original, language);
       if (translated !== null) element.setAttribute(attr, translated);
     });
   }
@@ -225,6 +239,7 @@
 
     attrsToTranslate.forEach(function (attr) {
       if (!element.hasAttribute(attr)) return;
+      if (Object.keys(dataAttrMap).some(key => dataAttrMap[key] === attr && element.hasAttribute(key))) return;
       if (attr === "value" && !/^(button|submit|reset)$/i.test(element.getAttribute("type") || "")) return;
       const original = getOriginalAttr(element, attr);
       const translated = translateValue(original, language);
@@ -234,6 +249,8 @@
 
   function translateTextNode(node, language) {
     if (!node || node.nodeType !== Node.TEXT_NODE || isExcluded(node)) return;
+    const keyed = node.parentElement;
+    if (keyed && !keyed.children.length && (keyed.hasAttribute("data-i18n") || keyed.hasAttribute("data-i18n-html"))) return;
     const original = getOriginalText(node);
     if (!hasLetters(original)) {
       node.nodeValue = original;
@@ -284,7 +301,7 @@
       translateAttributes(elementRoot, language);
     }
 
-    const elements = root.querySelectorAll ? root.querySelectorAll("[data-i18n], [data-i18n-alt], [data-i18n-title], [data-i18n-label], [data-i18n-placeholder], [placeholder], [title], [aria-label], [alt], input[type='button'], input[type='submit'], input[type='reset']") : [];
+    const elements = root.querySelectorAll ? root.querySelectorAll("[data-i18n], [data-i18n-html], [data-i18n-aria], [data-i18n-alt], [data-i18n-title], [data-i18n-label], [data-i18n-placeholder], [placeholder], [title], [aria-label], [alt], input[type='button'], input[type='submit'], input[type='reset']") : [];
     elements.forEach(function (element) {
       translateDataI18nElement(element, language);
       translateDataI18nAttributes(element, language);
@@ -299,49 +316,80 @@
     document.title = translateValue(originalTitle, language);
   }
 
+  const observerOptions = {
+    childList: true, subtree: true, characterData: true, attributes: true,
+    attributeFilter: ["placeholder", "title", "aria-label", "alt", "data-label", "value",
+      "data-i18n", "data-i18n-html", "data-i18n-aria", "data-i18n-alt",
+      "data-i18n-title", "data-i18n-label", "data-i18n-placeholder"]
+  };
+
+  function invalidateExternalChanges(mutations) {
+    let relevant = false;
+    mutations.forEach(function(m) {
+      if (isExcluded(m.target)) return;
+      relevant = true;
+      if (m.type === "characterData") textOriginals.delete(m.target);
+      if (m.type === "attributes") {
+        const map = attrOriginals.get(m.target);
+        if (map) delete map[m.attributeName];
+      }
+      const parent = m.target.nodeType === Node.ELEMENT_NODE ? m.target : m.target.parentElement;
+      if (parent) elementOriginals.delete(parent);
+    });
+    return relevant;
+  }
+
   function applyLanguage(language) {
     if (!available.includes(language)) language = defaultLanguage;
     if (translating) return;
+    // Own translations must not be mistaken for changes made by a widget.
+    if (observer) {
+      invalidateExternalChanges(observer.takeRecords());
+      observer.disconnect();
+    }
     translating = true;
-
     currentLanguage = language;
     try {
-      localStorage.setItem(storageKey, language);
-    } catch (error) {}
-
-    document.documentElement.setAttribute("data-tsiino-language", language);
-    updateDocumentLanguage(language);
-    translateElementTree(document.body || document.documentElement, language);
-    updateSwitcher(language);
-
-    translating = false;
+      try { localStorage.setItem(storageKey, language); } catch (error) {}
+      document.documentElement.setAttribute("data-tsiino-language", language);
+      updateDocumentLanguage(language);
+      translateElementTree(document.body || document.documentElement, language);
+      updateSwitcher(language);
+    } finally {
+      translating = false;
+      if (observer && document.body) observer.observe(document.body, observerOptions);
+    }
   }
 
   function scheduleApply() {
     if (translating) return;
     clearTimeout(refreshTimer);
-    refreshTimer = setTimeout(function () {
-      applyLanguage(currentLanguage);
-    }, 80);
+    refreshTimer = setTimeout(function () { applyLanguage(currentLanguage); }, 80);
   }
 
   function startObserver() {
     if (observer || !document.body) return;
     observer = new MutationObserver(function (mutations) {
-      if (translating) return;
-      const relevant = mutations.some(function (m) {
-        return m.type === "childList" || m.type === "characterData" || m.type === "attributes";
-      });
-      if (relevant) scheduleApply();
+      if (invalidateExternalChanges(mutations)) scheduleApply();
     });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: ["placeholder", "title", "aria-label", "alt", "data-label", "data-i18n", "data-i18n-alt", "data-i18n-title", "data-i18n-label", "data-i18n-placeholder"]
-    });
+    observer.observe(document.body, observerOptions);
   }
+
+  function refreshConfig() {
+    config = window.TsiinoTranslations || {};
+    strings = config.strings || {};
+    phrases = config.phrases || {};
+    prefixes = config.prefixes || {};
+    regexRules = config.regex || {};
+    labels = config.labels || { pt: "Português", en: "English" };
+    available = config.availableLanguages || ["pt", "en"];
+    defaultLanguage = config.defaultLanguage || "pt";
+    storageKey = config.storageKey || "tsiino-language";
+  }
+  window.addEventListener("tsiino:translations-ready", function() {
+    refreshConfig();
+    if (document.body && window.TsiinoSetLanguage) applyLanguage(currentLanguage);
+  });
 
   function getInitialLanguage() {
     const params = new URLSearchParams(window.location.search);
@@ -421,6 +469,8 @@
   }
 
   function updateSwitcher(language) {
+    const control = document.querySelector(".tsiino-language-control");
+    if (control) control.setAttribute("aria-label", language === "en" ? "Language" : "Idioma");
     document.querySelectorAll(".tsiino-language-button").forEach(function (button) {
       const active = button.dataset.language === language;
       button.classList.toggle("is-active", active);
@@ -430,6 +480,7 @@
 
   function boot() {
     if (!document.body) return;
+    refreshConfig();
     createSwitcher();
     applyLanguage(getInitialLanguage());
     startObserver();
@@ -440,6 +491,7 @@
       setTimeout(scheduleApply, 2500);
     });
     window.TsiinoSetLanguage = applyLanguage;
+    window.TsiinoTranslate = function(value, language) { return translateValue(value, language || currentLanguage); };
   }
 
   if (document.readyState === "loading") {

@@ -206,23 +206,96 @@ responsible_names <- c(
   "Clístenes Nascimento",
   "Dirce Komura",
   "Denilson Peralta",
-  "Felipe Wartchow",
+  "Leandro Giacomin",
   "Micheline Carvalho-Silva"
 )
 
 responsible_keys <- normalize_name(responsible_names)
 team_data$responsible_rank <- match(team_data$member_key, responsible_keys)
-team_data$team_role <- ifelse(!is.na(team_data$responsible_rank), "responsavel", "integrante")
+
+# Classificação dos bolsistas indígenas diretamente pelo campo "Cargo no projeto".
+# Entra nesta categoria somente quando o texto do cargo contém, ao mesmo tempo,
+# as palavras "bolsista" e "comunidade" (sem depender de maiúsculas ou acentos).
+project_role_col <- get_col(
+  team_data,
+  c(
+    "Cargo no projeto",
+    "Cargo.no.projeto",
+    "Cargo",
+    "Participacao no projeto",
+    "Participação no projeto",
+    "Participacao.no.projeto",
+    "Participação.no.projeto",
+    "Participacao",
+    "Participação",
+    "Funcao no projeto",
+    "Função no projeto",
+    "Funcao.no.projeto",
+    "Função.no.projeto",
+    "Funcao",
+    "Função",
+    "Project role",
+    "Project.Role",
+    "ProjectRole",
+    "Role"
+  ),
+  required = FALSE
+)
+
+if (!is.na(project_role_col)) {
+  team_data$project_role_raw <- as.character(team_data[[project_role_col]])
+} else {
+  team_data$project_role_raw <- ""
+}
+
+team_data$project_role_raw[is.na(team_data$project_role_raw)] <- ""
+team_data$project_role_key <- normalize_name(team_data$project_role_raw)
+
+team_data$is_bolsista <-
+  grepl("bolsista", team_data$project_role_key, fixed = TRUE)
+
+team_data$is_bolsista_indigena <-
+  team_data$is_bolsista &
+  grepl("comunidade", team_data$project_role_key, fixed = TRUE)
+
+team_data$is_bolsista_instituicao <-
+  team_data$is_bolsista &
+  !grepl("comunidade", team_data$project_role_key, fixed = TRUE)
+
+# Prioridade de exibição:
+# 1. coordenação
+# 2. bolsistas indígenas: cargo contém "bolsista" + "comunidade"
+# 3. bolsistas das instituições: cargo contém "bolsista" e não contém "comunidade"
+# 4. equipe ampliada
+team_data$team_role <- dplyr::case_when(
+  !is.na(team_data$responsible_rank) ~ "responsavel",
+  team_data$is_bolsista_indigena ~ "bolsista_indigena",
+  team_data$is_bolsista_instituicao ~ "bolsista_instituicao",
+  TRUE ~ "integrante"
+)
 
 responsaveis <- team_data |>
   filter(team_role == "responsavel") |>
   arrange(responsible_rank, Member)
 
+bolsistas_indigenas <- team_data |>
+  filter(team_role == "bolsista_indigena") |>
+  arrange(Member)
+
+bolsistas_instituicoes <- team_data |>
+  filter(team_role == "bolsista_instituicao") |>
+  arrange(Member)
+
 integrantes <- team_data |>
   filter(team_role == "integrante") |>
   arrange(Member)
 
-team_ordered <- bind_rows(responsaveis, integrantes)
+team_ordered <- bind_rows(
+  responsaveis,
+  bolsistas_indigenas,
+  bolsistas_instituicoes,
+  integrantes
+)
 ```
 
 ```{=html}
@@ -795,6 +868,20 @@ team_ordered <- bind_rows(responsaveis, integrantes)
     border-top-color: var(--ochre);
   }
 
+  .team-card[data-role="bolsista_indigena"]{
+    border-top-color: var(--ochre);
+    background:
+      radial-gradient(circle at 92% 6%, rgba(217,154,39,0.14), transparent 24%),
+      rgba(255,253,247,0.98);
+  }
+
+  .team-card[data-role="bolsista_instituicao"]{
+    border-top-color: var(--red);
+    background:
+      radial-gradient(circle at 92% 6%, rgba(169,54,50,0.10), transparent 24%),
+      rgba(255,253,247,0.98);
+  }
+
   .team-photo-wrap{
     position: relative;
     z-index: 1;
@@ -1103,19 +1190,28 @@ team_ordered <- bind_rows(responsaveis, integrantes)
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 
-  #integrantes .team-grid{
+  #bolsistas-indigenas .team-grid,
+  #bolsistas-instituicoes .team-grid{
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  #equipe-ampliada .team-grid{
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   }
 
   @media (max-width: 1320px){
-    #integrantes .team-grid{
+    #bolsistas-indigenas .team-grid,
+    #bolsistas-instituicoes .team-grid,
+    #equipe-ampliada .team-grid{
       grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
   }
 
   @media (max-width: 991.98px){
     #pesquisadores-responsaveis .team-grid,
-    #integrantes .team-grid{
+    #bolsistas-indigenas .team-grid,
+    #bolsistas-instituicoes .team-grid,
+    #equipe-ampliada .team-grid{
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 
@@ -1128,7 +1224,9 @@ team_ordered <- bind_rows(responsaveis, integrantes)
 
   @media (max-width: 640px){
     #pesquisadores-responsaveis .team-grid,
-    #integrantes .team-grid{
+    #bolsistas-indigenas .team-grid,
+    #bolsistas-instituicoes .team-grid,
+    #equipe-ampliada .team-grid{
       grid-template-columns: 1fr !important;
     }
   }
@@ -1156,8 +1254,10 @@ team_ordered <- bind_rows(responsaveis, integrantes)
     </p>
 
     <div class="hero-actions">
-      <a class="btn-main" href="#pesquisadores-responsaveis">Pesquisadores responsáveis</a>
-      <a class="btn-ghost" href="#integrantes">Integrantes</a>
+      <a class="btn-main" href="#pesquisadores-responsaveis">Coordenação</a>
+      <a class="btn-main btn-bolsista-indigena" href="#bolsistas-indigenas">Bolsistas indígenas</a>
+      <a class="btn-main btn-bolsista-instituicao" href="#bolsistas-instituicoes">Bolsistas das instituições</a>
+      <a class="btn-ghost" href="#equipe-ampliada">Equipe ampliada</a>
     </div>
   </div>
 </section>
@@ -1172,11 +1272,10 @@ team_ordered <- bind_rows(responsaveis, integrantes)
   <div class="team-overview-grid">
     <div>
       <p class="lead">
-        A equipe do Tsiino Hiiwiida reúne pesquisadores responsáveis, estudantes, colaboradores e instituições parceiras em uma rede voltada à documentação da biodiversidade de plantas e fungos na Cabeça do Cachorro, Alto Rio Negro.
+        A equipe do Tsiino Hiiwiida reúne coordenação, bolsistas indígenas, bolsistas vinculados às instituições parceiras e uma equipe ampliada dedicada à documentação da biodiversidade de plantas e fungos na Cabeça do Cachorro, Alto Rio Negro.
       </p>
 
       <p>
-        Nesta página, os pesquisadores responsáveis aparecem primeiro, na mesma ordem apresentada na seção de coordenação científica da página inicial. Em seguida, aparecem os demais integrantes do projeto, mantendo a busca por nome, cargo no projeto ou instituição.
       </p>
     </div>
 
@@ -1184,18 +1283,88 @@ team_ordered <- bind_rows(responsaveis, integrantes)
 ```
 
 ```{r team-summary, results='asis'}
-tagList(
+network_node <- function(count, label, filter, target, extra_class = "", helper = NULL) {
+  tags$button(
+    type = "button",
+    class = paste("team-summary-item team-network-node", extra_class),
+    `data-summary-filter` = filter,
+    `data-summary-target` = target,
+    `aria-label` = paste("Mostrar", label),
+    tags$span(class = "team-node-halo", aria.hidden = "true"),
+    tags$span(
+      class = "team-node-inner",
+      tags$span(class = "team-number", count),
+      tags$span(class = "team-label", label),
+      tags$span(
+        class = "team-node-helper",
+        ifelse(is.null(helper), ifelse(filter == "all", "ver panorama completo", "filtrar categoria"), helper)
+      )
+    )
+  )
+}
+
+htmltools::tagList(
   tags$div(
-    tags$span(class = "team-number", nrow(responsaveis)),
-    tags$span(class = "team-label", "pesquisadores responsáveis")
-  ),
-  tags$div(
-    tags$span(class = "team-number", nrow(integrantes)),
-    tags$span(class = "team-label", "integrantes")
-  ),
-  tags$div(
-    tags$span(class = "team-number", nrow(team_ordered)),
-    tags$span(class = "team-label", "pessoas cadastradas")
+    class = "team-network-panel",
+    tags$div(
+      class = "team-network-head",
+      tags$p(class = "team-network-kicker", "Painel interativo"),
+      tags$p(
+        class = "team-network-note",
+        "Clique em um nó para filtrar a equipe. O total ocupa o centro da rede e conecta as demais categorias."
+      )
+    ),
+    tags$div(
+      class = "team-network-stage",
+      tags$svg(
+        class = "team-network-lines team-network-lines-desktop",
+        viewBox = "0 0 100 100",
+        preserveAspectRatio = "none",
+        "aria-hidden" = "true",
+        tags$line(x1 = "50", y1 = "50", x2 = "17", y2 = "24"),
+        tags$line(x1 = "50", y1 = "50", x2 = "83", y2 = "24"),
+        tags$line(x1 = "50", y1 = "50", x2 = "17", y2 = "76"),
+        tags$line(x1 = "50", y1 = "50", x2 = "83", y2 = "76")
+      ),
+      tags$svg(
+        class = "team-network-lines team-network-lines-tablet",
+        viewBox = "0 0 100 120",
+        preserveAspectRatio = "none",
+        "aria-hidden" = "true",
+        tags$line(x1 = "50", y1 = "16", x2 = "30", y2 = "52"),
+        tags$line(x1 = "50", y1 = "16", x2 = "70", y2 = "52"),
+        tags$line(x1 = "50", y1 = "16", x2 = "30", y2 = "92"),
+        tags$line(x1 = "50", y1 = "16", x2 = "70", y2 = "92")
+      ),
+      tags$div(
+        class = "team-network-grid",
+        network_node(
+          nrow(responsaveis), "Coordenação",
+          "responsavel", "pesquisadores-responsaveis",
+          extra_class = "team-network-node-coord"
+        ),
+        network_node(
+          nrow(bolsistas_indigenas), "Bolsistas indígenas",
+          "bolsista_indigena", "bolsistas-indigenas",
+          extra_class = "team-network-node-indigena"
+        ),
+        network_node(
+          nrow(team_ordered), "Equipe total",
+          "all", "team-controls",
+          extra_class = "team-network-node-total"
+        ),
+        network_node(
+          nrow(bolsistas_instituicoes), "Bolsistas das instituições",
+          "bolsista_instituicao", "bolsistas-instituicoes",
+          extra_class = "team-network-node-instituicao"
+        ),
+        network_node(
+          nrow(integrantes), "Equipe ampliada",
+          "integrante", "equipe-ampliada",
+          extra_class = "team-network-node-ampliada"
+        )
+      )
+    )
   )
 )
 ```
@@ -1383,14 +1552,16 @@ letter_links <- vapply(LETTERS, function(letter) {
 ```
 
 ```{=html}
-<div class="team-controls" aria-label="Controles de busca e filtro da equipe">
+<div id="team-controls" class="team-controls" aria-label="Controles de busca e filtro da equipe">
   <div class="team-search-row">
     <input type="text" id="team-search" class="team-search" placeholder="Buscar por nome, cargo no projeto ou instituição..." />
 
     <div class="team-filter-buttons" aria-label="Filtros da equipe">
       <button class="team-filter active" type="button" data-filter="all">Todos</button>
-      <button class="team-filter" type="button" data-filter="responsavel">Responsáveis</button>
-      <button class="team-filter" type="button" data-filter="integrante">Integrantes</button>
+      <button class="team-filter" type="button" data-filter="responsavel">Coordenação</button>
+      <button class="team-filter" type="button" data-filter="bolsista_indigena">Bolsistas indígenas</button>
+      <button class="team-filter" type="button" data-filter="bolsista_instituicao">Bolsistas das instituições</button>
+      <button class="team-filter" type="button" data-filter="integrante">Equipe ampliada</button>
     </div>
   </div>
 
@@ -1409,10 +1580,12 @@ HTML(paste(letter_links, collapse = " | "))
 ```{=html}
 <section id="pesquisadores-responsaveis" class="content-card team-section" data-section-role="responsavel">
   <div class="section-title">
-    <h2>Pesquisadores responsáveis</h2>
+    <h2>Coordenação</h2>
   </div>
 
   <div class="team-section-header">
+    <h3>Coordenação científica</h3>
+    <p></p>
   </div>
 ```
 
@@ -1421,18 +1594,58 @@ render_team_grid(responsaveis)
 ```
 
 ```{=html}
-  <div class="empty-team-message">Nenhum pesquisador responsável corresponde à busca atual.</div>
+  <div class="empty-team-message">Nenhum membro da coordenação corresponde à busca atual.</div>
 </section>
 ```
 
 ```{=html}
-<section id="integrantes" class="content-card team-section" data-section-role="integrante">
+<section id="bolsistas-indigenas" class="content-card team-section team-section-featured" data-section-role="bolsista_indigena">
   <div class="section-title">
-    <h2>Integrantes</h2>
+    <h2>Bolsistas indígenas</h2>
   </div>
 
   <div class="team-section-header">
-    <h3>Equipe ampliada</h3>
+    <h3>Bolsistas das comunidades</h3>
+  </div>
+```
+
+```{r render-bolsistas-indigenas, results='asis'}
+render_team_grid(bolsistas_indigenas)
+```
+
+```{=html}
+  <div class="empty-team-message">Nenhum bolsista indígena corresponde à busca atual.</div>
+</section>
+```
+
+```{=html}
+<section id="bolsistas-instituicoes" class="content-card team-section team-section-featured-instituicoes" data-section-role="bolsista_instituicao">
+  <div class="section-title">
+    <h2>Bolsistas das instituições</h2>
+  </div>
+
+  <div class="team-section-header">
+    <h3>Bolsistas vinculados às instituições parceiras</h3>
+  </div>
+```
+
+```{r render-bolsistas-instituicoes, results='asis'}
+render_team_grid(bolsistas_instituicoes)
+```
+
+```{=html}
+  <div class="empty-team-message">Nenhum bolsista das instituições corresponde à busca atual.</div>
+</section>
+```
+
+```{=html}
+<section id="equipe-ampliada" class="content-card team-section" data-section-role="integrante">
+  <div class="section-title">
+    <h2>Equipe ampliada</h2>
+  </div>
+
+  <div class="team-section-header">
+    <h3>Pesquisadores, estudantes e colaboradores</h3>
     <p></p>
   </div>
 ```
@@ -1442,7 +1655,7 @@ render_team_grid(integrantes)
 ```
 
 ```{=html}
-  <div class="empty-team-message">Nenhum integrante corresponde à busca atual.</div>
+  <div class="empty-team-message">Nenhum membro da equipe ampliada corresponde à busca atual.</div>
 </section>
 ```
 
@@ -1451,6 +1664,7 @@ render_team_grid(integrantes)
 document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("team-search");
   const filterButtons = document.querySelectorAll(".team-filter");
+  const summaryItems = document.querySelectorAll(".team-summary-item");
   const cards = document.querySelectorAll(".team-card");
   const sections = document.querySelectorAll(".team-section");
   let activeFilter = "all";
@@ -1493,6 +1707,26 @@ document.addEventListener("DOMContentLoaded", function () {
       if (empty) empty.style.display = visibleCards.length ? "none" : "block";
       if (grid) grid.hidden = !visibleCards.length;
     });
+
+    filterButtons.forEach(function (button) {
+      button.classList.toggle("active", (button.dataset.filter || "all") === activeFilter);
+    });
+
+    summaryItems.forEach(function (item) {
+      item.classList.toggle("active", (item.dataset.summaryFilter || "all") === activeFilter);
+    });
+  }
+
+  function setFilter(filter, targetId, shouldScroll) {
+    activeFilter = filter || "all";
+    applyFilters();
+
+    if (shouldScroll && targetId) {
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
   }
 
   if (searchInput) {
@@ -1501,10 +1735,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   filterButtons.forEach(function (button) {
     button.addEventListener("click", function () {
-      activeFilter = button.dataset.filter || "all";
-      filterButtons.forEach(btn => btn.classList.remove("active"));
-      button.classList.add("active");
-      applyFilters();
+      setFilter(button.dataset.filter || "all", null, false);
+    });
+  });
+
+  summaryItems.forEach(function (item) {
+    const activate = function () {
+      setFilter(
+        item.dataset.summaryFilter || "all",
+        item.dataset.summaryTarget || null,
+        true
+      );
+    };
+
+    item.addEventListener("click", activate);
+    item.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        activate();
+      }
     });
   });
 
@@ -1760,7 +2009,9 @@ main.content,
 .team-controls,
 #visao-geral-equipe.content-card,
 #pesquisadores-responsaveis.content-card,
-#integrantes.content-card {
+#bolsistas-indigenas.content-card,
+#bolsistas-instituicoes.content-card,
+#equipe-ampliada.content-card {
   position: relative !important;
   left: auto !important;
   right: auto !important;
@@ -1779,7 +2030,9 @@ main.content,
   .team-controls,
   #visao-geral-equipe.content-card,
   #pesquisadores-responsaveis.content-card,
-  #integrantes.content-card {
+  #bolsistas-indigenas.content-card,
+  #bolsistas-instituicoes.content-card,
+  #equipe-ampliada.content-card {
     width: min(1220px, calc(100% - 1.25rem)) !important;
     max-width: calc(100% - 1.25rem) !important;
     padding-left: clamp(0.95rem, 2vw, 1.6rem) !important;
@@ -1792,7 +2045,9 @@ main.content,
   .team-controls,
   #visao-geral-equipe.content-card,
   #pesquisadores-responsaveis.content-card,
-  #integrantes.content-card {
+  #bolsistas-indigenas.content-card,
+  #bolsistas-instituicoes.content-card,
+  #equipe-ampliada.content-card {
     width: calc(100% - 0.75rem) !important;
     max-width: calc(100% - 0.75rem) !important;
     padding-left: 0.95rem !important;
@@ -1830,7 +2085,25 @@ main.content,
   overflow: hidden !important;
 }
 
-#integrantes .team-grid {
+#bolsistas-indigenas .team-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: clamp(0.85rem, 1.25vw, 1.15rem) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+#bolsistas-instituicoes .team-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: clamp(0.85rem, 1.25vw, 1.15rem) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+#equipe-ampliada .team-grid {
   display: grid !important;
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   gap: clamp(0.85rem, 1.25vw, 1.15rem) !important;
@@ -1840,21 +2113,27 @@ main.content,
 }
 
 @media (max-width: 1368px) {
-  #integrantes .team-grid {
+  #bolsistas-indigenas .team-grid,
+  #bolsistas-instituicoes .team-grid,
+  #equipe-ampliada .team-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
 
 @media (max-width: 1120px) {
   #pesquisadores-responsaveis .team-grid,
-  #integrantes .team-grid {
+  #bolsistas-indigenas .team-grid,
+  #bolsistas-instituicoes .team-grid,
+  #equipe-ampliada .team-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
 @media (max-width: 640px) {
   #pesquisadores-responsaveis .team-grid,
-  #integrantes .team-grid {
+  #bolsistas-indigenas .team-grid,
+  #bolsistas-instituicoes .team-grid,
+  #equipe-ampliada .team-grid {
     grid-template-columns: 1fr !important;
   }
 }
@@ -1962,6 +2241,453 @@ main.content,
 .icon-link img {
   width: 16px !important;
   height: 16px !important;
+}
+
+/* ===== Destaque para bolsistas indígenas ===== */
+#bolsistas-indigenas.content-card {
+  border-top: 6px solid var(--ochre) !important;
+  background:
+    radial-gradient(circle at 96% 4%, rgba(217,154,39,0.17), transparent 22%),
+    linear-gradient(135deg, rgba(255,253,247,0.98), rgba(246,241,232,0.98)) !important;
+  box-shadow: 0 18px 38px rgba(0,0,0,0.13) !important;
+}
+
+#bolsistas-indigenas .section-title h2 {
+  color: var(--red-dark) !important;
+}
+
+.team-card[data-role="bolsista_indigena"] {
+  border-top-color: var(--ochre) !important;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.10) !important;
+}
+
+.team-card[data-role="bolsista_indigena"] .team-name {
+  color: var(--red-dark) !important;
+}
+
+.team-card[data-role="bolsista_indigena"] .team-project-role {
+  color: var(--red-dark) !important;
+  border-left-color: var(--ochre) !important;
+}
+
+.btn-bolsista-indigena {
+  background: var(--ochre) !important;
+  color: #171717 !important;
+}
+
+.btn-bolsista-indigena:hover {
+  background: #efb84d !important;
+  color: #171717 !important;
+}
+
+.team-filter[data-filter="bolsista_indigena"] {
+  border-color: rgba(217,154,39,0.78) !important;
+}
+
+.team-filter[data-filter="bolsista_indigena"].active,
+.team-filter[data-filter="bolsista_indigena"]:hover {
+  background: var(--ochre) !important;
+  border-color: var(--ochre) !important;
+  color: #171717 !important;
+}
+
+/* ===== Painel Rede do projeto: visual em rede ===== */
+#visao-geral-equipe.content-card {
+  border-top-color: rgba(169,54,50,0.88) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,249,247,0.98)) !important;
+}
+
+#visao-geral-equipe .section-title h2 {
+  color: var(--red-dark) !important;
+}
+
+#visao-geral-equipe .team-overview-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1.35rem !important;
+}
+
+#visao-geral-equipe .lead {
+  max-width: 70ch;
+  background: transparent !important;
+}
+
+.team-summary-box {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.team-network-panel {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1rem, 2vw, 1.4rem);
+  border-radius: 28px;
+  border: 1px solid rgba(169,54,50,0.10);
+  background:
+    radial-gradient(circle at 10% 12%, rgba(169,54,50,0.055), transparent 18%),
+    radial-gradient(circle at 90% 18%, rgba(169,54,50,0.045), transparent 16%),
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,249,247,0.98));
+  box-shadow: 0 18px 45px rgba(17,17,17,0.08);
+}
+
+.team-network-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(169,54,50,0.10) 1.1px, transparent 1.1px);
+  background-size: 30px 30px;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.team-network-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+
+.team-network-kicker {
+  margin: 0 !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red) !important;
+}
+
+.team-network-note {
+  margin: 0 !important;
+  max-width: 44rem;
+  color: rgba(23,23,23,0.72) !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 0.92rem !important;
+  line-height: 1.55 !important;
+}
+
+.team-network-stage {
+  position: relative;
+  z-index: 1;
+  padding: clamp(0.5rem, 1.5vw, 1rem) 0;
+}
+
+.team-network-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.team-network-lines line {
+  stroke: rgba(169,54,50,0.22);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-dasharray: 3 5;
+}
+
+.team-network-lines-tablet {
+  display: none;
+}
+
+.team-network-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 1.1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "coord total indigena"
+    "instituicao total ampliada";
+  gap: 1.1rem 1.25rem;
+  align-items: center;
+}
+
+.team-network-node {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  outline: none;
+  animation: teamNodeFadeIn 0.55s ease both;
+}
+
+.team-network-node:nth-child(1) { animation-delay: 0.02s; }
+.team-network-node:nth-child(2) { animation-delay: 0.09s; }
+.team-network-node:nth-child(3) { animation-delay: 0.16s; }
+.team-network-node:nth-child(4) { animation-delay: 0.23s; }
+.team-network-node:nth-child(5) { animation-delay: 0.30s; }
+
+@keyframes teamNodeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.team-network-node-coord { grid-area: coord; }
+.team-network-node-indigena { grid-area: indigena; }
+.team-network-node-total { grid-area: total; }
+.team-network-node-instituicao { grid-area: instituicao; }
+.team-network-node-ampliada { grid-area: ampliada; }
+
+.team-node-halo {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(169,54,50,0.10);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.team-node-inner {
+  position: relative;
+  display: grid;
+  gap: 0.26rem;
+  min-height: 132px;
+  padding: 1rem 1rem 0.95rem 1rem;
+  border-radius: 24px;
+  border: 1px solid rgba(169,54,50,0.10);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 12px 30px rgba(17,17,17,0.05);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+.team-network-node .team-number {
+  display: block;
+  margin: 0;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(1.8rem, 2.8vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--red-dark);
+}
+
+.team-network-node .team-label {
+  display: block;
+  margin-top: 0.18rem;
+  color: rgba(23,23,23,0.78);
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.team-node-helper {
+  display: block;
+  margin-top: 0.35rem;
+  color: rgba(23,23,23,0.52);
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.team-network-node:hover .team-node-inner,
+.team-network-node:focus-visible .team-node-inner {
+  transform: translateY(-3px) scale(1.01);
+  border-color: rgba(169,54,50,0.22);
+  box-shadow: 0 20px 38px rgba(17,17,17,0.09);
+  background: rgba(255,255,255,0.98);
+}
+
+.team-network-node.active .team-node-inner {
+  border-color: rgba(169,54,50,0.30);
+  box-shadow: 0 0 0 3px rgba(169,54,50,0.08), 0 18px 34px rgba(17,17,17,0.08);
+  background: rgba(169,54,50,0.035);
+}
+
+.team-network-node-total .team-node-inner {
+  min-height: 212px;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  border-radius: 30px;
+  background: linear-gradient(180deg, rgba(169,54,50,0.96), rgba(126,34,31,0.96));
+  border-color: rgba(126,34,31,0.9);
+  box-shadow: 0 22px 44px rgba(110,31,29,0.22);
+}
+
+.team-network-node-total .team-number,
+.team-network-node-total .team-label,
+.team-network-node-total .team-node-helper {
+  color: #fff !important;
+}
+
+.team-network-node-total .team-number {
+  font-size: clamp(2.6rem, 4.5vw, 4rem);
+}
+
+.team-network-node-total .team-label {
+  font-size: 0.82rem;
+}
+
+.team-network-node-total .team-node-helper {
+  opacity: 0.88;
+}
+
+.team-network-node-total .team-node-halo {
+  width: 34px;
+  height: 34px;
+  background: rgba(169,54,50,0.18);
+}
+
+.team-network-node-total:hover .team-node-inner,
+.team-network-node-total:focus-visible .team-node-inner,
+.team-network-node-total.active .team-node-inner {
+  background: linear-gradient(180deg, rgba(169,54,50,1), rgba(126,34,31,1));
+  border-color: rgba(126,34,31,1);
+  box-shadow: 0 0 0 4px rgba(169,54,50,0.10), 0 24px 48px rgba(110,31,29,0.25);
+}
+
+@media (max-width: 991.98px) {
+  .team-network-lines-desktop {
+    display: none;
+  }
+
+  .team-network-lines-tablet {
+    display: block;
+  }
+
+  .team-network-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "total total"
+      "coord indigena"
+      "instituicao ampliada";
+    gap: 1rem;
+  }
+
+  .team-network-node-total .team-node-inner {
+    min-height: 190px;
+  }
+}
+
+@media (max-width: 640px) {
+  .team-network-panel {
+    padding: 1rem 0.9rem;
+    border-radius: 22px;
+  }
+
+  .team-network-head {
+    margin-bottom: 0.8rem;
+  }
+
+  .team-network-note {
+    font-size: 0.88rem !important;
+  }
+
+  .team-network-lines {
+    display: none !important;
+  }
+
+  .team-network-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .team-network-node {
+    width: 100%;
+  }
+
+  .team-network-node::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 0.2rem);
+    width: 1px;
+    height: 0.7rem;
+    background: linear-gradient(180deg, rgba(169,54,50,0.28), rgba(169,54,50,0.05));
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .team-network-node:last-child::after {
+    display: none;
+  }
+
+  .team-node-halo {
+    display: none;
+  }
+
+  .team-node-inner,
+  .team-network-node-total .team-node-inner {
+    min-height: auto;
+    padding: 0.95rem 0.95rem 0.9rem 0.95rem;
+    border-radius: 20px;
+  }
+
+  .team-network-node-total {
+    order: -1;
+  }
+}
+
+/* ===== Destaque para bolsistas das instituições ===== */
+#bolsistas-instituicoes.content-card {
+  border-top: 6px solid var(--red) !important;
+  background:
+    radial-gradient(circle at 96% 4%, rgba(169,54,50,0.11), transparent 22%),
+    linear-gradient(135deg, rgba(255,253,247,0.98), rgba(246,241,232,0.98)) !important;
+  box-shadow: 0 18px 38px rgba(0,0,0,0.12) !important;
+}
+
+#bolsistas-instituicoes .section-title h2 {
+  color: var(--red) !important;
+}
+
+.team-card[data-role="bolsista_instituicao"] {
+  border-top-color: var(--red) !important;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.09) !important;
+}
+
+.team-card[data-role="bolsista_instituicao"] .team-name,
+.team-card[data-role="bolsista_instituicao"] .team-project-role {
+  color: var(--red-dark) !important;
+}
+
+.team-card[data-role="bolsista_instituicao"] .team-project-role {
+  border-left-color: var(--red) !important;
+}
+
+.btn-bolsista-instituicao {
+  background: var(--red-dark) !important;
+  color: #fff !important;
+}
+
+.btn-bolsista-instituicao:hover {
+  background: var(--red) !important;
+  color: #fff !important;
+}
+
+.team-filter[data-filter="bolsista_instituicao"] {
+  border-color: rgba(169,54,50,0.58) !important;
+}
+
+.team-filter[data-filter="bolsista_instituicao"].active,
+.team-filter[data-filter="bolsista_instituicao"]:hover {
+  background: var(--red-dark) !important;
+  border-color: var(--red-dark) !important;
+  color: #fff !important;
 }
 
 /* Busca, filtros e títulos longos não devem gerar largura extra. */

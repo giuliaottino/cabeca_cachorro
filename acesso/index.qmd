@@ -16,6 +16,7 @@ execute:
 resources:
   - ../figures/
   - _input_data/
+  - ../_input_data/icons/ffb.png
 ---
 
 ```{r conservacao-setup, include=FALSE}
@@ -124,6 +125,10 @@ empty_catalog <- function() {
     group = character(),
     year = integer(),
     record_id = character(),
+    collector = character(),
+    collector_display = character(),
+    recordNumber = character(),
+    ffb_taxon_url = character(),
     latitude = numeric(),
     longitude = numeric(),
     has_coordinates = logical(),
@@ -134,7 +139,7 @@ empty_catalog <- function() {
 read_dwc_xlsx <- function(path) {
   sheets <- readxl::excel_sheets(path)
   sheet <- if ("DwC_records" %in% sheets) "DwC_records" else sheets[[1]]
-  dat <- readxl::read_xlsx(path, sheet = sheet, .name_repair = "unique") |>
+  dat <- readxl::read_xlsx(path, sheet = sheet, col_types = "text", .name_repair = "unique") |>
     tibble::as_tibble(.name_repair = "unique")
   names(dat) <- trimws(gsub("^\ufeff", "", names(dat)))
   dat
@@ -200,6 +205,11 @@ standardize_dwc_cols <- function(dat) {
     col("key"),
     col("catalogNumber")
   )
+
+  dat$collector <- fill_col("collector", col("collector"), col("recordedBy"))
+  dat$collector_display <- fill_col("collector_display", col("collector_display"))
+  dat$recordNumber <- fill_col("recordNumber", col("recordNumber"))
+  dat$ffb_taxon_url <- fill_col("ffb_taxon_url", col("ffb_taxon_url"))
 
   dat$latitude <- fill_col(
     "latitude",
@@ -493,10 +503,6 @@ calc_stats <- function(group_filter = NULL) {
     gbif_species <- gbif_species |> filter(group == group_filter)
   }
 
-  exp_keys <- exp_species |> filter(nz(species_key)) |> pull(species_key) |> unique()
-  gbif_keys <- gbif_species |> filter(nz(species_key)) |> pull(species_key) |> unique()
-  new_keys <- if (length(exp_keys) == 0) character() else setdiff(exp_keys, gbif_keys)
-
   list(
     data = species_dat,
     all_data = all_dat,
@@ -512,8 +518,6 @@ calc_stats <- function(group_filter = NULL) {
     exp_records = nrow(exp_all),
     gbif_records = nrow(gbif_all),
     georef_records = all_dat |> filter(has_coordinates) |> nrow(),
-    new_records = length(new_keys),
-    new_keys = new_keys,
     resolution = taxon_resolution_df(all_dat)
   )
 }
@@ -725,7 +729,18 @@ species_list_df <- function(dat) {
       species_key = stringr::str_to_sentence(species_key)
     ) |>
     group_by(family, species_key) |>
-    summarise(records = n(), sources = n_distinct(source), .groups = "drop") |>
+    summarise(
+      records = n(),
+      ffb_taxon_url = {
+        urls <- ffb_taxon_url[nz(ffb_taxon_url) & grepl("^https?://", ffb_taxon_url)]
+        if (length(urls)) urls[[1]] else NA_character_
+      },
+      occurrences = list(tibble::tibble(
+        collector = collector, collector_display = collector_display,
+        recordNumber = recordNumber, source = source
+      )),
+      .groups = "drop"
+    ) |>
     arrange(family, species_key)
 }
 
@@ -734,13 +749,8 @@ species_drawer <- function(stats) {
   if (nrow(dat) == 0) {
     return(tags$div(class = "species-drawer-empty reveal", `data-reveal` = "", "Inclua nomes científicos em nível de espécie no input tratado para gerar a lista completa deste grupo."))
   }
-  new_keys <- stats$new_keys
-  if (length(new_keys) == 1 && is.na(new_keys)) new_keys <- character()
   dat <- dat |>
-    mutate(
-      is_new = species_key %in% stringr::str_to_sentence(new_keys),
-      record_label = dplyr::if_else(records == 1, "1 registro", paste0(format_int(records), " registros"))
-    )
+    mutate(record_label = dplyr::if_else(records == 1, "1 registro", paste0(format_int(records), " registros")))
   tags$details(
     class = "species-drawer reveal",
     `data-reveal` = "",
@@ -753,16 +763,44 @@ species_drawer <- function(stats) {
       tags$div(
         class = "species-drawer-intro",
         tags$div(tags$span(class = "eyebrow", paste("Lista", stats$group)), tags$h4("Espécies registradas no painel")),
-        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada e quantidade de registros.")
+        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; o ícone abre a página na Flora e Funga do Brasil.")
       ),
       tags$div(
         class = "species-list-grid",
         lapply(seq_len(nrow(dat)), function(i) {
+          occurrences <- dat$occurrences[[i]]
           tags$article(
-            class = paste("species-list-card", ifelse(dat$is_new[i], "is-new", "")),
-            tags$div(class = "species-family-line", tags$span(dat$family[i]), if (dat$is_new[i]) tags$b("novo potencial")),
-            tags$em(dat$species_key[i]),
-            tags$small(dat$record_label[i])
+            class = "species-list-card",
+            tags$div(class = "species-family-line", tags$span(dat$family[i])),
+            tags$div(
+              class = "species-taxon-line",
+              tags$button(type = "button", class = "species-taxon-trigger",
+                `aria-expanded` = "false", `aria-controls` = "taxon-record-popup",
+                tags$em(dat$species_key[i])),
+              if (nz(dat$ffb_taxon_url[i])) tags$a(
+                class = "ffb-link", href = dat$ffb_taxon_url[i],
+                target = "_blank", rel = "noopener noreferrer",
+                title = "Flora e Funga do Brasil",
+                `aria-label` = paste(dat$species_key[i], "na Flora e Funga do Brasil"),
+                tags$img(src = "../_input_data/icons/ffb.png", alt = "Flora e Funga do Brasil", width = 28, height = 28)
+              )
+            ),
+            tags$template(
+              class = "taxon-record-content",
+              tags$strong(dat$species_key[i]),
+              tags$p(dat$record_label[i]),
+              tags$ul(lapply(seq_len(nrow(occurrences)), function(j) {
+                rec <- occurrences[j, ]
+                collection_label <- if (nz(rec$collector)) {
+                  paste0(rec$collector, " · nº ", if (nz(rec$recordNumber)) rec$recordNumber else "não informado")
+                } else if (nz(rec$collector_display)) {
+                  rec$collector_display
+                } else {
+                  paste0("Coletor não informado · nº ", if (nz(rec$recordNumber)) rec$recordNumber else "não informado")
+                }
+                tags$li(tags$span(collection_label), tags$small(rec$source))
+              }))
+            )
           )
         })
       )
@@ -780,7 +818,10 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
     kpi_card(format_int(stats$genera), "gêneros", "Gêneros distintos considerando registros até espécie ou até gênero."),
     kpi_card(format_int(stats$families), "famílias", "Famílias distintas considerando registros até espécie, gênero ou família."),
     kpi_card(format_int(stats$records), "registros", "Todas as ocorrências do grupo, incluindo espécie, gênero, família e indeterminados."),
-    kpi_card(format_int(stats$new_records), "novos registros potenciais", "Só espécies completas das expedições ausentes no input GBIF/coleções."),
+    kpi_card(format_int(stats$exp_records), "registros das expedições", paste0(
+      if (stats$records > 0) format(round(100 * stats$exp_records / stats$records, 1), decimal.mark = ",", trim = TRUE) else "0",
+      "% dos registros deste painel foram coletados nas expedições Tsiino Hiiwiida."
+    )),
     kpi_card(format_int(stats$georef_records), "georreferenciados", "Todos os registros do grupo com latitude e longitude disponíveis.")
   )
 
@@ -1027,15 +1068,18 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
     font-size: clamp(1.12rem, 2vw, 1.36rem) !important;
     line-height: 1.72 !important;
     color: #191711 !important;
-    border-left: 4px solid var(--ochre);
-    padding-left: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(215,221,197,0.22);
+    padding: 1rem 1.2rem;
     margin-bottom: 1.25rem !important;
   }
   .big-statement{
     margin-top: 1.4rem;
     padding: clamp(1.1rem, 2.4vw, 1.7rem);
     background: linear-gradient(135deg, rgba(217,154,39,0.15), rgba(98,106,56,0.10));
-    border-left: 5px solid var(--ochre);
+    border: 1px solid var(--line);
+    border-radius: 16px;
     color: var(--green-dark);
     font-family: 'Source Serif 4', Georgia, serif;
     font-weight: 800;
@@ -1144,10 +1188,19 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
   .species-list-card{ min-width: 0; padding: 0.85rem 0.9rem; border-radius: 16px; background: rgba(255,253,247,0.94); border: 1px solid rgba(98,106,56,0.18); box-shadow: 0 8px 18px rgba(0,0,0,0.045); }
   .species-family-line{ display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.45rem; }
   .species-family-line span{ color: var(--green); font-family: 'Space Mono', monospace; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .species-family-line b{ flex: 0 0 auto; border-radius: 999px; padding: 0.2rem 0.45rem; background: rgba(169,54,50,0.12); color: var(--red); font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.06em; text-transform: uppercase; }
   .species-list-card em{ display: block; color: var(--ink); font-family: 'Source Serif 4', Georgia, serif; font-size: 1.04rem; line-height: 1.22; font-weight: 700; }
   .species-list-card small{ display: block; margin-top: 0.5rem; color: var(--muted); font-family: 'Montserrat', Arial, sans-serif; font-size: 0.78rem; }
-  .species-list-card.is-new{ border-color: rgba(169,54,50,0.32); background: radial-gradient(circle at 100% 0%, rgba(217,154,39,0.16), transparent 32%), rgba(255,253,247,0.98); }
+  .species-taxon-line{ display: flex; align-items: center; gap: 0.6rem; }
+  .species-taxon-trigger{ border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; flex: 1; min-width: 0; }
+  .species-taxon-trigger:focus-visible, .ffb-link:focus-visible{ outline: 2px solid var(--green); outline-offset: 4px; }
+  .ffb-link{ display: inline-flex; flex: 0 0 auto; }
+  .ffb-link img{ width: 28px; height: 28px; object-fit: contain; }
+  .taxon-record-popup{ position: fixed; z-index: 10001; width: min(390px, calc(100vw - 24px)); max-height: min(420px, calc(100dvh - 24px)); overflow: auto; padding: 1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 12px 36px rgba(0,0,0,0.2); font-family: 'Montserrat', Arial, sans-serif; }
+  .taxon-record-popup[hidden]{ display: none; }
+  .taxon-record-popup p{ margin: 0.5rem 0; font-size: 0.85rem; }
+  .taxon-record-popup ul{ margin: 0; padding-left: 1.2rem; }
+  .taxon-record-popup li{ padding: 0.45rem 0; font-size: 0.85rem; overflow-wrap: anywhere; }
+  .taxon-record-popup small{ display: block; color: var(--muted); margin-top: 0.2rem; }
   .species-drawer-empty{ margin-top: 1rem; padding: 1rem; border-radius: 18px; border: 1px dashed rgba(169,54,50,0.32); background: rgba(246,241,232,0.54); color: var(--muted); }
 
   .data-infra-layout{ display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.74fr); gap: clamp(1.2rem, 3vw, 2.4rem); align-items: stretch; }
@@ -1253,7 +1306,7 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
   <div class="intro-layout-wide">
     <div class="intro-copy">
       <p class="lead reveal" data-reveal>O Alto Rio Negro, no noroeste da Amazônia, combina campinaranas, florestas de terra firme, igapós, formações aluviais e serras em uma região reconhecida como uma das grandes lacunas de conhecimento da biodiversidade brasileira.</p>
-      <p class="reveal" data-reveal>O projeto integra registros históricos acumulados em herbários, bases públicas e plataformas agregadoras com as coletas realizadas nas expedições atuais. Essa leitura conjunta evidencia o que já foi documentado, onde ainda existem vazios de amostragem e quais espécies aparecem como possíveis novos registros para a Cabeça do Cachorro.</p>
+      <p class="reveal" data-reveal>O projeto integra registros históricos acumulados em herbários, bases públicas e plataformas agregadoras com as coletas realizadas nas expedições atuais. Essa leitura conjunta evidencia o que já foi documentado, onde ainda existem vazios de amostragem e a contribuição das expedições do projeto para a documentação da Cabeça do Cachorro.</p>
       <p class="reveal" data-reveal>As coleções biológicas sustentam a rastreabilidade dos dados: cada voucher pode ser revisado, comparado, georreferenciado, associado a amostras de tecido e incorporado a análises taxonômicas, filogenéticas e ambientais. O resultado é uma base pública para inventários, revisões, biomonitoramento e estratégias de conservação.</p>
       <div class="big-statement reveal" data-reveal>Campo, herbários, bases públicas e amostras moleculares formam uma infraestrutura comum para documentar plantas, fungos, habitats e lacunas de conhecimento no Alto Rio Negro.</div>
       <div class="mini-facts">
@@ -1293,7 +1346,7 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
     <h2>Indicadores gerais</h2>
   </div>
   <p class="lead reveal" data-reveal>Os painéis abaixo são atualizados a partir de um catálogo validado previamente em R, reunindo as coletas das expedições atuais e os registros já existentes para a região, obtidos de coleções e bases agregadoras.</p>
-  <p class="reveal" data-reveal>O indicador de <strong>novos registros potenciais</strong> compara apenas nomes completos em nível de espécie: uma espécie entra como candidata quando aparece nas expedições Tsiino Hiiwiida e não aparece na base histórica de coleções/GBIF. O painel geral também mostra o nível de identificação dos registros — até espécie, até gênero, até família ou indeterminados — para acompanhar a qualidade taxonômica da base.</p>
+  <p class="reveal" data-reveal>O painel geral e os painéis por grupo mostram o total e a proporção de registros das expedições Tsiino Hiiwiida em relação ao conjunto de dados. O painel geral também mostra o nível de identificação dos registros — até espécie, até gênero, até família ou indeterminados — para acompanhar a qualidade taxonômica da base.</p>
   <div class="indicator-photo-row reveal" data-reveal aria-label="Grupos biológicos monitorados nos indicadores">
     <article class="indicator-photo-card" style="--img: url('../figures/conservacao/fanerogama_campo.jpg'); --tone: #626A38;"><span>Fanerógamas</span><h3>Plantas com sementes</h3><p>Árvores, lianas, arbustos, ervas e táxons de interesse para revisão taxonômica, história evolutiva e usos potenciais.</p></article>
     <article class="indicator-photo-card" style="--img: url('../figures/conservacao/criptogama_campo.jpeg'); --tone: #2E3B24;"><span>Criptógamas</span><h3>Briófitas, samambaias e licófitas</h3><p>Grupos sensíveis a microhabitats, importantes para leitura ambiental, biomonitoramento e diversidade críptica.</p></article>
@@ -1308,7 +1361,7 @@ input_status_panel()
 ```{r conservacao-painel-geral}
 render_dashboard(
   title = "Painel geral · flora e funga",
-  subtitle = "Síntese integrada da flora e funga documentada pelas coleções existentes e pelas expedições atuais. O painel reúne fanerógamas, criptógamas e fungos, evidenciando riqueza, gêneros, famílias, registros, georreferenciamento e possíveis novos registros regionais.",
+  subtitle = "Síntese integrada da flora e funga documentada pelas coleções existentes e pelas expedições atuais. O painel reúne fanerógamas, criptógamas e fungos, evidenciando riqueza, gêneros, famílias, registros, georreferenciamento e a contribuição das expedições do projeto.",
   group_filter = NULL
 )
 ```
@@ -1462,6 +1515,62 @@ render_dashboard(
     revealNow(); setTimeout(revealNow, 260); setTimeout(revealNow, 800);
   }
 
+  function setupTaxonPopups(){
+    var popup = document.createElement('div');
+    popup.id = 'taxon-record-popup';
+    popup.className = 'taxon-record-popup';
+    popup.hidden = true;
+    popup.setAttribute('role', 'region');
+    popup.setAttribute('aria-label', 'Registros do táxon');
+    popup.tabIndex = 0;
+    document.body.appendChild(popup);
+    var active = null, pinned = false, closeTimer;
+    function close(){
+      clearTimeout(closeTimer);
+      if(active) active.setAttribute('aria-expanded', 'false');
+      active = null; pinned = false; popup.hidden = true;
+    }
+    function position(){
+      if(!active) return;
+      var rect = active.getBoundingClientRect();
+      popup.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - popup.offsetWidth - 12)) + 'px';
+      var top = rect.bottom + 8;
+      if(top + popup.offsetHeight > window.innerHeight - 12) top = rect.top - popup.offsetHeight - 8;
+      popup.style.top = Math.max(12, top) + 'px';
+    }
+    function show(button){
+      clearTimeout(closeTimer);
+      if(active !== button){
+        close(); active = button;
+        popup.replaceChildren(button.closest('.species-list-card').querySelector('template').content.cloneNode(true));
+      }
+      popup.hidden = false; button.setAttribute('aria-expanded', 'true'); position();
+    }
+    function scheduleClose(){
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(function(){ if(!pinned && !popup.matches(':hover') && !popup.contains(document.activeElement) && active !== document.activeElement) close(); }, 220);
+    }
+    document.querySelectorAll('.species-taxon-trigger').forEach(function(button){
+      button.addEventListener('mouseenter', function(){ if(!pinned) show(button); });
+      button.addEventListener('mouseleave', scheduleClose);
+      button.addEventListener('focus', function(){ if(!pinned) show(button); });
+      button.addEventListener('blur', scheduleClose);
+      button.addEventListener('click', function(){
+        if(active === button && pinned){ close(); return; }
+        show(button); pinned = true;
+      });
+    });
+    popup.addEventListener('mouseenter', function(){ clearTimeout(closeTimer); });
+    popup.addEventListener('mouseleave', scheduleClose);
+    popup.addEventListener('focusout', scheduleClose);
+    document.addEventListener('click', function(event){
+      if(active && !popup.contains(event.target) && !active.contains(event.target)) close();
+    });
+    document.addEventListener('keydown', function(event){ if(event.key === 'Escape') close(); });
+    document.addEventListener('scroll', function(event){ if(!popup.contains(event.target)) close(); }, true);
+    window.addEventListener('resize', position);
+  }
+
   var resizeTimer;
   window.addEventListener('resize', function(){
     clearTimeout(resizeTimer);
@@ -1470,7 +1579,8 @@ render_dashboard(
     }, 180);
   });
 
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupReveal); else setupReveal();
+  function setupPage(){ setupReveal(); setupTaxonPopups(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupPage); else setupPage();
 })();
 </script>
 ```
