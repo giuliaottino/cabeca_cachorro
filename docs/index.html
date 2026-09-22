@@ -4969,11 +4969,200 @@ section#pesquisadores-responsaveis {
     <span class="icon-play" aria-hidden="true"></span>
   </button>
 </section>
-<section id="o-projeto" class="content-card about-section page-columns page-full">
+<style>
+/* CSS restrito a esta seção. A especificidade protege o bloco das diversas
+   regras antigas, inclusive das que aparecem depois dele no index.qmd. */
+#o-projeto.content-card.about-section.projeto-editorial {
+  --pe-rule: rgba(46,59,36,.22);
+  width: min(1320px, 100%) !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: clamp(2rem,5vw,5rem) auto !important;
+  padding: clamp(1.1rem,3.3vw,3rem) !important;
+  position: relative; left: auto !important; right: auto !important;
+  transform: none !important;
+  background: var(--paper, #FFFDF7) !important;
+  border: 0 !important; border-radius: 0 !important;
+  box-shadow: none !important; backdrop-filter: none !important;
+  overflow: visible !important; opacity: 1 !important;
+  scroll-margin-top: 6rem;
+}
+/* O seletor raiz completo supera as regras legadas sem afetar outras seções. */
+#o-projeto.content-card.about-section.projeto-editorial .section-title { display:block; margin:0 0 2rem; padding:0; }
+#o-projeto.content-card.about-section.projeto-editorial .section-title h2 {
+  margin:0; padding:0; border:0; color:var(--red, #A93632);
+  font:700 clamp(1.35rem,2.4vw,2rem)/1.2 'Montserrat',Arial,sans-serif;
+  letter-spacing:-.025em;
+}
+#o-projeto.content-card.about-section.projeto-editorial::before, #o-projeto.content-card.about-section.projeto-editorial::after,
+#o-projeto.content-card.about-section.projeto-editorial .section-title::before, #o-projeto.content-card.about-section.projeto-editorial .section-title::after,
+#o-projeto.content-card.about-section.projeto-editorial .about-photo-expanded::before, #o-projeto.content-card.about-section.projeto-editorial .about-photo-expanded::after,
+#o-projeto.content-card.about-section.projeto-editorial .about-stat::before, #o-projeto.content-card.about-section.projeto-editorial .about-stat::after,
+#o-projeto.content-card.about-section.projeto-editorial .about-pullquote::before, #o-projeto.content-card.about-section.projeto-editorial .about-pullquote::after { content:none !important; display:none !important; }
+#o-projeto.content-card.about-section.projeto-editorial .about-hero-grid {
+  display:grid !important; grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:clamp(1.4rem,3.6vw,3.5rem) !important; align-items:start !important;
+  width:100% !important; min-width:0 !important; margin:0 !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-copy-editorial {
+  display:block !important; width:100% !important; max-width:70ch !important;
+  min-width:0 !important; padding:0 !important; margin:0 !important;
+  align-self:start !important; overflow-wrap:anywhere;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-eyebrow {
+  display:block; width:auto; margin:0 0 1rem; padding:0;
+  background:none; border:0; border-radius:0; color:var(--muted, #675F55);
+  font:400 .69rem/1.5 'Space Mono',monospace; letter-spacing:.12em;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-display-title {
+  width:100% !important; max-width:100% !important; margin:0 0 1.6rem !important;
+  font:700 clamp(1.8rem,3.15vw,2.9rem)/1.12 'Montserrat',Arial,sans-serif !important;
+  letter-spacing:-.045em !important; color:var(--green-dark, #2E3B24);
+  text-wrap:balance; overflow-wrap:anywhere;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-display-title span {
+  display:inline !important; margin:0 !important; padding:0 !important;
+  color:inherit !important; transform:none !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .lead {
+  width:100% !important; max-width:65ch !important;
+  margin:0 0 1.65rem !important; padding:0 !important; border:0 !important;
+  background:none !important;
+  font:400 clamp(1.15rem,1.5vw,1.3rem)/1.6 'Source Serif 4',Georgia,serif !important;
+  color:var(--green-dark, #2E3B24) !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-copy-columns {
+  display:block !important; width:100% !important; max-width:70ch !important;
+  margin:0 !important; columns:auto !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-copy-columns p {
+  margin:0 0 1.15rem !important;
+  font:400 clamp(.94rem,1.08vw,1rem)/1.8 'Montserrat',Arial,sans-serif !important;
+  color:var(--ink, #171717) !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-pullquote {
+  width:100% !important; max-width:60ch !important;
+  margin:1.8rem 0 0 !important; padding:1.4rem 0 0 !important;
+  border:0 !important; border-top:1px solid var(--pe-rule) !important;
+  background:none !important; box-shadow:none !important;
+  font:400 clamp(1.25rem,1.8vw,1.6rem)/1.5 'Source Serif 4',Georgia,serif;
+  color:var(--green-dark, #2E3B24);
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-visual-module {
+  display:grid !important; grid-template-columns:minmax(0,1fr) !important;
+  grid-template-rows:auto !important; gap:1.5rem !important;
+  align-self:start !important; width:100% !important; min-width:0 !important;
+  padding:0 !important; margin:0 !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-photo-expanded, #o-projeto.content-card.about-section.projeto-editorial .pe-field-photo {
+  display:block !important; position:relative !important;
+  width:100% !important; min-width:0 !important; height:auto !important;
+  min-height:0 !important; margin:0 !important; padding:0 !important;
+  background:none !important; border:0 !important; border-radius:0 !important;
+  box-shadow:none !important; overflow:visible !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .pe-image { position:relative; width:100%; background:var(--cream, #F6F1E8); overflow:hidden; }
+#o-projeto.content-card.about-section.projeto-editorial .pe-main-photo .pe-image { height:clamp(320px,62vh,660px); }
+#o-projeto.content-card.about-section.projeto-editorial .pe-image img {
+  display:block; width:100% !important; height:100% !important;
+  min-height:0 !important; max-width:100%; object-fit:cover !important;
+  object-position:50% 35% !important; border-radius:0 !important;
+  filter:saturate(.88) sepia(.045) contrast(1.025) !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .pe-image img[hidden] { display:none !important; }
+#o-projeto.content-card.about-section.projeto-editorial .pe-image.image-missing {
+  display:flex; align-items:center; justify-content:center; padding:1.5rem;
+  color:var(--muted, #675F55); font:400 .8rem/1.5 'Space Mono',monospace;
+}
+#o-projeto.content-card.about-section.projeto-editorial .pe-image.image-missing::after { content:attr(data-label); }
+#o-projeto.content-card.about-section.projeto-editorial figcaption {
+  position:static !important; inset:auto !important; display:block !important;
+  width:auto !important; margin:0 !important; padding:.6rem 0 0 !important;
+  background:none !important; color:var(--muted, #675F55) !important;
+  font:400 .66rem/1.6 'Space Mono',monospace !important;
+  letter-spacing:.015em; text-shadow:none !important; overflow-wrap:anywhere;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-stat-overlay {
+  position:static !important; inset:auto !important; transform:none !important;
+  display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:1rem !important; width:100% !important; margin:0 !important;
+  padding:1.1rem 0 !important; background:none !important;
+  border:0 !important; border-top:1px solid var(--pe-rule) !important;
+  border-bottom:1px solid var(--pe-rule) !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-stat {
+  display:block !important; position:static !important; min-width:0 !important;
+  min-height:0 !important; margin:0 !important; padding:0 !important;
+  background:none !important; border:0 !important; border-radius:0 !important;
+  box-shadow:none !important; backdrop-filter:none !important; transform:none !important;
+  text-align:left !important; overflow:visible !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-stat strong {
+  display:block; margin:0 0 .4rem; color:var(--red, #A93632) !important;
+  font:600 clamp(2rem,3.3vw,3rem)/1 'Source Serif 4',Georgia,serif !important;
+  letter-spacing:-.035em !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-stat span {
+  display:block; color:var(--green-dark, #2E3B24) !important;
+  font:400 .65rem/1.6 'Space Mono',monospace !important;
+  text-transform:none !important; letter-spacing:0 !important; overflow-wrap:anywhere;
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-map-compact {
+  width:100% !important; min-width:0 !important; margin:0 !important;
+  padding:0 !important; align-self:start !important;
+  background:none !important; border:0 !important; border-radius:0 !important;
+  box-shadow:none !important; overflow:hidden;
+}
+#o-projeto.content-card.about-section.projeto-editorial .project-map-header { padding:0 0 .8rem !important; background:none !important; }
+#o-projeto.content-card.about-section.projeto-editorial .project-map-header h3 {
+  margin:0; color:var(--green-dark, #2E3B24) !important;
+  font:700 .74rem/1.5 'Space Mono',monospace; letter-spacing:.035em;
+}
+#o-projeto.content-card.about-section.projeto-editorial .project-map-header p {
+  margin:.35rem 0 0 !important; color:var(--muted, #675F55) !important;
+  font:400 .8rem/1.6 'Montserrat',Arial,sans-serif !important;
+}
+#o-projeto.content-card.about-section.projeto-editorial #project-sgc-map { width:100% !important; height:clamp(230px,29vh,310px) !important; border-radius:0 !important; }
+#o-projeto.content-card.about-section.projeto-editorial .pe-collage {
+  grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr) minmax(0,1fr);
+  align-items:start; gap:clamp(.85rem,2vw,1.8rem); min-width:0; margin-top:.5rem;
+}
+#o-projeto.content-card.about-section.projeto-editorial .pe-landscape .pe-image { height:clamp(240px,29vw,390px); }
+#o-projeto.content-card.about-section.projeto-editorial .pe-botanical { padding-top:clamp(1.5rem,4vw,4rem) !important; }
+#o-projeto.content-card.about-section.projeto-editorial .pe-botanical .pe-image { height:clamp(190px,23vw,310px); }
+#o-projeto.content-card.about-section.projeto-editorial .pe-documentary .pe-image { height:clamp(220px,26vw,350px); }
+#o-projeto.content-card.about-section.projeto-editorial .pe-documentary img { filter:grayscale(1) contrast(1.04) !important; object-position:center !important; }
+/* Preserve o mapa: nenhum reset é aplicado aos descendentes do Leaflet. */
+#o-projeto.content-card.about-section.projeto-editorial .reveal-ready { opacity:1 !important; transform:none !important; transition:none !important; }
+@media (min-width:641px) and (max-width:1279px) {
+  #o-projeto.content-card.about-section.projeto-editorial .about-hero-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:1.6rem !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .pe-main-photo .pe-image { height:clamp(300px,58vh,520px); }
+  #o-projeto.content-card.about-section.projeto-editorial .about-stat-overlay { grid-template-columns:repeat(2,minmax(0,1fr)) !important; row-gap:1.1rem !important; }
+}
+@media (max-width:640px) {
+  #o-projeto.content-card.about-section.projeto-editorial .section-title { margin-bottom:1.2rem; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-hero-grid { display:flex !important; flex-direction:column !important; gap:1.7rem !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-visual-module { display:contents !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .pe-main-photo { order:1; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-copy-editorial { order:2; }
+  #o-projeto.content-card.about-section.projeto-editorial .pe-collage { order:3; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-stat-overlay { order:4; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-map-compact { order:5; }
+  #o-projeto.content-card.about-section.projeto-editorial .pe-main-photo .pe-image { height:clamp(310px,110vw,560px); }
+  #o-projeto.content-card.about-section.projeto-editorial .about-display-title { font-size:clamp(1.9rem,7.5vw,2.8rem) !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-stat-overlay { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:1.25rem !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-stat strong { font-size:2.6rem !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .about-stat span { font-size:.7rem !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .pe-collage { display:flex; flex-direction:column; gap:1.25rem; width:100%; margin:0; }
+  #o-projeto.content-card.about-section.projeto-editorial .pe-botanical { padding-top:0 !important; }
+  #o-projeto.content-card.about-section.projeto-editorial .pe-field-photo .pe-image { height:auto; aspect-ratio:4 / 3; }
+}
+</style>
+
+<section id="o-projeto" class="content-card about-section projeto-editorial page-columns page-full">
   <div class="section-title">
     <h2 class="anchored">O projeto</h2>
   </div>
-
   <div class="about-intro-grid about-hero-grid page-columns page-full">
     <div class="about-copy about-copy-editorial">
       <div class="about-eyebrow">Síntese</div>
@@ -5002,11 +5191,13 @@ section#pesquisadores-responsaveis {
         Da coleta em rios e serras ao catálogo público: o projeto transforma registros de campo, coleções biológicas em conhecimento acessível sobre a flora e a funga da Cabeça do Cachorro.
       </div>
     </div>
-
     <aside class="about-visual-module" aria-label="Resumo territorial e institucional">
-      <figure class="about-photo-quote about-photo-expanded figure">
-        <img src="figures/projeto_rio_bela_adormecida.png" alt="Vista aérea do Alto Rio Negro com a formação da Bela Adormecida ao fundo" class="figure-img">
-
+      <figure class="about-photo-quote about-photo-expanded pe-main-photo figure">
+        <div class="pe-image" data-label="Vista aérea do Alto Rio Negro com a formação da Bela Adormecida ao fundo">
+          <img src="figures/projeto_rio_bela_adormecida.png" alt="Vista aérea do Alto Rio Negro com a formação da Bela Adormecida ao fundo" loading="lazy" decoding="async" onerror="this.onerror=null; this.hidden=true; this.parentElement.classList.add('image-missing'); this.parentElement.setAttribute('role','img'); this.parentElement.setAttribute('aria-label',this.alt);" class="figure-img">
+        </div>
+        <figcaption>Alto Rio Negro · território, ciência e colaboração</figcaption>
+      </figure>
         <div class="about-stat-grid about-stat-overlay" aria-label="Números-chave do projeto">
           <div class="about-stat">
             <strong>36</strong>
@@ -5028,10 +5219,6 @@ section#pesquisadores-responsaveis {
             <span>rios de amostragem</span>
           </div>
         </div>
-
-        <figcaption>Alto Rio Negro · território, ciência e colaboração</figcaption>
-      </figure>
-
       <div class="project-map-card about-map-compact">
         <div class="project-map-header">
           <h3 class="anchored">São Gabriel da Cachoeira</h3>
@@ -5041,9 +5228,28 @@ section#pesquisadores-responsaveis {
         <div id="project-sgc-map" aria-label="Mapa do município de São Gabriel da Cachoeira"></div>
       </div>
     </aside>
+    <!-- Fontes preferenciais informadas no pedido. Ajuste apenas os caminhos
+         se DSC_7419/DC0_7440/DC0_7451 estiverem em outra pasta local.
+         As alternativas abaixo existem no repositório e não geram loops. -->
+    <div class="pe-collage" aria-label="Registros fotográficos de campo">
+      <figure class="pe-field-photo pe-landscape figure">
+        <div class="pe-image" data-label="Paisagem do Alto Rio Negro">
+          <img src="figures/DSC_7419.jpg" alt="Paisagem do Alto Rio Negro" loading="lazy" decoding="async" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='figures/DC0_7440.jpg';}else if(this.dataset.fallback==='1'){this.dataset.fallback='2';this.src='figures/campo.jpg';}else{this.onerror=null;this.hidden=true;this.parentElement.classList.add('image-missing');this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label',this.alt);}" class="figure-img">
+        <figcaption>Paisagem · Alto Rio Negro</figcaption>
+      </div></figure>
+      <figure class="pe-field-photo pe-botanical figure">
+        <div class="pe-image" data-label="Detalhe de planta em campo">
+          <img src="figures/DC0_7451.jpg" alt="Detalhe de planta em campo" loading="lazy" decoding="async" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='_input_data/expedicoes_fotos/curicuriari-julho-2025/tovomita-clusiaceae.JPG';}else{this.onerror=null;this.hidden=true;this.parentElement.classList.add('image-missing');this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label',this.alt);}" class="figure-img">
+        <figcaption>Flora · registro de campo</figcaption>
+      </div></figure>
+      <figure class="pe-field-photo pe-documentary figure">
+        <div class="pe-image" data-label="Equipe processando material botânico em campo">
+          <img src="_input_data/expedicoes_fotos/tiquie-julho-2026/WhatsApp Image 2026-09-20 at 19.16.35.jpeg" alt="Equipe processando material botânico em campo" loading="lazy" decoding="async" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='figures/paisagem.jpg';}else{this.onerror=null;this.hidden=true;this.parentElement.classList.add('image-missing');this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label',this.alt);}" class="figure-img">
+        <figcaption>Coleções · trabalho de campo</figcaption>
+      </div></figure>
+    </div>
   </div>
 </section>
-
 <section id="frentes-integradas" class="full-bleed-feature" aria-label="Três eixos do projeto de pesquisa">
   <div class="feature-title-wrap">
     <div class="feature-eyebrow"></div>
@@ -6590,7 +6796,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="divulg-track" id="divulg-track">
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/713023556_17908168236415941_219328854288232478_n.jpg?stp=c604.0.1815.1814a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=OpvKazXOFcMQ7kNvwFKelP3&amp;_nc_oc=Adrm_OSs_DAu9dDoFAqdJZ5OSlW0-r_peQ6Vot8z1Nx8rE4uN-r-CVp6YxUH2MePIe8&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=IGTFbWahb7Otnsh8h4iG1A&amp;_nc_ss=7ba02&amp;oh=00_AQJ1io4CP58LwU6ZthnKkCq4vVUMVbBif7CBG79wMVUAeQ&amp;oe=6AB78DD6" alt="Atividades de campo na Serra Curicuriari e Serra da Bela Adormecida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/713023556_17908168236415941_219328854288232478_n.jpg?stp=c604.0.1815.1814a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=UxxYQgF0maIQ7kNvwGZCHLg&amp;_nc_oc=AdoyNUG-zr4uhUzbSo_sqCtssuGkuKd25sw23jyjwJcFpNJ4amZRgFbF35U6lkEBGpY&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=tOE1be1ZkSI3WzkDYXRkzw&amp;_nc_ss=7b60f&amp;oh=00_AQL1bWrc8RyRWiKaE2Xo_lFMIXl9q12PQKo0kdRaoUVL0w&amp;oe=6AB78DD6" alt="Atividades de campo na Serra Curicuriari e Serra da Bela Adormecida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6602,7 +6808,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/708877028_17907549048415941_8086947597057656567_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=111&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=7LdNoq8Dam0Q7kNvwFY6vYe&amp;_nc_oc=AdorCSGBFndppkKOT-TrIBznK-Aj7hpNDWpXKPh6ow3C6yTzUCHn3Jp9pkqm6XrL-Dc&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=LHxhEUW4L1CBkYi-EUJ84g&amp;_nc_ss=7ba02&amp;oh=00_AQLx4F76__Xr4f0IJQlf45AWvOsdGDwqzrh0MF1HuK5YXQ&amp;oe=6AB79847" alt="Nova etapa para revelar a biodiversidade de plantas e fungos do Alto Rio Negro" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/708877028_17907549048415941_8086947597057656567_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=111&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=7LdNoq8Dam0Q7kNvwGZnrHz&amp;_nc_oc=AdozrhJ4cWBY_qTBSf3-ySIr1Jbk9WILRLC39-_Rg2GbssHVSXo5TKNQocE4X5lZXmE&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=GIMouDXyOD1ZEzVxw1FYcg&amp;_nc_ss=7b60f&amp;oh=00_AQK3Iyz1g3rELFMffjIQHqPzva2uSYStoqR2IL3wIgOBWQ&amp;oe=6AB79847" alt="Nova etapa para revelar a biodiversidade de plantas e fungos do Alto Rio Negro" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6614,7 +6820,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/653887413_17896058841415941_1376087743757294225_n.webp?stp=c288.0.864.864a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=vPQiOjlLaSoQ7kNvwGoJAMY&amp;_nc_oc=Adp_iQW7CCy2G8xDdIrTKdZBJycthDjzvsA6IQdpStoCmK-vKO8-bxIqPH5Fh4SsPwc&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=TtDc60XcarRmhz7nKHvVtw&amp;_nc_ss=7ba02&amp;oh=00_AQJqK921ot5l2tKDpi9Rtbtt_IhlwRxpBnwlm0j0IuvwOQ&amp;oe=6AB783C2" alt="Bromélia do igapó no Alto Rio Negro" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/653887413_17896058841415941_1376087743757294225_n.webp?stp=c288.0.864.864a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=vPQiOjlLaSoQ7kNvwFVzp8h&amp;_nc_oc=AdodxLJ4htmD6-2YaO6AQC4A3HXMNwImEgjnhDtMY_DYR3coRTjoW-CGAklnefK6sCs&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=QKPWoqpmNOp-QH6QVouh9w&amp;_nc_ss=7b60f&amp;oh=00_AQIgP3esInJoyKbwzwdf6MVkFz8VZ5amxi7nQzDHvYYD3Q&amp;oe=6AB7BC02" alt="Bromélia do igapó no Alto Rio Negro" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6626,7 +6832,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/576528013_17880530649415941_2277481138650739211_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=106&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=csdLkW6rMR0Q7kNvwHEi8Te&amp;_nc_oc=AdrOalUnx112D48XLk35FW051L7dEf8dMB8iKyX6-SGRr-6zW0X5x_N-1Lrgx4xFB5M&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=pHgJomkembmyXamjoLxO1A&amp;_nc_ss=7ba02&amp;oh=00_AQI2X5eKW_KJcTBq7kzddiy2fXWc4FVayUhg4bL60omgJQ&amp;oe=6AB793A3" alt="Do campo ao herbário: revelando a biodiversidade do Alto Rio Negro" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/576528013_17880530649415941_2277481138650739211_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=106&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=csdLkW6rMR0Q7kNvwGueZyN&amp;_nc_oc=Adq1ikUK_r2--YP5xK7sRMqfJQch1KT-gSLGX8JnrL8hH4MT8Ncf2tDjS1b-cvQPByE&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=GYiTHd1aTqd4DqFrhCw-7w&amp;_nc_ss=7b60f&amp;oh=00_AQL95Gx8HsJjNmbfFLkCIBDXvQmxHZLT0Wke-e39Oh0l4w&amp;oe=6AB793A3" alt="Do campo ao herbário: revelando a biodiversidade do Alto Rio Negro" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6668,7 +6874,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/583052972_17881075674415941_1384101271160209828_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=102&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=xWtvFEbmxt4Q7kNvwGtgnrC&amp;_nc_oc=AdrMGXZm9oGZv0JqIhRMKjtkQlWUFYRrOzojBGtOFaTvcpY8jT7rbGNg2MljKy4bZyw&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=8IIUVtpr3KdHeYmowJXQ_w&amp;_nc_ss=7ba02&amp;oh=00_AQJfAUeClVnKVbpig8IXeJAgolRG7jG9T_d9yEl9it1FIg&amp;oe=6AB7826D" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/583052972_17881075674415941_1384101271160209828_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=102&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=xWtvFEbmxt4Q7kNvwHUtFOu&amp;_nc_oc=AdqoHxhTwYFM9-3UYQ9631yLlsx6HohrSY8To9-e9sqb1Wp5w0W_vuXVz6jvT1AzIww&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=rlsPlz54keX2NzP8Ja3n3g&amp;_nc_ss=7b60f&amp;oh=00_AQJeroiczBsRJ9IV21c9qGOodObWDqw0pi_d1wO9Pk3NXw&amp;oe=6AB7BAAD" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6679,7 +6885,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/588471972_17882214837415941_6123531806883822854_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=105&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=HPoxRz3o2NsQ7kNvwHEtFJt&amp;_nc_oc=AdqvG9D-STpmYu2DdvUsESKrp1gbzQyjwVYUhti6b0oWRB3mtv_IOBXqYZnwJWDtVVE&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=04lABm8hbAPq1aVm8bsLEg&amp;_nc_ss=7ba02&amp;oh=00_AQLWnAY9X767EDuSNDcCnmUL8gsxuMwEdWXbEwRhuiAhDg&amp;oe=6AB78FA3" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/588471972_17882214837415941_6123531806883822854_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=105&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=HPoxRz3o2NsQ7kNvwHpHWeI&amp;_nc_oc=Adocmv-mq8tcI7cWNCSP6b4nrJwR7jR5vfA7-sh-cQPYiEA3138kXBOSwOCe_ji9f-o&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=YPbCjceg6vXfuR5buZ_Fkw&amp;_nc_ss=7b60f&amp;oh=00_AQKj5VRU8yBh5X53gQGF7k1ZZh4GpIv5lBQqL8vnZr_ODQ&amp;oe=6AB78FA3" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6690,7 +6896,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/556822342_17876017662415941_1388118623585190058_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=110&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=aGJbDJZg48IQ7kNvwFN1knt&amp;_nc_oc=AdrmSeRJyscahySTK8DhddFGih0E_BpKzAitCnU6XzEPfu2_6bxnC0dV5EE2JnRewOE&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=UalDRreDu3RjbqNHUQ-rug&amp;_nc_ss=7ba02&amp;oh=00_AQJsjdiFh3Rke33CgPD_ca8GYdpciHhc5q1cdg2eR0cdVQ&amp;oe=6AB7953F" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/556822342_17876017662415941_1388118623585190058_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=110&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=aGJbDJZg48IQ7kNvwHpn5ju&amp;_nc_oc=AdoRAPE9dIYu3cMo12mm8-UK9cVKuc11QgwU9iv_M-XpN0vrEjcpXuP7dNwaU5K37FU&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=-mpXktKxZpmGNK-VzJQbZA&amp;_nc_ss=7b60f&amp;oh=00_AQKmpuNdgVSZ3SfcDE7mvHSm9cz0hXum_YuO4qcW7pBJdw&amp;oe=6AB7953F" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
