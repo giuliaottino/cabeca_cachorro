@@ -5189,7 +5189,7 @@ section#pesquisadores-responsaveis {
       </figure>
       <figure class="pe-field-photo pe-documentary">
         <div class="pe-image" data-label="Equipe processando material botânico em campo">
-          <img src="_input_data/expedicoes_fotos/tiquie-julho-2026/WhatsApp%20Image%202026-09-20%20at%2019.16.35.jpeg"
+          <img src="figures/WhatsApp%20Image%202026-09-20%20at%2019.16.35.jpeg"
                alt="Equipe processando material botânico em campo"
                loading="lazy" decoding="async"
                onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='figures/paisagem.jpg';}else{this.onerror=null;this.hidden=true;this.parentElement.classList.add('image-missing');this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label',this.alt);}">
