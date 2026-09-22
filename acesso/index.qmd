@@ -17,7 +17,7 @@ resources:
   - ../figures/
   - _input_data/
   - ../_input_data/icons/ffb.png
-  - ../_input_data/icons/powo.jpg
+  - ../_input_data/icons/powo.png
 ---
 
 ```{r conservacao-setup, include=FALSE}

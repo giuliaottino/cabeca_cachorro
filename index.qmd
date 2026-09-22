@@ -5209,7 +5209,7 @@ section#pesquisadores-responsaveis {
 
   <div class="feature-band">
     <article class="feature-photo" data-label="Equipe em atividade de levantamento de flora e funga em campo">
-      <img src="figures/rio.png" alt="Equipe em atividade de levantamento de flora e funga em campo" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
+      <img src="figures/levantamento_flora_funga_02.jpg" alt="Equipe em atividade de levantamento de flora e funga em campo" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing');">
     </article>
 
     <article class="feature-panel feature-panel-green">
