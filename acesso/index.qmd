@@ -17,6 +17,7 @@ resources:
   - ../figures/
   - _input_data/
   - ../_input_data/icons/ffb.png
+  - ../_input_data/icons/powo.jpg
 ---
 
 ```{r conservacao-setup, include=FALSE}
@@ -129,6 +130,7 @@ empty_catalog <- function() {
     collector_display = character(),
     recordNumber = character(),
     ffb_taxon_url = character(),
+    powo_taxon_url = character(),
     latitude = numeric(),
     longitude = numeric(),
     has_coordinates = logical(),
@@ -210,6 +212,7 @@ standardize_dwc_cols <- function(dat) {
   dat$collector_display <- fill_col("collector_display", col("collector_display"))
   dat$recordNumber <- fill_col("recordNumber", col("recordNumber"))
   dat$ffb_taxon_url <- fill_col("ffb_taxon_url", col("ffb_taxon_url"))
+  dat$powo_taxon_url <- fill_col("powo_taxon_url", col("powo_taxon_url"))
 
   dat$latitude <- fill_col(
     "latitude",
@@ -735,6 +738,10 @@ species_list_df <- function(dat) {
         urls <- ffb_taxon_url[nz(ffb_taxon_url) & grepl("^https?://", ffb_taxon_url)]
         if (length(urls)) urls[[1]] else NA_character_
       },
+      powo_taxon_url = {
+        urls <- powo_taxon_url[nz(powo_taxon_url) & grepl("^https?://", powo_taxon_url)]
+        if (length(urls)) urls[[1]] else NA_character_
+      },
       occurrences = list(tibble::tibble(
         collector = collector, collector_display = collector_display,
         recordNumber = recordNumber, source = source
@@ -763,7 +770,7 @@ species_drawer <- function(stats) {
       tags$div(
         class = "species-drawer-intro",
         tags$div(tags$span(class = "eyebrow", paste("Lista", stats$group)), tags$h4("Espécies registradas no painel")),
-        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; o ícone abre a página na Flora e Funga do Brasil.")
+        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; os ícones abrem as páginas do táxon na Flora e Funga do Brasil e no Plants of the World Online (POWO).")
       ),
       tags$div(
         class = "species-list-grid",
@@ -777,12 +784,22 @@ species_drawer <- function(stats) {
               tags$button(type = "button", class = "species-taxon-trigger",
                 `aria-expanded` = "false", `aria-controls` = "taxon-record-popup",
                 tags$em(dat$species_key[i])),
-              if (nz(dat$ffb_taxon_url[i])) tags$a(
-                class = "ffb-link", href = dat$ffb_taxon_url[i],
-                target = "_blank", rel = "noopener noreferrer",
-                title = "Flora e Funga do Brasil",
-                `aria-label` = paste(dat$species_key[i], "na Flora e Funga do Brasil"),
-                tags$img(src = "../_input_data/icons/ffb.png", alt = "Flora e Funga do Brasil", width = 28, height = 28)
+              tags$span(
+                class = "taxon-external-links",
+                if (nz(dat$ffb_taxon_url[i])) tags$a(
+                  class = "taxon-source-link ffb-link", href = dat$ffb_taxon_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "Flora e Funga do Brasil",
+                  `aria-label` = paste(dat$species_key[i], "na Flora e Funga do Brasil"),
+                  tags$img(src = "../_input_data/icons/ffb.png", alt = "Flora e Funga do Brasil", width = 28, height = 28)
+                ),
+                if (nz(dat$powo_taxon_url[i])) tags$a(
+                  class = "taxon-source-link powo-link", href = dat$powo_taxon_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "Plants of the World Online (POWO)",
+                  `aria-label` = paste(dat$species_key[i], "no Plants of the World Online"),
+                  tags$img(src = "../_input_data/icons/powo.jpg", alt = "Plants of the World Online (POWO)", width = 28, height = 28)
+                )
               )
             ),
             tags$template(
@@ -1192,9 +1209,11 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
   .species-list-card small{ display: block; margin-top: 0.5rem; color: var(--muted); font-family: 'Montserrat', Arial, sans-serif; font-size: 0.78rem; }
   .species-taxon-line{ display: flex; align-items: center; gap: 0.6rem; }
   .species-taxon-trigger{ border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; flex: 1; min-width: 0; }
-  .species-taxon-trigger:focus-visible, .ffb-link:focus-visible{ outline: 2px solid var(--green); outline-offset: 4px; }
-  .ffb-link{ display: inline-flex; flex: 0 0 auto; }
-  .ffb-link img{ width: 28px; height: 28px; object-fit: contain; }
+  .species-taxon-trigger:focus-visible, .taxon-source-link:focus-visible{ outline: 2px solid var(--green); outline-offset: 4px; }
+  .taxon-external-links{ display: inline-flex; align-items: center; gap: 0.35rem; flex: 0 0 auto; }
+  .taxon-source-link{ display: inline-flex; flex: 0 0 auto; border-radius: 6px; }
+  .taxon-source-link img{ width: 28px; height: 28px; object-fit: contain; display: block; }
+  .powo-link img{ border-radius: 4px; }
   .taxon-record-popup{ position: fixed; z-index: 10001; width: min(390px, calc(100vw - 24px)); max-height: min(420px, calc(100dvh - 24px)); overflow: auto; padding: 1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 12px 36px rgba(0,0,0,0.2); font-family: 'Montserrat', Arial, sans-serif; }
   .taxon-record-popup[hidden]{ display: none; }
   .taxon-record-popup p{ margin: 0.5rem 0; font-size: 0.85rem; }
