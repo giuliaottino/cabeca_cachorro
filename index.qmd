@@ -5336,7 +5336,7 @@ section#pesquisadores-responsaveis {
       <article class="core-objective-card is-active" data-objective-index="0" role="listitem">
         <div class="core-objective-media" aria-label="Imagens do Objetivo 1">
           <img class="core-objective-photo is-photo-active" src="figures/objetivos/levantamento_flora_funga_01.jpg" alt="Levantamento de flora e funga em campo" loading="lazy">
-          <img class="core-objective-photo" src="figures/objetivos/levantamento_flora_funga_02.png" alt="Registro de campo de flora e funga" loading="lazy">
+          <img class="core-objective-photo" src="figures/objetivos/levantamento_flora_funga_02.jpg" alt="Registro de campo de flora e funga" loading="lazy">
         </div>
         <div class="core-objective-body">
           <span class="core-objective-number">01</span>
@@ -5587,7 +5587,7 @@ section#pesquisadores-responsaveis {
     <div class="exp-collage-cta">
       <h2 class="exp-collage-heading">Expedições recentes</h2>
       <span class="exp-collage-line" aria-hidden="true"></span>
-      <a class="btn-main" href="expedicoes.html">Mapa e fotos das expedições</a>
+      <a class="btn-main" href="expedicoes/index.html">Mapa e fotos das expedições</a>
     </div>
   </div>
 </section>

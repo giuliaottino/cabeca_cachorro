@@ -14,8 +14,8 @@
   name: Fundação Carlos Chagas Filho de Amparo à Pesquisa do Estado do Rio de Janeiro
   role: Instituição de fomento
   url: https://www.faperj.br/
-  logo: figures/logos/institutions/FAPERJ.png
-  source_file: FAPERJ.png
+  logo: figures/logos/institutions/faperj.png
+  source_file: faperj.png
 - id: ukri
   group: fomento
   order: 3
@@ -41,8 +41,8 @@
   name: Fundação de Amparo à Ciência e Tecnologia do Estado de Pernambuco
   role: Instituição de fomento
   url: https://www.facepe.br/
-  logo: figures/logos/institutions/FACEPE.png
-  source_file: FACEPE.png
+  logo: figures/logos/institutions/facepe.png
+  source_file: facepe.png
 - id: fapema
   group: fomento
   order: 6
@@ -50,8 +50,8 @@
   name: Fundação de Amparo à Pesquisa e ao Desenvolvimento Científico e Tecnológico do Maranhão
   role: Instituição de fomento
   url: https://www.fapema.br/
-  logo: figures/logos/institutions/FAPEMA.png
-  source_file: FAPEMA.png
+  logo: figures/logos/institutions/fapema.png
+  source_file: fapema.png
 - id: fapesp
   group: fomento
   order: 7
@@ -59,8 +59,8 @@
   name: Fundação de Amparo à Pesquisa do Estado de São Paulo
   role: Instituição de fomento
   url: https://fapesp.br/
-  logo: figures/logos/institutions/FAPESP.png
-  source_file: FAPESP.png
+  logo: figures/logos/institutions/fapesp.png
+  source_file: fapesp.png
 - id: fapesq_pb
   group: fomento
   order: 8
@@ -77,8 +77,8 @@
   name: Fundação de Apoio à Pesquisa do Distrito Federal
   role: Instituição de fomento
   url: https://www.fap.df.gov.br/
-  logo: figures/logos/institutions/FAPDF.png
-  source_file: FAPDF.png
+  logo: figures/logos/institutions/fapdf.png
+  source_file: fapdf.png
 - id: inpa
   group: participante
   order: 1
@@ -149,8 +149,8 @@
   name: Universidade de Brasília
   role: Instituição participante da rede de coordenação científica
   url: https://www.unb.br/
-  logo: figures/logos/institutions/UnB.png
-  source_file: UnB.png
+  logo: figures/logos/institutions/unb.png
+  source_file: unb.png
 - id: cnpq
   group: parceira
   order: 2
@@ -250,8 +250,8 @@
   name: Fundação Oswaldo Cruz
   role: Instituição parceira
   url: https://fiocruz.br/
-  logo: figures/logos/institutions/FIOCRUZ.png
-  source_file: FIOCRUZ.png
+  logo: figures/logos/institutions/fiocruz.png
+  source_file: fiocruz.png
 - id: university_copenhagen
   group: parceira
   order: 13
