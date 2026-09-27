@@ -4414,6 +4414,8 @@ iframe {
   transform: none !important;
 }
 
+
+
 /* Seções centrais: usa 100%, não 100vw. 100vw é a origem mais comum do escape. */
 #metodo-integrado.content-card,
 #objetivos.objectives-section,
@@ -5152,6 +5154,86 @@ section#pesquisadores-responsaveis {
   #o-projeto.content-card.about-section.projeto-editorial .pe-botanical { padding-top:0 !important; }
   #o-projeto.content-card.about-section.projeto-editorial .pe-field-photo .pe-image { height:auto; aspect-ratio:4 / 3; }
 }
+/* ===== Vídeos: largura vinculada à janela, sem escape horizontal ===== */
+#videos-projeto.content-card {
+  box-sizing: border-box !important;
+  position: relative !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(1260px, calc(100vw - 3rem)) !important;
+  max-width: calc(100vw - 3rem) !important;
+  min-width: 0 !important;
+  margin: clamp(2.5rem, 4vw, 4rem) 0 2rem !important;
+  padding: clamp(1.2rem, 2.5vw, 2.4rem) clamp(0.8rem, 2vw, 2rem) !important;
+  overflow: hidden !important;
+}
+#videos-projeto .section-title,
+#videos-projeto .videos-grid {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+#videos-projeto .videos-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(0.85rem, 2vw, 1.6rem) !important;
+}
+#videos-projeto .video-card {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  border-radius: 20px;
+  overflow: hidden !important;
+  background: var(--green-dark);
+  border: 1px solid rgba(98,106,56,0.22);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.14);
+}
+#videos-projeto .video-frame-wrap {
+  position: relative !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  aspect-ratio: 16 / 9;
+  overflow: hidden !important;
+  background: #000;
+}
+#videos-projeto .video-frame-wrap iframe {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  border: 0 !important;
+}
+#videos-projeto .video-caption {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(180deg, rgba(255,253,247,0.96), rgba(246,241,232,0.86));
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  font-style: italic;
+}
+@media (max-width: 1100px) {
+  #videos-projeto .videos-grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@media (max-width: 600px) {
+  #videos-projeto.content-card {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+    padding: 1rem 0.7rem !important;
+  }
+}
 </style>
 
 <section id="o-projeto" class="content-card about-section projeto-editorial page-columns page-full">
@@ -5280,6 +5362,27 @@ section#pesquisadores-responsaveis {
       <h3 class="anchored">Eixo 3</h3>
       <p class="axis-title">Campo e tecnologias emergentes</p>
       <p class="axis-detail">Integrar vouchers, coleções, DNA, metabarcoding, biomonitoramento, bancos de dados e comunicação pública para transformar coletas em conhecimento acessível.</p>
+    </article>
+  </div>
+</section>
+<section id="videos-projeto" class="content-card" aria-label="Vídeos do projeto">
+  <div class="section-title">
+    <h2 class="anchored">Vídeos do projeto</h2>
+  </div>
+
+  <div class="videos-grid">
+    <article class="video-card">
+      <div class="video-frame-wrap">
+        <iframe src="https://www.youtube-nocookie.com/embed/9_cCiNW_5F8" title="Vídeo do projeto Tsiino Hiiwiida 1" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen=""></iframe>
+      </div>
+      <p class="video-caption">Registro em vídeo · Tsiino Hiiwiida</p>
+    </article>
+
+    <article class="video-card">
+      <div class="video-frame-wrap">
+        <iframe src="https://www.youtube-nocookie.com/embed/m1FYFChmLr8" title="Vídeo do projeto Tsiino Hiiwiida 2" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen=""></iframe>
+      </div>
+      <p class="video-caption">Registro em vídeo · Tsiino Hiiwiida</p>
     </article>
   </div>
 </section>
@@ -6791,7 +6894,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="divulg-track" id="divulg-track">
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/713023556_17908168236415941_219328854288232478_n.jpg?stp=c604.0.1815.1814a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=UxxYQgF0maIQ7kNvwHAs6Ih&amp;_nc_oc=AdoVgwy_0Uza2G4CiEsfHANivf--6zBFjly147AWov8ObHu-Phoo00UitakHn_X0Eq0&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=kLHJeEiivRFRGBovHmRK5Q&amp;_nc_ss=7b60f&amp;oh=00_AQLKPB4myDIaJZlo0QZQjAeddlNZF9Nvr5U-_3k5wC2LZQ&amp;oe=6AB86ED6" alt="Atividades de campo na Serra Curicuriari e Serra da Bela Adormecida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/713023556_17908168236415941_219328854288232478_n.jpg?stp=c604.0.1815.1814a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=gzRhlG_4rl4Q7kNvwGpFL1G&amp;_nc_oc=AdobQnqEyitAGgbp_5fYb3FijFqO30Qj59AD-uV4R6Ln56zJ_dOFXJrvRen8hVgvpmjZAr6HsT_L2y7NKe1HhHQf&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=zwgrNR2jKVk5wqBPhWEnLw&amp;_nc_ss=7b60f&amp;oh=00_AQLl5-HJArRz5fcIe1KPAIubr5sKFduWA6KP1pXIJrPvJQ&amp;oe=6ABF0656" alt="Atividades de campo na Serra Curicuriari e Serra da Bela Adormecida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6803,7 +6906,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/708877028_17907549048415941_8086947597057656567_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=111&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=7LdNoq8Dam0Q7kNvwFY6vYe&amp;_nc_oc=AdorCSGBFndppkKOT-TrIBznK-Aj7hpNDWpXKPh6ow3C6yTzUCHn3Jp9pkqm6XrL-Dc&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=E_r75SBSICP2cCvuLP3jEA&amp;_nc_ss=7b60f&amp;oh=00_AQKJGZ7ccp8eXjJLVfRJ8eZ64Bt4VtffuTo6ijcf-9zpgQ&amp;oe=6AB87947" alt="Nova etapa para revelar a biodiversidade de plantas e fungos do Alto Rio Negro" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/708877028_17907549048415941_8086947597057656567_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=111&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=7sDPV6e6bIIQ7kNvwG45BTK&amp;_nc_oc=AdoPyIOMwUkNO2HNJuDI6EheXgv8Wl7QvGP1oLvF-Bg6AHu1Xc5OhI1p_R55u1luu5qdUpQBnW7r9eh1YugNiIHQ&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=YaY3zBiWFymCzwiRhm7uuQ&amp;_nc_ss=7b60f&amp;oh=00_AQIe-HZ0H5FvxiTKiZdmfSS6AD43SEnYb1QbyoiviOrpPg&amp;oe=6ABF10C7" alt="Nova etapa para revelar a biodiversidade de plantas e fungos do Alto Rio Negro" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6815,7 +6918,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/653887413_17896058841415941_1376087743757294225_n.webp?stp=c288.0.864.864a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=vPQiOjlLaSoQ7kNvwGoJAMY&amp;_nc_oc=Adp_iQW7CCy2G8xDdIrTKdZBJycthDjzvsA6IQdpStoCmK-vKO8-bxIqPH5Fh4SsPwc&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=y3YnoTyOLigPGuhgRlIh5A&amp;_nc_ss=7b60f&amp;oh=00_AQKXy8DjSbMSOp6QI64Tr0HEFaA4ddjz0mfPrlydd8u9SQ&amp;oe=6AB864C2" alt="Bromélia do igapó no Alto Rio Negro" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/653887413_17896058841415941_1376087743757294225_n.webp?stp=c288.0.864.864a_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=107&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&amp;_nc_ohc=jbPC6QWrnvkQ7kNvwFaKRrJ&amp;_nc_oc=AdoQFVd0j2XbrmLW4N5veOCGw8tGuW6ulisYYpqakKNk0EHv5yZoqLuK0dTDp8m04REDqAvAzXXXwEu58A0tM_2A&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=R5_DQUPY2C47Cp-a8mo37g&amp;_nc_ss=7b60f&amp;oh=00_AQIAslwhIV8nEAeEG4iy7YihT96NxQxALpAid_QK1-W5MQ&amp;oe=6ABEFC42" alt="Bromélia do igapó no Alto Rio Negro" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6827,7 +6930,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/576528013_17880530649415941_2277481138650739211_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=106&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=zAap91F1RtAQ7kNvwHRqhKi&amp;_nc_oc=AdpGWRfd2wv_ehOborJJkQBIod1Ski3ROXRkJmiBgdxT-F8-7eFbwoVxJgdAt0JjjK8&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=0a76jxWNrAXIk4lxg0FIjQ&amp;_nc_ss=7b60f&amp;oh=00_AQLfp1p9xxHpZeQbGk9ZtDJ_Eg907RqDTj6dM_3jcXWSJA&amp;oe=6AB874A3" alt="Do campo ao herbário: revelando a biodiversidade do Alto Rio Negro" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/576528013_17880530649415941_2277481138650739211_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=106&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=dggYnYV_3wMQ7kNvwF-eUfu&amp;_nc_oc=AdovEoVQkUpDHyr3MRM-q9Xt8u6Y8ERmvsQXKe5XJK48abt3WNDc6-njd-HOSiCDjzw80ZOFizI-3B_9SKM9vS4w&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=iKk8kKBM0X9Ws4HLFN9hTw&amp;_nc_ss=7b60f&amp;oh=00_AQLU9R42fMqDoLxtKO3C9rsxSS--UdganKn0PLbdIB8OKA&amp;oe=6ABF0C23" alt="Do campo ao herbário: revelando a biodiversidade do Alto Rio Negro" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6869,7 +6972,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/583052972_17881075674415941_1384101271160209828_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=102&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=pbmE5Dqtq2YQ7kNvwFXxSuL&amp;_nc_oc=Adr54EQisVoRB8b7l8A1mmTxFR28HsGVth2wCYzYSNG_1yLzAAeg8kGfwwH6gZA6MUY&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=cYlWklOCnSkMGeZCU-m7xA&amp;_nc_ss=7b60f&amp;oh=00_AQKclGnq95JS4boQlZliG1LPYICg4ynjSBSPlCkI6nxRoA&amp;oe=6AB8636D" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/583052972_17881075674415941_1384101271160209828_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=102&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=V-RIC-vbFJ8Q7kNvwFW18K6&amp;_nc_oc=AdrOnzq7eaRNWek2SyUpvsA-GwaAwyKA4KW_3SBNJdr3WUJoqv9ksFoEeGge2rKB2iuck0qkObu9pfigDfy-57Wi&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=frPVPnZ0lZJeD5GYbHD0Jg&amp;_nc_ss=7b60f&amp;oh=00_AQIR04t5xCylb7ytKF0Z1uMxbPI2buDLiTwqnYyQZ1Kz-g&amp;oe=6ABEFAED" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6880,7 +6983,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/588471972_17882214837415941_6123531806883822854_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=105&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=HPoxRz3o2NsQ7kNvwHEtFJt&amp;_nc_oc=AdqvG9D-STpmYu2DdvUsESKrp1gbzQyjwVYUhti6b0oWRB3mtv_IOBXqYZnwJWDtVVE&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=cMiow6Qxa3KlJKRMqmhaAQ&amp;_nc_ss=7b60f&amp;oh=00_AQJy9pxeQeTL7-Nka4Qgqusy2yVyEva6P6ywcQZi_3HWmQ&amp;oe=6AB870A3" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/588471972_17882214837415941_6123531806883822854_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=105&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=uWtj-zzgEncQ7kNvwEdGobT&amp;_nc_oc=AdpHReimYMnuBbW-NZjoSyTYTYrFL7ptoH3JALZyMaXyG-tO0WKD_3wGHcx63ixEewOzlTdUixfjWMyrrG6UPtIv&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=OaOvVe7cSRDaYALeXTavUw&amp;_nc_ss=7b60f&amp;oh=00_AQJFLbInZhoK6ydiuv9nvs0yUZpCadDWVMFUwpsPGaG6yA&amp;oe=6ABF0823" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>
@@ -6891,7 +6994,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </article>
 <article class="carousel-slide carousel-slide-instagram ">
 <div class="carousel-thumb">
-<img src="https://scontent.cdninstagram.com/v/t51.82787-15/556822342_17876017662415941_1388118623585190058_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=110&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=aGJbDJZg48IQ7kNvwFN1knt&amp;_nc_oc=AdrmSeRJyscahySTK8DhddFGih0E_BpKzAitCnU6XzEPfu2_6bxnC0dV5EE2JnRewOE&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=MCxmBrE6JDM8pLMxDNafAw&amp;_nc_ss=7b60f&amp;oh=00_AQLnnmNSELuei-GOoRAYsuPPnnozaHlTY9QanS8LJ9DfaA&amp;oe=6AB8763F" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
+<img src="https://scontent.cdninstagram.com/v/t51.82787-15/556822342_17876017662415941_1388118623585190058_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&amp;_nc_cat=110&amp;ccb=7-5&amp;_nc_sid=18de74&amp;efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&amp;_nc_ohc=yM8cbD6yQg4Q7kNvwGlh6lQ&amp;_nc_oc=AdrtOEnLRS0zV8PqKoIwWOc7Vz1q4Ap2qcorV4BkZIjgQkmOfHe3vBpUYIVHDwGvcauf1S2TOU6wM2M1w-MOwy6j&amp;_nc_zt=23&amp;_nc_ht=scontent.cdninstagram.com&amp;_nc_gid=jFl4I_ASlC-RDeRM2ngN_g&amp;_nc_ss=7b60f&amp;oh=00_AQJQEwq1rGeOwRintNgSbQglafGwkBN8Zf5uI5nU9LwyvQ&amp;oe=6ABF0DBF" alt="Post de divulgação do projeto Tsiino Hiiwiida" loading="lazy">
 </div>
 <div class="carousel-body">
 <span class="carousel-type-pill ">Instagram</span>

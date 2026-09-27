@@ -4339,6 +4339,8 @@ iframe {
   transform: none !important;
 }
 
+
+
 /* Seções centrais: usa 100%, não 100vw. 100vw é a origem mais comum do escape. */
 #metodo-integrado.content-card,
 #objetivos.objectives-section,
@@ -5095,6 +5097,86 @@ section#pesquisadores-responsaveis {
   #o-projeto.content-card.about-section.projeto-editorial .pe-botanical { padding-top:0 !important; }
   #o-projeto.content-card.about-section.projeto-editorial .pe-field-photo .pe-image { height:auto; aspect-ratio:4 / 3; }
 }
+/* ===== Vídeos: largura vinculada à janela, sem escape horizontal ===== */
+#videos-projeto.content-card {
+  box-sizing: border-box !important;
+  position: relative !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(1260px, calc(100vw - 3rem)) !important;
+  max-width: calc(100vw - 3rem) !important;
+  min-width: 0 !important;
+  margin: clamp(2.5rem, 4vw, 4rem) 0 2rem !important;
+  padding: clamp(1.2rem, 2.5vw, 2.4rem) clamp(0.8rem, 2vw, 2rem) !important;
+  overflow: hidden !important;
+}
+#videos-projeto .section-title,
+#videos-projeto .videos-grid {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+#videos-projeto .videos-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(0.85rem, 2vw, 1.6rem) !important;
+}
+#videos-projeto .video-card {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  border-radius: 20px;
+  overflow: hidden !important;
+  background: var(--green-dark);
+  border: 1px solid rgba(98,106,56,0.22);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.14);
+}
+#videos-projeto .video-frame-wrap {
+  position: relative !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  aspect-ratio: 16 / 9;
+  overflow: hidden !important;
+  background: #000;
+}
+#videos-projeto .video-frame-wrap iframe {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  border: 0 !important;
+}
+#videos-projeto .video-caption {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(180deg, rgba(255,253,247,0.96), rgba(246,241,232,0.86));
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  font-style: italic;
+}
+@media (max-width: 1100px) {
+  #videos-projeto .videos-grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@media (max-width: 600px) {
+  #videos-projeto.content-card {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+    padding: 1rem 0.7rem !important;
+  }
+}
 </style>
 
 <section id="o-projeto" class="content-card about-section projeto-editorial">
@@ -5236,6 +5318,42 @@ section#pesquisadores-responsaveis {
       <h3>Eixo 3</h3>
       <p class="axis-title">Campo e tecnologias emergentes</p>
       <p class="axis-detail">Integrar vouchers, coleções, DNA, metabarcoding, biomonitoramento, bancos de dados e comunicação pública para transformar coletas em conhecimento acessível.</p>
+    </article>
+  </div>
+</section>
+```
+
+```{=html}
+<section id="videos-projeto" class="content-card" aria-label="Vídeos do projeto">
+  <div class="section-title">
+    <h2>Vídeos do projeto</h2>
+  </div>
+
+  <div class="videos-grid">
+    <article class="video-card">
+      <div class="video-frame-wrap">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/9_cCiNW_5F8"
+          title="Vídeo do projeto Tsiino Hiiwiida 1"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <p class="video-caption">Registro em vídeo · Tsiino Hiiwiida</p>
+    </article>
+
+    <article class="video-card">
+      <div class="video-frame-wrap">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/m1FYFChmLr8"
+          title="Vídeo do projeto Tsiino Hiiwiida 2"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <p class="video-caption">Registro em vídeo · Tsiino Hiiwiida</p>
     </article>
   </div>
 </section>

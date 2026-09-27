@@ -24,6 +24,7 @@ resources:
   - ../_input_data/icons/bold.png
   - ../_input_data/icons/mycobank.png
   - ../_input_data/icons/indexfungorum.png
+  - ../_input_data/icons/wfo.png
 ---
 
 ```{r conservacao-setup, include=FALSE}
@@ -143,6 +144,7 @@ empty_catalog <- function() {
     ebi_search_url = character(),
     bold_taxon_url = character(),
     mycobank_taxon_url = character(),
+    wfo_url = character(),
     index_fungorum_taxon_url = character(),
     latitude = numeric(),
     longitude = numeric(),
@@ -233,6 +235,7 @@ standardize_dwc_cols <- function(dat) {
   dat$bold_taxon_url <- fill_col("bold_taxon_url", col("bold_taxon_url"))
   dat$mycobank_taxon_url <- fill_col("mycobank_taxon_url", col("mycobank_taxon_url"))
   dat$index_fungorum_taxon_url <- fill_col("index_fungorum_taxon_url", col("index_fungorum_taxon_url"))
+  dat$wfo_url <- fill_col("wfo_url", col("wfo_url"))
 
   dat$latitude <- fill_col(
     "latitude",
@@ -774,6 +777,7 @@ species_list_df <- function(dat) {
       bold_taxon_url = first_taxon_link(bold_taxon_url),
       mycobank_taxon_url = first_taxon_link(mycobank_taxon_url),
       index_fungorum_taxon_url = first_taxon_link(index_fungorum_taxon_url),
+      wfo_url = first_taxon_link(wfo_url),
       occurrences = list(tibble::tibble(
         collector = collector, collector_display = collector_display,
         recordNumber = recordNumber, source = source
@@ -880,7 +884,13 @@ species_drawer <- function(stats) {
                   title = "Index Fungorum",
                   `aria-label` = paste(dat$species_key[i], "no Index Fungorum"),
                   tags$img(src = "../_input_data/icons/indexfungorum.png", alt = "Index Fungorum", width = 28, height = 28)
-                )
+                ),
+                if (nz(dat$wfo_url[i])) tags$a( class = "taxon-source-link wfo-link",href = dat$wfo_url[i],target = "_blank",
+                                                rel = "noopener noreferrer", title = "World Flora Online (WFO)",
+                                                `aria-label` = paste(dat$species_key[i], "na World Flora Online"),
+                                                tags$img(src = "../_input_data/icons/wfo.png",alt = "World Flora Online (WFO)",
+                                                         width = 28, height = 28)
+                                                )
               )
             ),
             tags$template(
@@ -1685,3 +1695,4 @@ render_dashboard(
 })();
 </script>
 ```
+
