@@ -18,6 +18,11 @@ resources:
   - _input_data/
   - ../_input_data/icons/ffb.png
   - ../_input_data/icons/powo.png
+  - ../_input_data/icons/gbif.png
+  - ../_input_data/icons/ncbi_taxonomy.png
+  - ../_input_data/icons/ncbi_nucleotide.png
+  - ../_input_data/icons/ebi.png
+  - ../_input_data/icons/bold.png
 ---
 
 ```{r conservacao-setup, include=FALSE}
@@ -131,6 +136,11 @@ empty_catalog <- function() {
     recordNumber = character(),
     ffb_taxon_url = character(),
     powo_taxon_url = character(),
+    gbif_taxon_url = character(),
+    ncbi_taxonomy_url = character(),
+    ncbi_nucleotide_url = character(),
+    ebi_search_url = character(),
+    bold_taxon_url = character(),
     latitude = numeric(),
     longitude = numeric(),
     has_coordinates = logical(),
@@ -213,6 +223,11 @@ standardize_dwc_cols <- function(dat) {
   dat$recordNumber <- fill_col("recordNumber", col("recordNumber"))
   dat$ffb_taxon_url <- fill_col("ffb_taxon_url", col("ffb_taxon_url"))
   dat$powo_taxon_url <- fill_col("powo_taxon_url", col("powo_taxon_url"))
+  dat$gbif_taxon_url <- fill_col("gbif_taxon_url", col("gbif_taxon_url"))
+  dat$ncbi_taxonomy_url <- fill_col("ncbi_taxonomy_url", col("ncbi_taxonomy_url"))
+  dat$ncbi_nucleotide_url <- fill_col("ncbi_nucleotide_url", col("ncbi_nucleotide_url"))
+  dat$ebi_search_url <- fill_col("ebi_search_url", col("ebi_search_url"))
+  dat$bold_taxon_url <- fill_col("bold_taxon_url", col("bold_taxon_url"))
 
   dat$latitude <- fill_col(
     "latitude",
@@ -724,6 +739,11 @@ plot_years <- function(dat) {
     config(displayModeBar = FALSE, responsive = TRUE)
 }
 
+first_taxon_link <- function(x) {
+  urls <- x[nz(x) & grepl("^https?://", x)]
+  if (length(urls)) urls[[1]] else NA_character_
+}
+
 species_list_df <- function(dat) {
   dat |>
     filter(nz(species_key)) |>
@@ -742,6 +762,11 @@ species_list_df <- function(dat) {
         urls <- powo_taxon_url[nz(powo_taxon_url) & grepl("^https?://", powo_taxon_url)]
         if (length(urls)) urls[[1]] else NA_character_
       },
+      gbif_taxon_url = first_taxon_link(gbif_taxon_url),
+      ncbi_taxonomy_url = first_taxon_link(ncbi_taxonomy_url),
+      ncbi_nucleotide_url = first_taxon_link(ncbi_nucleotide_url),
+      ebi_search_url = first_taxon_link(ebi_search_url),
+      bold_taxon_url = first_taxon_link(bold_taxon_url),
       occurrences = list(tibble::tibble(
         collector = collector, collector_display = collector_display,
         recordNumber = recordNumber, source = source
@@ -770,7 +795,7 @@ species_drawer <- function(stats) {
       tags$div(
         class = "species-drawer-intro",
         tags$div(tags$span(class = "eyebrow", paste("Lista", stats$group)), tags$h4("Espécies registradas no painel")),
-        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; os ícones abrem as páginas do táxon na Flora e Funga do Brasil e no Plants of the World Online (POWO).")
+        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; os ícones abrem os links disponíveis na Flora e Funga do Brasil, POWO, GBIF, NCBI Taxonomy, NCBI Nucleotide, EMBL-EBI e BOLD.")
       ),
       tags$div(
         class = "species-list-grid",
@@ -799,6 +824,41 @@ species_drawer <- function(stats) {
                   title = "Plants of the World Online (POWO)",
                   `aria-label` = paste(dat$species_key[i], "no Plants of the World Online"),
                   tags$img(src = "../_input_data/icons/powo.png", alt = "Plants of the World Online (POWO)", width = 28, height = 28)
+                ),
+                if (nz(dat$gbif_taxon_url[i])) tags$a(
+                  class = "taxon-source-link gbif-link", href = dat$gbif_taxon_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "GBIF",
+                  `aria-label` = paste(dat$species_key[i], "no GBIF"),
+                  tags$img(src = "../_input_data/icons/gbif.png", alt = "GBIF", width = 28, height = 28)
+                ),
+                if (nz(dat$ncbi_taxonomy_url[i])) tags$a(
+                  class = "taxon-source-link ncbi_taxonomy-link", href = dat$ncbi_taxonomy_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "NCBI Taxonomy",
+                  `aria-label` = paste(dat$species_key[i], "no NCBI Taxonomy"),
+                  tags$img(src = "../_input_data/icons/nih.png", alt = "NCBI Taxonomy", width = 28, height = 28)
+                ),
+                if (nz(dat$ncbi_nucleotide_url[i])) tags$a(
+                  class = "taxon-source-link ncbi_nucleotide-link", href = dat$ncbi_nucleotide_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "NCBI Nucleotide",
+                  `aria-label` = paste(dat$species_key[i], "no NCBI Nucleotide"),
+                  tags$img(src = "../_input_data/icons/nih.png", alt = "NCBI Nucleotide", width = 28, height = 28)
+                ),
+                if (nz(dat$ebi_search_url[i])) tags$a(
+                  class = "taxon-source-link ebi-link", href = dat$ebi_search_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "EMBL-EBI (busca textual)",
+                  `aria-label` = paste(dat$species_key[i], "na pesquisa EMBL-EBI"),
+                  tags$img(src = "../_input_data/icons/ebi.png", alt = "EMBL-EBI (busca textual)", width = 28, height = 28)
+                ),
+                if (nz(dat$bold_taxon_url[i])) tags$a(
+                  class = "taxon-source-link bold-link", href = dat$bold_taxon_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "BOLD Systems",
+                  `aria-label` = paste(dat$species_key[i], "no BOLD Systems"),
+                  tags$img(src = "../_input_data/icons/bold.png", alt = "BOLD Systems", width = 28, height = 28)
                 )
               )
             ),
@@ -1210,7 +1270,7 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
   .species-taxon-line{ display: flex; align-items: center; gap: 0.6rem; }
   .species-taxon-trigger{ border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; flex: 1; min-width: 0; }
   .species-taxon-trigger:focus-visible, .taxon-source-link:focus-visible{ outline: 2px solid var(--green); outline-offset: 4px; }
-  .taxon-external-links{ display: inline-flex; align-items: center; gap: 0.35rem; flex: 0 0 auto; }
+  .taxon-external-links{ display: inline-flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 0.35rem; flex: 0 0 auto; max-width: 10.7rem; }
   .taxon-source-link{ display: inline-flex; flex: 0 0 auto; border-radius: 6px; }
   .taxon-source-link img{ width: 28px; height: 28px; object-fit: contain; display: block; }
   .powo-link img{ border-radius: 4px; }
