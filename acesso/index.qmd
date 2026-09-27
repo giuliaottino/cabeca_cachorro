@@ -19,10 +19,11 @@ resources:
   - ../_input_data/icons/ffb.png
   - ../_input_data/icons/powo.png
   - ../_input_data/icons/gbif.png
-  - ../_input_data/icons/ncbi_taxonomy.png
-  - ../_input_data/icons/ncbi_nucleotide.png
+  - ../_input_data/icons/nih.png
   - ../_input_data/icons/ebi.png
   - ../_input_data/icons/bold.png
+  - ../_input_data/icons/mycobank.png
+  - ../_input_data/icons/indexfungorum.png
 ---
 
 ```{r conservacao-setup, include=FALSE}
@@ -141,6 +142,8 @@ empty_catalog <- function() {
     ncbi_nucleotide_url = character(),
     ebi_search_url = character(),
     bold_taxon_url = character(),
+    mycobank_taxon_url = character(),
+    index_fungorum_taxon_url = character(),
     latitude = numeric(),
     longitude = numeric(),
     has_coordinates = logical(),
@@ -228,6 +231,8 @@ standardize_dwc_cols <- function(dat) {
   dat$ncbi_nucleotide_url <- fill_col("ncbi_nucleotide_url", col("ncbi_nucleotide_url"))
   dat$ebi_search_url <- fill_col("ebi_search_url", col("ebi_search_url"))
   dat$bold_taxon_url <- fill_col("bold_taxon_url", col("bold_taxon_url"))
+  dat$mycobank_taxon_url <- fill_col("mycobank_taxon_url", col("mycobank_taxon_url"))
+  dat$index_fungorum_taxon_url <- fill_col("index_fungorum_taxon_url", col("index_fungorum_taxon_url"))
 
   dat$latitude <- fill_col(
     "latitude",
@@ -767,6 +772,8 @@ species_list_df <- function(dat) {
       ncbi_nucleotide_url = first_taxon_link(ncbi_nucleotide_url),
       ebi_search_url = first_taxon_link(ebi_search_url),
       bold_taxon_url = first_taxon_link(bold_taxon_url),
+      mycobank_taxon_url = first_taxon_link(mycobank_taxon_url),
+      index_fungorum_taxon_url = first_taxon_link(index_fungorum_taxon_url),
       occurrences = list(tibble::tibble(
         collector = collector, collector_display = collector_display,
         recordNumber = recordNumber, source = source
@@ -795,7 +802,7 @@ species_drawer <- function(stats) {
       tags$div(
         class = "species-drawer-intro",
         tags$div(tags$span(class = "eyebrow", paste("Lista", stats$group)), tags$h4("Espécies registradas no painel")),
-        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; os ícones abrem os links disponíveis na Flora e Funga do Brasil, POWO, GBIF, NCBI Taxonomy, NCBI Nucleotide, EMBL-EBI e BOLD.")
+        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; os ícones abrem os links disponíveis na Flora e Funga do Brasil, POWO, GBIF, NCBI Taxonomy, NCBI Nucleotide, EMBL-EBI, BOLD, MycoBank e Index Fungorum.")
       ),
       tags$div(
         class = "species-list-grid",
@@ -859,6 +866,20 @@ species_drawer <- function(stats) {
                   title = "BOLD Systems",
                   `aria-label` = paste(dat$species_key[i], "no BOLD Systems"),
                   tags$img(src = "../_input_data/icons/bold.png", alt = "BOLD Systems", width = 28, height = 28)
+                ),
+                if (nz(dat$mycobank_taxon_url[i])) tags$a(
+                  class = "taxon-source-link mycobank-link", href = dat$mycobank_taxon_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "MycoBank",
+                  `aria-label` = paste(dat$species_key[i], "no MycoBank"),
+                  tags$img(src = "../_input_data/icons/mycobank.png", alt = "MycoBank", width = 72, height = 28)
+                ),
+                if (nz(dat$index_fungorum_taxon_url[i])) tags$a(
+                  class = "taxon-source-link indexfungorum-link", href = dat$index_fungorum_taxon_url[i],
+                  target = "_blank", rel = "noopener noreferrer",
+                  title = "Index Fungorum",
+                  `aria-label` = paste(dat$species_key[i], "no Index Fungorum"),
+                  tags$img(src = "../_input_data/icons/indexfungorum.png", alt = "Index Fungorum", width = 28, height = 28)
                 )
               )
             ),
@@ -1273,6 +1294,7 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
   .taxon-external-links{ display: inline-flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 0.35rem; flex: 0 0 auto; max-width: 10.7rem; }
   .taxon-source-link{ display: inline-flex; flex: 0 0 auto; border-radius: 6px; }
   .taxon-source-link img{ width: 28px; height: 28px; object-fit: contain; display: block; }
+  .mycobank-link img{ width: 72px; height: 28px; }
   .powo-link img{ border-radius: 4px; }
   .taxon-record-popup{ position: fixed; z-index: 10001; width: min(390px, calc(100vw - 24px)); max-height: min(420px, calc(100dvh - 24px)); overflow: auto; padding: 1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 12px 36px rgba(0,0,0,0.2); font-family: 'Montserrat', Arial, sans-serif; }
   .taxon-record-popup[hidden]{ display: none; }
