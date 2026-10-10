@@ -2244,7 +2244,7 @@ display: none/
 
   .about-stat-grid,
   .impact-grid {
-    grid-template-columns: 1fr;
+ grid-template-columns: 1fr 1fr 1.6fr;
   }
 
   .about-display-title {
@@ -2304,7 +2304,8 @@ display: none/
   font-size: clamp(0.53rem, 0.62vw, 0.64rem);
   line-height: 1.23;
   letter-spacing: 0.072em;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
+  word-break: normal;
   hyphens: none;
 }
 
@@ -5228,19 +5229,14 @@ section#pesquisadores-responsaveis {
           </div>
 
           <div class="about-stat">
-            <strong>6</strong>
+            <strong>8</strong>
             <span>campanhas de campo</span>
           </div>
 
-          <div class="about-stat">
-            <strong>30</strong>
-            <span>instituições Brasil + Reino Unido</span>
-          </div>
-
-          <div class="about-stat">
-            <strong>4</strong>
-            <span>rios de amostragem</span>
-          </div>
+<div class="about-stat">
+  <strong>30</strong>
+  <span>instituições<br>Brasil + Reino Unido</span>
+</div>
         </div>
       <div class="project-map-card about-map-compact">
         <div class="project-map-header">
@@ -9776,6 +9772,32 @@ body {
 #salvaguardas-cta .safeguards-editorial-eyebrow,
 #salvaguardas-cta .safeguards-editorial-copy h3 {
   display: none !important;
+}
+/* Ajustes pontuais: estatísticas do projeto e título de salvaguardas no celular. */
+@media (min-width: 1280px) {
+  #o-projeto.content-card.about-section.projeto-editorial .about-stat-overlay {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.7fr) !important;
+    gap: 0.75rem !important;
+  }
+}
+#o-projeto.content-card.about-section.projeto-editorial .about-stat span {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+}
+@media (max-width: 640px) {
+  #salvaguardas-cta .section-title {
+    grid-template-columns: 24px minmax(0, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  #salvaguardas-cta .section-title h2 {
+    font-size: 1.05rem !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
 }
 </style>
 ```

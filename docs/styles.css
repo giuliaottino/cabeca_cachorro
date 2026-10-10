@@ -376,3 +376,34 @@ body > .tsiino-site-footer {
 body .tsiino-site-footer {
   display: block !important;
 }
+
+/* TSIINO — CARDS COM FUNDO LISO (GLOBAL) */
+/*
+   Remove somente a textura tsiino_bg.png dos cards e cabeçalhos
+   informativos. O fundo geral das páginas, fotografias, mapas,
+   imagens de expedições, hero e rodapé continuam inalterados.
+
+   Regras com !important são necessárias porque algumas páginas
+   definem o background em CSS local e/ou com !important.
+*/
+html body .kpi-card,
+html body .mol-kpi,
+html body .taxa-card,
+html body .about-stat,
+html body .safeguards-status-card,
+html body .species-drawer summary,
+html body .data-flow-card,
+html body .project-map-header,
+html body #divulgacao .media-panel-header,
+html body #salvaguardas-cta .safeguards-simple-card {
+  background: #2E3B24 !important;
+  background-image: none !important;
+  background-size: auto !important;
+}
+
+/* Classe reutilizável para novos cards com fundo liso. */
+html body .tsiino-card-solid {
+  background: #2E3B24 !important;
+  background-image: none !important;
+  background-size: auto !important;
+}

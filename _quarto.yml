@@ -1,12 +1,15 @@
+
 project:
   output-dir: docs
   type: website
   render:
     - index.qmd
     - acesso/index.qmd
+    - acesso/molecular/index.qmd
     - expedicoes/index.qmd
     - ferramentas/validador-herbario/index.qmd
     - team/index.qmd
+
   resources:
     - figures/**
     - js/**
@@ -15,11 +18,12 @@ project:
     - test_data/**
 
 website:
-  title: "Tsiino Hiwiida"
+  title: "Tsiino Hiiwiida"
   page-navigation: true
   reader-mode: false
   search: false
   favicon: "figures/tsiino_hex_sticker.png"
+
   navbar:
     search: false
     background: light
@@ -27,17 +31,27 @@ website:
     type: light
     logo: "figures/tsiino_hex_sticker.png"
     href: index.qmd
+
     left:
       - text: "Sobre"
         href: index.qmd
+
       - text: "Expedições"
         href: expedicoes/index.qmd
+
       - text: "Acesso aos dados"
-        href: acesso/index.qmd
+        menu:
+          - text: "Visão geral"
+            href: acesso/index.qmd
+
+          - text: "Dados moleculares"
+            href: acesso/molecular/index.qmd
+
       - text: "Ferramentas"
         menu:
           - text: "Validador de planilha de herbário"
             href: ferramentas/validador-herbario/index.qmd
+
       - text: "Equipe"
         href: team/index.qmd
 
@@ -49,12 +63,15 @@ format:
     code-copy: true
     code-overflow: wrap
     code-tools: false
+
     css:
       - styles.css
+
     eval: true
     theme: [spacelab, theme.scss]
     include-in-header: gtm-head.html
     include-before-body: gtm-body.html
+
     include-after-body:
       - tsiino-footer.html
       - _includes/language-router.html
