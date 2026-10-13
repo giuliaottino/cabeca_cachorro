@@ -5,7 +5,6 @@ project:
   render:
     - index.qmd
     - acesso/index.qmd
-    - acesso/molecular/index.qmd
     - expedicoes/index.qmd
     - ferramentas/validador-herbario/index.qmd
     - team/index.qmd
