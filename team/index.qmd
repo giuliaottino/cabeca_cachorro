@@ -206,6 +206,7 @@ responsible_names <- c(
   "Clístenes Nascimento",
   "Dirce Komura",
   "Denilson Peralta",
+  "Felipe Wartchow",
   "Leandro Giacomin",
   "Micheline Carvalho-Silva"
 )
