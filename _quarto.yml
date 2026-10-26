@@ -43,9 +43,6 @@ website:
           - text: "Visão geral"
             href: acesso/index.qmd
 
-          - text: "Dados moleculares"
-            href: acesso/molecular/index.qmd
-
       - text: "Ferramentas"
         menu:
           - text: "Validador de planilha de herbário"
