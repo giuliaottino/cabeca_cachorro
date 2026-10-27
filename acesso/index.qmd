@@ -16,15 +16,6 @@ execute:
 resources:
   - ../figures/
   - _input_data/
-  - ../_input_data/icons/ffb.png
-  - ../_input_data/icons/powo.png
-  - ../_input_data/icons/gbif.png
-  - ../_input_data/icons/nih.png
-  - ../_input_data/icons/ebi.png
-  - ../_input_data/icons/bold.png
-  - ../_input_data/icons/mycobank.png
-  - ../_input_data/icons/indexfungorum.png
-  - ../_input_data/icons/wfo.png
 ---
 
 ```{r conservacao-setup, include=FALSE}
@@ -132,19 +123,32 @@ empty_catalog <- function() {
     order = character(),
     group = character(),
     year = integer(),
+    eventDate = character(),
     record_id = character(),
+    gbif_id = character(),
     collector = character(),
     collector_display = character(),
     recordNumber = character(),
+    catalogNumber = character(),
+    locality = character(),
+    institution = character(),
+    collection = character(),
+    basisOfRecord = character(),
     ffb_taxon_url = character(),
     powo_taxon_url = character(),
     gbif_taxon_url = character(),
+    opentree_url = character(),
+    pubchem_url = character(),
     ncbi_taxonomy_url = character(),
     ncbi_nucleotide_url = character(),
     ebi_search_url = character(),
     bold_taxon_url = character(),
     mycobank_taxon_url = character(),
-    wfo_url = character(),
+    wfo_taxon_url = character(),
+    col_url = character(),
+    globi_url = character(),
+    europepmc_url = character(),
+    inaturalist_url = character(),
     index_fungorum_taxon_url = character(),
     latitude = numeric(),
     longitude = numeric(),
@@ -222,20 +226,33 @@ standardize_dwc_cols <- function(dat) {
     col("key"),
     col("catalogNumber")
   )
+  dat$gbif_id <- fill_col("gbif_id", col("gbifID"), col("gbif_id"))
 
   dat$collector <- fill_col("collector", col("collector"), col("recordedBy"))
   dat$collector_display <- fill_col("collector_display", col("collector_display"))
   dat$recordNumber <- fill_col("recordNumber", col("recordNumber"))
+  dat$catalogNumber <- fill_col("catalogNumber", col("catalogNumber"))
+  dat$eventDate <- fill_col("eventDate", col("eventDate"), col("verbatimEventDate"), col("date"))
+  dat$locality <- fill_col("locality", col("locality"), col("verbatimLocality"))
+  dat$institution <- fill_col("institution", col("institution"), col("institutionCode"))
+  dat$collection <- fill_col("collection", col("collection"), col("collectionCode"))
+  dat$basisOfRecord <- fill_col("basisOfRecord", col("basisOfRecord"))
   dat$ffb_taxon_url <- fill_col("ffb_taxon_url", col("ffb_taxon_url"))
   dat$powo_taxon_url <- fill_col("powo_taxon_url", col("powo_taxon_url"))
   dat$gbif_taxon_url <- fill_col("gbif_taxon_url", col("gbif_taxon_url"))
+  dat$opentree_url <- fill_col("opentree_url", col("opentree_url"))
+  dat$pubchem_url <- fill_col("pubchem_url", col("pubchem_url"))
   dat$ncbi_taxonomy_url <- fill_col("ncbi_taxonomy_url", col("ncbi_taxonomy_url"))
   dat$ncbi_nucleotide_url <- fill_col("ncbi_nucleotide_url", col("ncbi_nucleotide_url"))
   dat$ebi_search_url <- fill_col("ebi_search_url", col("ebi_search_url"))
   dat$bold_taxon_url <- fill_col("bold_taxon_url", col("bold_taxon_url"))
   dat$mycobank_taxon_url <- fill_col("mycobank_taxon_url", col("mycobank_taxon_url"))
   dat$index_fungorum_taxon_url <- fill_col("index_fungorum_taxon_url", col("index_fungorum_taxon_url"))
-  dat$wfo_url <- fill_col("wfo_url", col("wfo_url"))
+  dat$wfo_taxon_url <- fill_col("wfo_taxon_url", col("wfo_taxon_url"), col("wfo_url"))
+  dat$col_url <- fill_col("col_url", col("col_url"))
+  dat$globi_url <- fill_col("globi_url", col("globi_url"))
+  dat$europepmc_url <- fill_col("europepmc_url", col("europepmc_url"))
+  dat$inaturalist_url <- fill_col("inaturalist_url", col("inaturalist_url"))
 
   dat$latitude <- fill_col(
     "latitude",
@@ -337,6 +354,16 @@ ensure_catalog_cols <- function(dat, source_label = NA_character_) {
       order = clean_text(order),
       group = clean_text(group),
       record_id = clean_text(record_id),
+      gbif_id = clean_text(gbif_id),
+      eventDate = clean_text(eventDate),
+      collector = clean_text(collector),
+      collector_display = clean_text(collector_display),
+      recordNumber = clean_text(recordNumber),
+      catalogNumber = clean_text(catalogNumber),
+      locality = clean_text(locality),
+      institution = clean_text(institution),
+      collection = clean_text(collection),
+      basisOfRecord = clean_text(basisOfRecord),
       year = to_year(year),
       latitude = as_num(latitude),
       longitude = as_num(longitude),
@@ -747,13 +774,120 @@ plot_years <- function(dat) {
     config(displayModeBar = FALSE, responsive = TRUE)
 }
 
-first_taxon_link <- function(x) {
-  urls <- x[nz(x) & grepl("^https?://", x)]
-  if (length(urls)) urls[[1]] else NA_character_
+collect_taxon_links <- function(x) {
+  urls <- as.character(x[nz(x) & grepl("^https?://", x)])
+  unique(urls)
 }
 
+occurrence_record_url <- function(rec) {
+  candidates <- c(rec$gbif_id, rec$record_id)
+  candidates <- candidates[!is.na(candidates) & nzchar(trimws(candidates))]
+  if (length(candidates) == 0) return(NA_character_)
+
+  for (candidate in candidates) {
+    candidate <- trimws(as.character(candidate))
+    if (grepl("^https?://", candidate, ignore.case = TRUE)) return(candidate)
+    if (grepl("gbif", rec$source, ignore.case = TRUE) && grepl("^[0-9]+$", candidate)) {
+      return(paste0("https://www.gbif.org/occurrence/", candidate))
+    }
+  }
+  NA_character_
+}
+
+occurrence_gbif_lookup_id <- function(rec) {
+  if (!grepl("gbif", rec$source, ignore.case = TRUE)) return(NA_character_)
+  candidates <- c(rec$gbif_id, rec$record_id)
+  candidates <- candidates[!is.na(candidates) & nzchar(trimws(candidates))]
+  if (length(candidates) == 0) return(NA_character_)
+  for (candidate in candidates) {
+    candidate <- trimws(as.character(candidate))
+    if (grepl("^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$", candidate)) {
+      return(candidate)
+    }
+  }
+  NA_character_
+}
+
+occurrence_label <- function(rec) {
+  if (nz(rec$collector)) {
+    paste0(rec$collector, " · nº ", if (nz(rec$recordNumber)) rec$recordNumber else "não informado")
+  } else if (nz(rec$collector_display)) {
+    rec$collector_display
+  } else {
+    paste0("Coletor não informado · nº ", if (nz(rec$recordNumber)) rec$recordNumber else "não informado")
+  }
+}
+
+occurrence_date_label <- function(rec) {
+  if (nz(rec$eventDate)) return(rec$eventDate)
+  if (!is.na(rec$year)) return(as.character(rec$year))
+  "Data não informada"
+}
+
+occurrence_locality_label <- function(rec) {
+  if (nz(rec$locality)) return(rec$locality)
+  if (!is.na(rec$latitude) && !is.na(rec$longitude)) {
+    return(paste0("Coordenadas: ", format(rec$latitude, digits = 6), ", ", format(rec$longitude, digits = 6)))
+  }
+  "Localidade não informada"
+}
+
+render_occurrence_record <- function(rec) {
+  url <- occurrence_record_url(rec)
+  gbif_lookup_id <- occurrence_gbif_lookup_id(rec)
+  label <- occurrence_label(rec)
+  primary_link <- if (!is.na(url)) {
+    tags$a(class = "occurrence-record-primary", label, href = url, target = "_blank", rel = "noopener noreferrer")
+  } else if (!is.na(gbif_lookup_id)) {
+    tags$a(
+      class = "occurrence-record-primary gbif-occurrence-lookup",
+      label,
+      href = paste0("https://www.gbif.org/occurrence/search?OCCURRENCE_ID=", utils::URLencode(gbif_lookup_id, reserved = TRUE)),
+      `data-occurrence-id` = gbif_lookup_id,
+      target = "_blank",
+      rel = "noopener noreferrer"
+    )
+  } else {
+    tags$strong(class = "occurrence-record-primary", label)
+  }
+  tags$li(
+    primary_link,
+    tags$div(class = "occurrence-record-meta", paste0("Data: ", occurrence_date_label(rec))),
+    if (nz(rec$institution) || nz(rec$collection) || nz(rec$catalogNumber) || nz(rec$basisOfRecord)) tags$div(
+      class = "occurrence-record-meta",
+      paste(c(
+        if (nz(rec$institution)) paste0("Instituição: ", rec$institution),
+        if (nz(rec$collection)) paste0("Coleção: ", rec$collection),
+        if (nz(rec$catalogNumber)) paste0("Catálogo: ", rec$catalogNumber),
+        if (nz(rec$basisOfRecord)) paste0("Tipo: ", rec$basisOfRecord)
+      ), collapse = " · ")
+    ),
+    tags$div(class = "occurrence-record-locality", occurrence_locality_label(rec)),
+    tags$small(rec$source)
+  )
+}
+
+taxon_link_sources <- list(
+  list(label = "Flora e Funga do Brasil", column = "ffb_taxon_url", group = "Taxonomia e ocorrência"),
+  list(label = "Plants of the World Online (POWO)", column = "powo_taxon_url", group = "Taxonomia e ocorrência"),
+  list(label = "GBIF", column = "gbif_taxon_url", group = "Taxonomia e ocorrência"),
+  list(label = "World Flora Online (WFO)", column = "wfo_taxon_url", group = "Taxonomia e ocorrência"),
+  list(label = "Catalogue of Life", column = "col_url", group = "Taxonomia e ocorrência"),
+  list(label = "Open Tree of Life", column = "opentree_url", group = "Taxonomia e ocorrência"),
+  list(label = "iNaturalist", column = "inaturalist_url", group = "Taxonomia e ocorrência"),
+  list(label = "NCBI Taxonomy", column = "ncbi_taxonomy_url", group = "Sequências, literatura e interações"),
+  list(label = "NCBI Nucleotide", column = "ncbi_nucleotide_url", group = "Sequências, literatura e interações"),
+  list(label = "EMBL-EBI", column = "ebi_search_url", group = "Sequências, literatura e interações"),
+  list(label = "BOLD Systems", column = "bold_taxon_url", group = "Sequências, literatura e interações"),
+  list(label = "PubChem", column = "pubchem_url", group = "Sequências, literatura e interações"),
+  list(label = "Europe PMC", column = "europepmc_url", group = "Sequências, literatura e interações"),
+  list(label = "Global Biotic Interactions (GloBI)", column = "globi_url", group = "Sequências, literatura e interações"),
+  list(label = "Index Fungorum", column = "index_fungorum_taxon_url", group = "Taxonomia de fungos"),
+  list(label = "MycoBank", column = "mycobank_taxon_url", group = "Taxonomia de fungos")
+)
+
 species_list_df <- function(dat) {
-  dat |>
+  species <- dat |>
     filter(nz(species_key)) |>
     mutate(
       family = ifelse(nz(family), family, "Família não informada"),
@@ -762,29 +896,73 @@ species_list_df <- function(dat) {
     group_by(family, species_key) |>
     summarise(
       records = n(),
-      ffb_taxon_url = {
-        urls <- ffb_taxon_url[nz(ffb_taxon_url) & grepl("^https?://", ffb_taxon_url)]
-        if (length(urls)) urls[[1]] else NA_character_
-      },
-      powo_taxon_url = {
-        urls <- powo_taxon_url[nz(powo_taxon_url) & grepl("^https?://", powo_taxon_url)]
-        if (length(urls)) urls[[1]] else NA_character_
-      },
-      gbif_taxon_url = first_taxon_link(gbif_taxon_url),
-      ncbi_taxonomy_url = first_taxon_link(ncbi_taxonomy_url),
-      ncbi_nucleotide_url = first_taxon_link(ncbi_nucleotide_url),
-      ebi_search_url = first_taxon_link(ebi_search_url),
-      bold_taxon_url = first_taxon_link(bold_taxon_url),
-      mycobank_taxon_url = first_taxon_link(mycobank_taxon_url),
-      index_fungorum_taxon_url = first_taxon_link(index_fungorum_taxon_url),
-      wfo_url = first_taxon_link(wfo_url),
+      ffb_taxon_url = list(collect_taxon_links(ffb_taxon_url)),
+      powo_taxon_url = list(collect_taxon_links(powo_taxon_url)),
+      gbif_taxon_url = list(collect_taxon_links(gbif_taxon_url)),
+      opentree_url = list(collect_taxon_links(opentree_url)),
+      pubchem_url = list(collect_taxon_links(pubchem_url)),
+      ncbi_taxonomy_url = list(collect_taxon_links(ncbi_taxonomy_url)),
+      ncbi_nucleotide_url = list(collect_taxon_links(ncbi_nucleotide_url)),
+      ebi_search_url = list(collect_taxon_links(ebi_search_url)),
+      bold_taxon_url = list(collect_taxon_links(bold_taxon_url)),
+      mycobank_taxon_url = list(collect_taxon_links(mycobank_taxon_url)),
+      wfo_taxon_url = list(collect_taxon_links(wfo_taxon_url)),
+      col_url = list(collect_taxon_links(col_url)),
+      globi_url = list(collect_taxon_links(globi_url)),
+      europepmc_url = list(collect_taxon_links(europepmc_url)),
+      inaturalist_url = list(collect_taxon_links(inaturalist_url)),
+      index_fungorum_taxon_url = list(collect_taxon_links(index_fungorum_taxon_url)),
       occurrences = list(tibble::tibble(
         collector = collector, collector_display = collector_display,
-        recordNumber = recordNumber, source = source
+        recordNumber = recordNumber, record_id = record_id, gbif_id = gbif_id,
+        eventDate = eventDate, year = year, locality = locality, latitude = latitude, longitude = longitude,
+        institution = institution, collection = collection, catalogNumber = catalogNumber,
+        basisOfRecord = basisOfRecord, source = source
       )),
       .groups = "drop"
     ) |>
     arrange(family, species_key)
+
+  species$external_links <- lapply(seq_len(nrow(species)), function(i) {
+    links <- list()
+    for (source in taxon_link_sources) {
+      urls <- species[[source$column]][[i]]
+      if (length(urls) == 0) next
+      for (j in seq_along(urls)) {
+        label <- if (length(urls) > 1) paste0(source$label, " · ", j) else source$label
+        links[[length(links) + 1]] <- list(
+          label = label,
+          url = urls[[j]],
+          group = source$group
+        )
+      }
+    }
+    links
+  })
+  species$external_link_count <- lengths(species$external_links)
+  species
+}
+
+render_taxon_link <- function(link) {
+  tags$a(
+    class = "species-source-link",
+    href = link$url,
+    target = "_blank",
+    rel = "noopener noreferrer",
+    `aria-label` = paste("Abrir", link$label),
+    tags$span(link$label),
+    tags$span(class = "species-source-arrow", "↗", `aria-hidden` = "true")
+  )
+}
+
+render_taxon_link_group <- function(group_name, links) {
+  group_links <- Filter(function(link) identical(link$group, group_name), links)
+  if (length(group_links) == 0) return(NULL)
+  tags$div(
+    class = "taxon-link-group",
+    tags$h6(group_name),
+    tags$div(class = "taxon-link-list", lapply(group_links, render_taxon_link))
+  )
 }
 
 species_drawer <- function(stats) {
@@ -806,108 +984,61 @@ species_drawer <- function(stats) {
       tags$div(
         class = "species-drawer-intro",
         tags$div(tags$span(class = "eyebrow", paste("Lista", stats$group)), tags$h4("Espécies registradas no painel")),
-        tags$p("A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; os ícones abrem os links disponíveis na Flora e Funga do Brasil, POWO, GBIF, NCBI Taxonomy, NCBI Nucleotide, EMBL-EBI, BOLD, MycoBank e Index Fungorum.")
+        tags$p("A lista reúne nomes completos em nível de espécie. Use + para abrir os links minerados e os registros de coleta, com dados primários, data e localidade disponíveis; registros GBIF identificáveis têm link direto.")
+      ),
+      tags$div(
+        class = "species-search-row",
+        tags$label(
+          class = "species-search",
+          tags$span("Buscar por espécie ou família"),
+          tags$input(type = "search", class = "species-search-input", placeholder = "Ex.: Pouteria ou Sapotaceae", autocomplete = "off")
+        ),
+        tags$p(class = "species-search-status", role = "status", paste(format_int(nrow(dat)), "espécies na lista"))
       ),
       tags$div(
         class = "species-list-grid",
         lapply(seq_len(nrow(dat)), function(i) {
           occurrences <- dat$occurrences[[i]]
+          available_links <- dat$external_links[[i]]
           tags$article(
             class = "species-list-card",
             tags$div(class = "species-family-line", tags$span(dat$family[i])),
             tags$div(
               class = "species-taxon-line",
-              tags$button(type = "button", class = "species-taxon-trigger",
-                `aria-expanded` = "false", `aria-controls` = "taxon-record-popup",
-                tags$em(dat$species_key[i])),
-              tags$span(
-                class = "taxon-external-links",
-                if (nz(dat$ffb_taxon_url[i])) tags$a(
-                  class = "taxon-source-link ffb-link", href = dat$ffb_taxon_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "Flora e Funga do Brasil",
-                  `aria-label` = paste(dat$species_key[i], "na Flora e Funga do Brasil"),
-                  tags$img(src = "../_input_data/icons/ffb.png", alt = "Flora e Funga do Brasil", width = 28, height = 28)
-                ),
-                if (nz(dat$powo_taxon_url[i])) tags$a(
-                  class = "taxon-source-link powo-link", href = dat$powo_taxon_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "Plants of the World Online (POWO)",
-                  `aria-label` = paste(dat$species_key[i], "no Plants of the World Online"),
-                  tags$img(src = "../_input_data/icons/powo.png", alt = "Plants of the World Online (POWO)", width = 28, height = 28)
-                ),
-                if (nz(dat$gbif_taxon_url[i])) tags$a(
-                  class = "taxon-source-link gbif-link", href = dat$gbif_taxon_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "GBIF",
-                  `aria-label` = paste(dat$species_key[i], "no GBIF"),
-                  tags$img(src = "../_input_data/icons/gbif.png", alt = "GBIF", width = 28, height = 28)
-                ),
-                if (nz(dat$ncbi_taxonomy_url[i])) tags$a(
-                  class = "taxon-source-link ncbi_taxonomy-link", href = dat$ncbi_taxonomy_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "NCBI Taxonomy",
-                  `aria-label` = paste(dat$species_key[i], "no NCBI Taxonomy"),
-                  tags$img(src = "../_input_data/icons/nih.png", alt = "NCBI Taxonomy", width = 28, height = 28)
-                ),
-                if (nz(dat$ncbi_nucleotide_url[i])) tags$a(
-                  class = "taxon-source-link ncbi_nucleotide-link", href = dat$ncbi_nucleotide_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "NCBI Nucleotide",
-                  `aria-label` = paste(dat$species_key[i], "no NCBI Nucleotide"),
-                  tags$img(src = "../_input_data/icons/nih.png", alt = "NCBI Nucleotide", width = 28, height = 28)
-                ),
-                if (nz(dat$ebi_search_url[i])) tags$a(
-                  class = "taxon-source-link ebi-link", href = dat$ebi_search_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "EMBL-EBI (busca textual)",
-                  `aria-label` = paste(dat$species_key[i], "na pesquisa EMBL-EBI"),
-                  tags$img(src = "../_input_data/icons/ebi.png", alt = "EMBL-EBI (busca textual)", width = 28, height = 28)
-                ),
-                if (nz(dat$bold_taxon_url[i])) tags$a(
-                  class = "taxon-source-link bold-link", href = dat$bold_taxon_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "BOLD Systems",
-                  `aria-label` = paste(dat$species_key[i], "no BOLD Systems"),
-                  tags$img(src = "../_input_data/icons/bold.png", alt = "BOLD Systems", width = 28, height = 28)
-                ),
-                if (nz(dat$mycobank_taxon_url[i])) tags$a(
-                  class = "taxon-source-link mycobank-link", href = dat$mycobank_taxon_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "MycoBank",
-                  `aria-label` = paste(dat$species_key[i], "no MycoBank"),
-                  tags$img(src = "../_input_data/icons/mycobank.png", alt = "MycoBank", width = 72, height = 28)
-                ),
-                if (nz(dat$index_fungorum_taxon_url[i])) tags$a(
-                  class = "taxon-source-link indexfungorum-link", href = dat$index_fungorum_taxon_url[i],
-                  target = "_blank", rel = "noopener noreferrer",
-                  title = "Index Fungorum",
-                  `aria-label` = paste(dat$species_key[i], "no Index Fungorum"),
-                  tags$img(src = "../_input_data/icons/indexfungorum.png", alt = "Index Fungorum", width = 28, height = 28)
-                ),
-                if (nz(dat$wfo_url[i])) tags$a( class = "taxon-source-link wfo-link",href = dat$wfo_url[i],target = "_blank",
-                                                rel = "noopener noreferrer", title = "World Flora Online (WFO)",
-                                                `aria-label` = paste(dat$species_key[i], "na World Flora Online"),
-                                                tags$img(src = "../_input_data/icons/wfo.png",alt = "World Flora Online (WFO)",
-                                                         width = 28, height = 28)
-                                                )
+              tags$span(class = "species-name", tags$em(dat$species_key[i])),
+              tags$button(
+                type = "button",
+                class = "species-card-expand",
+                `aria-expanded` = "false",
+                `aria-label` = paste("Expandir links e registros para", dat$species_key[i]),
+                tags$span(class = "species-expand-symbol", `aria-hidden` = "true", "+"),
+                tags$span(
+                  class = "species-expand-count",
+                  paste0(length(available_links), if (length(available_links) == 1) " link" else " links",
+                         " · ", format_int(nrow(occurrences)), if (nrow(occurrences) == 1) " registro" else " registros")
+                )
               )
             ),
-            tags$template(
-              class = "taxon-record-content",
-              tags$strong(dat$species_key[i]),
-              tags$p(dat$record_label[i]),
-              tags$ul(lapply(seq_len(nrow(occurrences)), function(j) {
-                rec <- occurrences[j, ]
-                collection_label <- if (nz(rec$collector)) {
-                  paste0(rec$collector, " · nº ", if (nz(rec$recordNumber)) rec$recordNumber else "não informado")
-                } else if (nz(rec$collector_display)) {
-                  rec$collector_display
-                } else {
-                  paste0("Coletor não informado · nº ", if (nz(rec$recordNumber)) rec$recordNumber else "não informado")
-                }
-                tags$li(tags$span(collection_label), tags$small(rec$source))
-              }))
+            tags$div(class = "species-card-meta", tags$small(dat$record_label[i])),
+            tags$div(
+              class = "species-expanded-content",
+              hidden = TRUE,
+              if (length(available_links) > 0) tags$div(
+                class = "species-links-panel",
+                render_taxon_link_group("Taxonomia e ocorrência", available_links),
+                render_taxon_link_group("Sequências, literatura e interações", available_links),
+                render_taxon_link_group("Taxonomia de fungos", available_links)
+              ),
+              tags$section(
+                class = "species-occurrences-panel",
+                tags$h6(paste0("Registros de ocorrência · ", format_int(nrow(occurrences)))),
+                tags$details(
+                  class = "species-occurrence-details",
+                  tags$summary("Mostrar registros"),
+                  tags$ul(lapply(seq_len(nrow(occurrences)), function(j) render_occurrence_record(occurrences[j, ])))
+                )
+              ),
+              if (length(available_links) == 0 && nrow(occurrences) == 0) tags$p(class = "taxon-links-empty", "Nenhum link ou registro disponível para esta espécie.")
             )
           )
         })
@@ -1282,36 +1413,60 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
   .input-file p{ margin: 0.4rem 0 0; font-size: 0.86rem; color: var(--muted); line-height: 1.48; }
 
   .species-drawer{ margin-top: 1rem; border-radius: 24px; overflow: hidden; border: 1px solid rgba(98,106,56,0.22); background: linear-gradient(135deg, rgba(255,253,247,0.98), rgba(246,241,232,0.88)); box-shadow: 0 14px 30px rgba(0,0,0,0.08); }
-  .species-drawer summary{ list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: clamp(1rem, 2vw, 1.25rem); background: linear-gradient(135deg, rgba(46,59,36,0.96), rgba(98,106,56,0.88)), url("../figures/tsiino_bg.png"); background-size: 420px auto; color: var(--cream); }
-  .species-drawer summary::-webkit-details-marker{ display: none; }
-  .species-drawer summary::after{ content: "+"; display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; flex: 0 0 auto; border-radius: 999px; border: 1px solid rgba(255,253,247,0.42); color: var(--ochre); font-size: 1.45rem; font-weight: 900; line-height: 1; transition: transform 0.2s ease, background 0.2s ease; }
-  .species-drawer[open] summary::after{ content: "–"; transform: rotate(180deg); background: rgba(0,0,0,0.18); }
+  .species-drawer > summary{ list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: clamp(1rem, 2vw, 1.25rem); background: linear-gradient(135deg, rgba(46,59,36,0.96), rgba(98,106,56,0.88)), url("../figures/tsiino_bg.png"); background-size: 420px auto; color: var(--cream); }
+  .species-drawer > summary::-webkit-details-marker{ display: none; }
+  .species-drawer > summary::after{ content: "+"; display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; flex: 0 0 auto; border-radius: 999px; border: 1px solid rgba(255,253,247,0.42); color: var(--ochre); font-size: 1.45rem; font-weight: 900; line-height: 1; transition: transform 0.2s ease, background 0.2s ease; }
+  .species-drawer[open] > summary::after{ content: "–"; transform: rotate(180deg); background: rgba(0,0,0,0.18); }
   .species-summary-label{ font-family: 'Montserrat', Arial, sans-serif; font-size: clamp(1.08rem, 2vw, 1.45rem); line-height: 1.05; font-weight: 900; letter-spacing: -0.04em; }
   .species-summary-count{ margin-left: auto; padding: 0.35rem 0.7rem; border-radius: 999px; background: rgba(217,154,39,0.18); color: var(--ochre); font-family: 'Space Mono', monospace; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
   .species-drawer-panel{ padding: clamp(1rem, 2.4vw, 1.55rem); }
   .species-drawer-intro{ display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(260px, 0.58fr); gap: 1rem; align-items: end; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(98,106,56,0.18); }
   .species-drawer-intro h4{ margin: 0.7rem 0 0; color: var(--green-dark); font-size: clamp(1.5rem, 3vw, 2.35rem); line-height: 0.96; font-weight: 900; letter-spacing: -0.055em; }
   .species-drawer-intro p{ margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+  .species-search-row{ display: flex; align-items: end; justify-content: space-between; gap: 0.8rem; margin: 0 0 0.85rem; }
+  .species-search{ display: grid; gap: 0.3rem; width: min(100%, 420px); color: var(--green-dark); font-family: 'Space Mono', monospace; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .species-search-input{ width: 100%; min-width: 0; border: 1px solid rgba(98,106,56,0.24); border-radius: 10px; padding: 0.58rem 0.7rem; background: rgba(255,253,247,0.96); color: var(--ink); font-family: 'Montserrat', Arial, sans-serif; font-size: 0.82rem; text-transform: none; letter-spacing: normal; }
+  .species-search-input:focus{ outline: 2px solid rgba(98,106,56,0.42); outline-offset: 1px; }
+  .species-search-status{ margin: 0 0 0.18rem; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.62rem; }
   .species-list-grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.72rem; max-height: min(70vh, 680px); overflow: auto; padding-right: 0.25rem; scrollbar-color: var(--green) rgba(98,106,56,0.12); }
-  .species-list-card{ min-width: 0; padding: 0.85rem 0.9rem; border-radius: 16px; background: rgba(255,253,247,0.94); border: 1px solid rgba(98,106,56,0.18); box-shadow: 0 8px 18px rgba(0,0,0,0.045); }
+  .species-list-card{ min-width: 0; padding: 0.85rem 0.9rem; border-radius: 16px; background: rgba(255,253,247,0.94); border: 1px solid rgba(98,106,56,0.18); box-shadow: 0 8px 18px rgba(0,0,0,0.045); transition: background 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease; }
+  .species-list-card.is-expanded{ grid-column: 1 / -1; border-color: rgba(98,106,56,0.42); background: rgba(255,253,247,0.99); box-shadow: 0 14px 28px rgba(0,0,0,0.10); }
   .species-family-line{ display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.45rem; }
   .species-family-line span{ color: var(--green); font-family: 'Space Mono', monospace; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .species-list-card em{ display: block; color: var(--ink); font-family: 'Source Serif 4', Georgia, serif; font-size: 1.04rem; line-height: 1.22; font-weight: 700; }
+  .species-name{ display: block; flex: 1; min-width: 0; }
   .species-list-card small{ display: block; margin-top: 0.5rem; color: var(--muted); font-family: 'Montserrat', Arial, sans-serif; font-size: 0.78rem; }
   .species-taxon-line{ display: flex; align-items: center; gap: 0.6rem; }
-  .species-taxon-trigger{ border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; flex: 1; min-width: 0; }
-  .species-taxon-trigger:focus-visible, .taxon-source-link:focus-visible{ outline: 2px solid var(--green); outline-offset: 4px; }
-  .taxon-external-links{ display: inline-flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 0.35rem; flex: 0 0 auto; max-width: 10.7rem; }
-  .taxon-source-link{ display: inline-flex; flex: 0 0 auto; border-radius: 6px; }
-  .taxon-source-link img{ width: 28px; height: 28px; object-fit: contain; display: block; }
-  .mycobank-link img{ width: 72px; height: 28px; }
-  .powo-link img{ border-radius: 4px; }
-  .taxon-record-popup{ position: fixed; z-index: 10001; width: min(390px, calc(100vw - 24px)); max-height: min(420px, calc(100dvh - 24px)); overflow: auto; padding: 1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 12px 36px rgba(0,0,0,0.2); font-family: 'Montserrat', Arial, sans-serif; }
-  .taxon-record-popup[hidden]{ display: none; }
-  .taxon-record-popup p{ margin: 0.5rem 0; font-size: 0.85rem; }
-  .taxon-record-popup ul{ margin: 0; padding-left: 1.2rem; }
-  .taxon-record-popup li{ padding: 0.45rem 0; font-size: 0.85rem; overflow-wrap: anywhere; }
-  .taxon-record-popup small{ display: block; color: var(--muted); margin-top: 0.2rem; }
+  .species-source-link:focus-visible, .species-card-expand:focus-visible{ outline: 2px solid var(--green); outline-offset: 4px; }
+  .species-card-meta{ margin-top: 0.35rem; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.61rem; }
+  .species-card-expand{ display: inline-flex; align-items: center; gap: 0.38rem; flex: 0 0 auto; border: 0; border-radius: 999px; padding: 0.18rem 0.24rem 0.18rem 0.18rem; background: transparent; color: var(--green-dark); cursor: pointer; font-family: 'Space Mono', monospace; font-size: 0.61rem; }
+  .species-card-expand:hover{ background: rgba(98,106,56,0.08); }
+  .species-expand-symbol{ display: inline-grid; place-items: center; width: 1.55rem; height: 1.55rem; border: 1px solid rgba(98,106,56,0.30); border-radius: 50%; color: var(--red); font-size: 1.05rem; line-height: 1; transition: transform 0.2s ease, background 0.2s ease; }
+  .species-card-expand[aria-expanded="true"] .species-expand-symbol{ transform: rotate(180deg); background: rgba(217,154,39,0.14); }
+  .species-expand-count{ white-space: nowrap; }
+  .species-expanded-content{ margin-top: 0.7rem; padding-top: 0.7rem; border-top: 1px solid rgba(98,106,56,0.16); }
+  .species-expanded-content[hidden]{ display: none; }
+  .species-links-panel{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.62rem; }
+  .species-occurrences-panel{ margin-top: 0.85rem; padding-top: 0.7rem; border-top: 1px solid rgba(98,106,56,0.12); }
+  .species-occurrences-panel h6{ margin: 0 0 0.35rem; color: var(--green); font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .species-occurrence-details > summary{ display: inline-flex; align-items: center; gap: 0.45rem; width: fit-content; list-style: none; color: var(--green-dark); cursor: pointer; font-size: 0.72rem; font-weight: 700; }
+  .species-occurrence-details > summary::-webkit-details-marker{ display: none; }
+  .species-occurrence-details > summary::after{ content: "+"; display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border: 1px solid rgba(98,106,56,0.25); border-radius: 50%; color: var(--red); font-size: 0.9rem; line-height: 1; }
+  .species-occurrence-details[open] > summary::after{ content: "−"; }
+  .species-occurrence-details ul{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.15rem 0.8rem; margin: 0.5rem 0 0; padding-left: 1.1rem; }
+  .species-occurrence-details li{ padding: 0.38rem 0; font-size: 0.72rem; overflow-wrap: anywhere; }
+  .occurrence-record-primary{ color: var(--green-dark); font-weight: 800; text-decoration: underline; text-decoration-color: rgba(98,106,56,0.42); text-underline-offset: 2px; }
+  .occurrence-record-primary:hover{ color: var(--red-dark); }
+  .occurrence-record-meta, .occurrence-record-locality{ margin-top: 0.18rem; color: var(--ink); font-size: 0.68rem; line-height: 1.45; }
+  .occurrence-record-locality{ color: var(--muted); }
+  .species-occurrence-details li small{ display: block; margin-top: 0.15rem; font-size: 0.61rem; }
+  .taxon-links-empty{ margin: 0; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.64rem; }
+  .taxon-link-group{ min-width: 0; padding: 0.68rem 0.72rem; border: 1px solid rgba(98,106,56,0.16); border-radius: 13px; background: linear-gradient(145deg, rgba(246,241,232,0.68), rgba(255,253,247,0.94)); }
+  .taxon-link-group h6{ margin: 0 0 0.48rem; color: var(--green-dark); font-family: 'Space Mono', monospace; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+  .taxon-link-list{ display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 0.38rem; }
+  .species-source-link{ display: inline-flex; align-items: center; justify-content: space-between; gap: 0.45rem; width: 100%; min-width: 0; border-radius: 9px; padding: 0.46rem 0.58rem; background: rgba(255,253,247,0.98); border: 1px solid rgba(98,106,56,0.19); color: var(--green-dark); font-size: 0.76rem; font-weight: 700; line-height: 1.3; text-decoration: none; overflow-wrap: anywhere; }
+  .species-source-link:hover{ background: rgba(217,154,39,0.15); border-color: rgba(169,54,50,0.32); color: var(--red-dark); }
+  .species-source-arrow{ color: var(--red); font-family: 'Space Mono', monospace; font-size: 0.72rem; }
   .species-drawer-empty{ margin-top: 1rem; padding: 1rem; border-radius: 18px; border: 1px dashed rgba(169,54,50,0.32); background: rgba(246,241,232,0.54); color: var(--muted); }
 
   .data-infra-layout{ display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.74fr); gap: clamp(1.2rem, 3vw, 2.4rem); align-items: stretch; }
@@ -1374,8 +1529,10 @@ render_dashboard <- function(title, subtitle, group_filter = NULL, compact = FAL
     .image-strip{ grid-template-columns: 1fr; }
     .image-card{ min-height: 420px; }
     .species-drawer-intro{ grid-template-columns: 1fr; }
+    .species-search-row{ align-items: stretch; flex-direction: column; }
+    .species-search{ width: 100%; }
     .species-list-grid{ grid-template-columns: 1fr; max-height: 72vh; }
-    .species-drawer summary{ align-items: flex-start; flex-direction: column; }
+    .species-drawer > summary{ align-items: flex-start; flex-direction: column; }
     .species-summary-count{ margin-left: 0; }
     .data-principles{ grid-template-columns: 1fr; }
     .rank-list li{ align-items: flex-start; flex-direction: column; gap: 0.25rem; }
@@ -1626,60 +1783,81 @@ render_dashboard(
     revealNow(); setTimeout(revealNow, 260); setTimeout(revealNow, 800);
   }
 
-  function setupTaxonPopups(){
-    var popup = document.createElement('div');
-    popup.id = 'taxon-record-popup';
-    popup.className = 'taxon-record-popup';
-    popup.hidden = true;
-    popup.setAttribute('role', 'region');
-    popup.setAttribute('aria-label', 'Registros do táxon');
-    popup.tabIndex = 0;
-    document.body.appendChild(popup);
-    var active = null, pinned = false, closeTimer;
-    function close(){
-      clearTimeout(closeTimer);
-      if(active) active.setAttribute('aria-expanded', 'false');
-      active = null; pinned = false; popup.hidden = true;
-    }
-    function position(){
-      if(!active) return;
-      var rect = active.getBoundingClientRect();
-      popup.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - popup.offsetWidth - 12)) + 'px';
-      var top = rect.bottom + 8;
-      if(top + popup.offsetHeight > window.innerHeight - 12) top = rect.top - popup.offsetHeight - 8;
-      popup.style.top = Math.max(12, top) + 'px';
-    }
-    function show(button){
-      clearTimeout(closeTimer);
-      if(active !== button){
-        close(); active = button;
-        popup.replaceChildren(button.closest('.species-list-card').querySelector('template').content.cloneNode(true));
+  function setupSpeciesSearch(){
+    document.querySelectorAll('.species-drawer').forEach(function(drawer){
+      var input = drawer.querySelector('.species-search-input');
+      var cards = Array.from(drawer.querySelectorAll('.species-list-card'));
+      var status = drawer.querySelector('.species-search-status');
+      if(!input || !status || !cards.length) return;
+      function filterSpecies(){
+        var query = input.value.trim().toLocaleLowerCase();
+        var visible = 0;
+        cards.forEach(function(card){
+          var searchable = card.querySelector('.species-name').textContent + ' ' + card.querySelector('.species-family-line').textContent;
+          var matches = !query || searchable.toLocaleLowerCase().includes(query);
+          card.hidden = !matches;
+          if(matches) visible += 1;
+        });
+        status.textContent = visible + (visible === 1 ? ' espécie' : ' espécies') + ' de ' + cards.length;
       }
-      popup.hidden = false; button.setAttribute('aria-expanded', 'true'); position();
-    }
-    function scheduleClose(){
-      clearTimeout(closeTimer);
-      closeTimer = setTimeout(function(){ if(!pinned && !popup.matches(':hover') && !popup.contains(document.activeElement) && active !== document.activeElement) close(); }, 220);
-    }
-    document.querySelectorAll('.species-taxon-trigger').forEach(function(button){
-      button.addEventListener('mouseenter', function(){ if(!pinned) show(button); });
-      button.addEventListener('mouseleave', scheduleClose);
-      button.addEventListener('focus', function(){ if(!pinned) show(button); });
-      button.addEventListener('blur', scheduleClose);
+      input.addEventListener('input', filterSpecies);
+      filterSpecies();
+    });
+  }
+
+  function setupSpeciesExpand(){
+    document.querySelectorAll('.species-card-expand').forEach(function(button){
+      var card = button.closest('.species-list-card');
+      var content = card && card.querySelector('.species-expanded-content');
+      var symbol = button.querySelector('.species-expand-symbol');
+      if(!card || !content || !symbol) return;
       button.addEventListener('click', function(){
-        if(active === button && pinned){ close(); return; }
-        show(button); pinned = true;
+        var expanded = button.getAttribute('aria-expanded') !== 'true';
+        if(expanded){
+          document.querySelectorAll('.species-card-expand[aria-expanded="true"]').forEach(function(openButton){
+            var openCard = openButton.closest('.species-list-card');
+            if(!openCard || openCard === card) return;
+            var openContent = openCard.querySelector('.species-expanded-content');
+            var openSymbol = openButton.querySelector('.species-expand-symbol');
+            openButton.setAttribute('aria-expanded', 'false');
+            openButton.setAttribute('aria-label', 'Expandir links e registros para ' + openCard.querySelector('.species-name').textContent.trim());
+            if(openSymbol) openSymbol.textContent = '+';
+            if(openContent) openContent.hidden = true;
+            openCard.classList.remove('is-expanded');
+          });
+        }
+        button.setAttribute('aria-expanded', String(expanded));
+        button.setAttribute('aria-label', (expanded ? 'Recolher links e registros de ' : 'Expandir links e registros para ') + card.querySelector('.species-name').textContent.trim());
+        symbol.textContent = expanded ? '−' : '+';
+        content.hidden = !expanded;
+        card.classList.toggle('is-expanded', expanded);
       });
     });
-    popup.addEventListener('mouseenter', function(){ clearTimeout(closeTimer); });
-    popup.addEventListener('mouseleave', scheduleClose);
-    popup.addEventListener('focusout', scheduleClose);
-    document.addEventListener('click', function(event){
-      if(active && !popup.contains(event.target) && !active.contains(event.target)) close();
+  }
+
+  function setupGBIFOccurrenceLinks(){
+    document.querySelectorAll('.gbif-occurrence-lookup').forEach(function(link){
+      link.addEventListener('click', function(event){
+        event.preventDefault();
+        var occurrenceId = link.getAttribute('data-occurrence-id');
+        var fallbackUrl = link.href;
+        var destination = window.open('about:blank', '_blank');
+        if(destination) destination.opener = null;
+        if(!destination){ window.location.assign(fallbackUrl); return; }
+
+        var apiUrl = 'https://api.gbif.org/v1/occurrence/search?occurrenceId=' + encodeURIComponent(occurrenceId) + '&limit=1';
+        var controller = new AbortController();
+        var timeout = setTimeout(function(){ controller.abort(); }, 8000);
+        fetch(apiUrl, { headers: { 'Accept': 'application/json' }, signal: controller.signal })
+          .then(function(response){ if(!response.ok) throw new Error('GBIF lookup failed'); return response.json(); })
+          .then(function(result){
+            var record = result.results && result.results[0];
+            destination.location.replace(record && record.key ? 'https://www.gbif.org/occurrence/' + record.key : fallbackUrl);
+          })
+          .catch(function(){ destination.location.replace(fallbackUrl); })
+          .finally(function(){ clearTimeout(timeout); });
+      });
     });
-    document.addEventListener('keydown', function(event){ if(event.key === 'Escape') close(); });
-    document.addEventListener('scroll', function(event){ if(!popup.contains(event.target)) close(); }, true);
-    window.addEventListener('resize', position);
   }
 
   var resizeTimer;
@@ -1690,7 +1868,7 @@ render_dashboard(
     }, 180);
   });
 
-  function setupPage(){ setupReveal(); setupTaxonPopups(); }
+  function setupPage(){ setupReveal(); setupSpeciesSearch(); setupSpeciesExpand(); setupGBIFOccurrenceLinks(); }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupPage); else setupPage();
 })();
 </script>
