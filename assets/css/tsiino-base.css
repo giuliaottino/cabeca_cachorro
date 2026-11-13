@@ -772,6 +772,157 @@ html body .team-card[data-role] .team-project-role {
   background: none !important;
 }
 
+/* Cartão: hierarquia nome > cargo > instituição, sem alturas mínimas fixas
+   (geravam vãos grandes nos cartões dos bolsistas) e sem sombra residual. */
+html body .team-card[data-role] {
+  box-shadow: none !important;
+  padding: var(--tsi-space-4) !important;
+  min-height: 0 !important;
+}
+html body .team-card[data-role] .team-photo {
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+}
+html body .team-card[data-role] .team-info {
+  flex: 1 1 auto !important;
+  gap: var(--tsi-space-1) !important;
+  padding-top: var(--tsi-space-3) !important;
+}
+html body .team-card[data-role] .team-name {
+  min-height: 0 !important;
+  font-size: var(--tsi-fs-base) !important;
+  font-weight: 700 !important;
+  line-height: var(--tsi-lh-snug) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+}
+html body .team-card[data-role] .team-project-role {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-left: 0 !important;
+  font-size: var(--tsi-fs-sm) !important;
+  font-weight: 500 !important;
+  line-height: var(--tsi-lh-snug) !important;
+}
+html body .team-card[data-role] .team-institution {
+  min-height: 0 !important;
+  margin: 0 !important;
+  color: var(--tsi-muted) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  line-height: var(--tsi-lh-snug) !important;
+}
+html body .team-card[data-role] .team-icons {
+  min-height: 0 !important;
+  margin: auto 0 0 !important;          /* ícones alinhados ao pé do cartão */
+  padding-top: var(--tsi-space-3) !important;
+  border-top: 0 !important;
+}
+/* Retratos: enquadra mais para cima (o centro cortava cabeças) */
+html body .team-card[data-role] .team-photo {
+  object-position: 50% 25% !important;
+}
+/* Rótulos sem caixa-alta espaçada (sobrescreve o legado; rodapé intocado) */
+html body:has(.page-hero-team) :is(.hero-kicker, .team-network-kicker, .team-label, .content-card h3:not(.team-name)) {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-family: var(--tsi-font-sans) !important;
+  font-weight: 600 !important;
+}
+html body:has(.page-hero-team) .page-hero-team .hero-kicker {
+  color: var(--tsi-on-dark-muted) !important;
+  font-size: var(--tsi-fs-sm) !important;
+}
+html body:has(.page-hero-team) :is(.team-network-kicker, .content-card h3:not(.team-name)) {
+  color: var(--tsi-muted) !important;
+  font-size: var(--tsi-fs-sm) !important;
+}
+html body .team-network-node .team-label {
+  font-size: var(--tsi-fs-sm) !important;
+}
+html body .team-network-node-total .team-label {
+  color: #fff !important;
+}
+/* Placeholders vazios (aria-hidden) que só ocupavam espaço */
+html body .team-card[data-role] :is(.team-project-role-empty, .team-institution-empty, .team-icons-empty) {
+  display: none !important;
+}
+@media (max-width: 640px) {
+  /* Celular: foto à esquerda e texto à direita; a lista de 80 pessoas
+     deixava a página com ~49 mil px de altura. Reusa o breakpoint de 640px. */
+  html body .team-grid {
+    gap: var(--tsi-space-2) !important;
+  }
+  html body .team-card[data-role] {
+    display: grid !important;
+    grid-template-columns: 88px minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    column-gap: var(--tsi-space-3) !important;
+    align-items: start !important;
+    padding: var(--tsi-space-3) !important;
+  }
+  html body .team-card[data-role] .team-photo-wrap {
+    width: 88px !important;
+    margin: 0 !important;
+  }
+  html body .team-card[data-role] .team-info {
+    padding-top: 0 !important;
+  }
+  html body .team-card[data-role] .team-icons {
+    padding-top: var(--tsi-space-2) !important;
+    gap: var(--tsi-space-1) !important;
+  }
+  html body .team-card[data-role] .team-icons .icon-link {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  /* Margens laterais: o cartão de seção tinha ~48px de recuo de cada lado */
+  html body:has(.page-hero-team) #quarto-content {
+    display: block !important;   /* grade de colunas do Quarto recuava 26px */
+  }
+  html body:has(.page-hero-team) main.content {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  html body .team-network-panel {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  html body .team-network-node .team-label {
+    overflow-wrap: anywhere !important;
+  }
+  /* Painel da rede: 4 categorias em 2×2 abaixo do total */
+  html body .team-network-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-areas:
+      "total total"
+      "coord indigena"
+      "instituicao ampliada" !important;
+    gap: var(--tsi-space-2) !important;
+    align-items: stretch !important;
+  }
+  html body .team-network-node::after {
+    display: none !important;   /* traço vertical entre nós empilhados */
+  }
+  html body .team-network-node .team-node-inner {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: var(--tsi-space-3) !important;
+  }
+  html body .team-network-node .team-label {
+    font-size: var(--tsi-fs-xs) !important;
+  }
+}
+/* O texto do cargo era cortado com "…" (line-clamp legado): mostra inteiro */
+html body .team-card[data-role] :is(.team-project-role, .team-institution, .team-name) {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  max-height: none !important;
+}
+
 /* Hero da equipe: botão secundário no mesmo padrão do principal */
 html body .hero-actions .btn-ghost {
   background: transparent !important;
@@ -945,6 +1096,59 @@ html body .hv-site-hero {
   html body .page-hero.page-hero-team,
   html body .hv-site-hero {
     min-height: 72svh !important;
+  }
+}
+
+/* 6b. Hero da Equipe: conteúdo no fluxo (antes era position:absolute com
+       top fixo, e o hero mais baixo cortava os botões no celular e em telas
+       baixas). A altura agora acompanha o conteúdo; o min-height continua.
+       Fundo: figures/equipe.jpg não existe no repositório; usa campo.jpg. */
+html body .page-hero.page-hero-team {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  gap: var(--tsi-space-5) !important;
+  padding: calc(76px + var(--tsi-space-6)) clamp(16px, 5vw, 80px) var(--tsi-space-8) !important;
+  background-image:
+    linear-gradient(90deg, rgba(0,0,0,.72) 0%, rgba(0,0,0,.45) 50%, rgba(0,0,0,.15) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.55) 100%),
+    url("../../figures/campo.jpg") !important;
+  background-size: cover !important;
+  background-position: center 60% !important;
+}
+html body .page-hero-team .page-hero-overlay {
+  display: none !important;   /* o gradiente já está no fundo do hero */
+}
+html body .page-hero-team :is(.page-hero-logo, .page-hero-content) {
+  position: relative !important;
+  inset: auto !important;
+  margin: 0 !important;
+}
+html body .page-hero-team .page-hero-logo {
+  width: clamp(64px, 6vw, 96px) !important;
+}
+html body .page-hero-team .page-hero-content {
+  width: 100% !important;
+  max-width: 820px !important;
+}
+html body .page-hero-team .hero-description:empty {
+  display: none !important;
+}
+html body .page-hero-team .hero-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: var(--tsi-space-2) !important;
+  margin-top: var(--tsi-space-5) !important;
+}
+@media (max-width: 991.98px) {
+  /* ícone do menu sumia sobre a foto */
+  html body:has(.page-hero-team) #quarto-header .navbar-toggler-icon {
+    filter: brightness(0) invert(1) !important;
+    opacity: 0.92 !important;
+  }
+  html body .page-hero.page-hero-team {
+    padding-top: calc(76px + var(--tsi-space-5)) !important;
+    padding-bottom: var(--tsi-space-6) !important;
   }
 }
 

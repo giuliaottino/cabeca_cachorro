@@ -169,6 +169,8 @@ if (member_col != "Member") {
 }
 team_data$Member <- trimws(as.character(team_data$Member))
 team_data <- team_data[nz(team_data$Member), , drop = FALSE]
+# Remove linhas idênticas da planilha (ex.: "Vitor Hugo Andrade Oliveira" repetido)
+team_data <- team_data[!duplicated(team_data), , drop = FALSE]
 
 photo_dir_abs <- file.path(dirname(team_path), "tsiino_team_images")
 photo_dir_html <- "../_input_data/tsiino_team_images"
