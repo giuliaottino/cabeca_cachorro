@@ -7,6 +7,7 @@ from typing import Any
 
 from app.config import settings
 from app.services import geography_ibge_sqlite as geo
+from app.services.corrections import detect_trailing_fill
 from app.services import taxonomy_ffb_sqlite as tax
 from app.services.issue_postprocess import postprocess_issues
 from app.services.job_store import JOBS
@@ -45,6 +46,22 @@ def run_validation(content: bytes, filename: str, *, sheet_name: str | None = No
             issues.extend(geo.validate_geography_ibge(record))
 
     issue_dicts = postprocess_issues(issues)
+    trailing = detect_trailing_fill(parsed.records, header.raw_headers, header.mapping)
+    if trailing:
+        rows = set(trailing["rows"])
+        trailing["issue_count"] = sum(1 for i in issue_dicts if i["row_number"] in rows)
+        trailing["error_count"] = sum(1 for i in issue_dicts if i["row_number"] in rows and i["severity"] == "error")
+        cols = ", ".join(f"'{c['header']}'" for c in trailing["columns"])
+        span = (f"linha {trailing['first_row']}" if trailing["count"] == 1
+                else f"linhas {trailing['first_row']} a {trailing['last_row']}")
+        issue_dicts.insert(0, {
+            "row_number": None, "column_name": trailing["columns"][0]["field"], "severity": "warning",
+            "code": "TRAILING_FILLED_ROWS",
+            "message": (f"Depois da última coleta (linha {trailing['last_data_row']}), as {span} só têm {cols} "
+                        f"preenchida(s): parece que a coluna foi arrastada além dos dados. "
+                        f"Essas linhas geram {trailing['issue_count']} ocorrências e podem ser limpas."),
+            "value": None, "suggestion": "Limpar as linhas", "source": None,
+        })
     counts = {sev: sum(1 for i in issue_dicts if i["severity"] == sev) for sev in ("error", "warning", "info")}
     rows_with_error = {i["row_number"] for i in issue_dicts if i["severity"] == "error" and i["row_number"]}
     job_id = str(uuid.uuid4())
@@ -79,6 +96,7 @@ def run_validation(content: bytes, filename: str, *, sheet_name: str | None = No
         "mapping": header.mapping,
         "field_to_header": header.field_to_header,
         "raw_headers": header.raw_headers,
+        "trailing_fill": trailing,
     })
     return {
         "job_id": job_id,
@@ -86,6 +104,7 @@ def run_validation(content: bytes, filename: str, *, sheet_name: str | None = No
         "summary": summary,
         "issues": issue_dicts,
         "table": table,
+        "trailing_fill": trailing,
         "header": {
             "row": header.header_row,
             "columns": [h for h in header.raw_headers if h],

@@ -159,6 +159,7 @@ ul.task-list li input[type="checkbox"] {
 
 <link rel="stylesheet" href="../../assets/css/pages/validador.css">
 <link rel="stylesheet" href="../../assets/css/tsiino-base.css">
+<link rel="stylesheet" href="../../assets/css/pages/validador-resultados.css?v=20261113-r1">
 <div class="hv-modern-page">
   <section class="hv-site-hero" aria-label="Abertura do validador de planilha de herbário">
     <div class="hv-site-hero-inner">
@@ -226,60 +227,86 @@ ul.task-list li input[type="checkbox"] {
       </form>
     </section>
 
-    <section id="validator-results" class="hv-results" hidden="" aria-label="Resultado da validação">
-      <div class="hv-section-title hv-result-title">
-        <span></span>
-        <h2 class="anchored">Resultado da validação</h2>
+    <section id="validator-results" class="hv-results tsr" hidden="" aria-label="Resultado da validação">
+      <header class="tsr-head">
+        <div class="tsr-head-text">
+          <p class="tsr-eyebrow">Resultado da validação</p>
+          <h2 id="tsr-verdict" class="tsr-verdict anchored">—</h2>
+          <p id="tsr-meta" class="tsr-meta"></p>
+        </div>
+        <div class="tsr-head-actions">
+          <a class="hv-primary tsr-btn" id="tsr-download-annotated" href="#">Baixar planilha anotada</a>
+          <button type="button" class="hv-secondary tsr-btn" id="download-issues-csv" disabled="">Ocorrências (.csv)</button>
+        </div>
+      </header>
+
+      <div class="tsr-kpis" id="validator-summary"></div>
+      <div class="tsr-health" id="tsr-health"></div>
+
+      <nav class="tsr-tabs" role="tablist" aria-label="Seções do resultado">
+        <button type="button" role="tab" class="tsr-tab is-active" data-tab="overview" aria-selected="true" aria-controls="tsr-pane-overview">Visão geral</button>
+        <button type="button" role="tab" class="tsr-tab" data-tab="map" aria-selected="false" aria-controls="tsr-pane-map">Mapa <span class="tsr-tab-count" id="tsr-count-map"></span></button>
+        <button type="button" role="tab" class="tsr-tab" data-tab="sheet" aria-selected="false" aria-controls="tsr-pane-sheet">Planilha anotada</button>
+        <button type="button" role="tab" class="tsr-tab" data-tab="issues" aria-selected="false" aria-controls="tsr-pane-issues">Ocorrências <span class="tsr-tab-count" id="tsr-count-issues"></span></button>
+      </nav>
+
+      <div class="tsr-pane" id="tsr-pane-overview" role="tabpanel" data-pane="overview">
+        <div id="validator-global-issues" class="tsr-global" hidden=""></div>
+        <div id="tsr-insights" class="tsr-insights"></div>
+        <div id="tsr-dashboard" class="tsr-grid"></div>
       </div>
 
-      <div class="hv-summary" id="validator-summary"></div>
-
-      <div class="hv-toolbar" aria-label="Filtros da planilha anotada">
-        <button type="button" class="hv-filter is-active" data-filter="all">Todos</button>
-        <button type="button" class="hv-filter" data-filter="error">Só erros</button>
-        <button type="button" class="hv-filter" data-filter="warning">Só alertas</button>
-        <button type="button" class="hv-filter" data-filter="clear">Sem problemas</button>
-        <label class="tsiino-code-filter">
-          <span>Tipo de ocorrência</span>
-          <select id="validator-code-filter"><option value="">Todas as ocorrências</option></select>
-        </label>
-        <label class="tsiino-info-toggle"><input type="checkbox" id="validator-show-info" checked=""> Mostrar notas</label>
-        <button type="button" class="hv-secondary" id="download-issues-csv" disabled="">Baixar ocorrências (.csv)</button>
-      </div>
-
-      <div id="validator-global-issues" class="tsiino-global-issues" hidden=""></div>
-
-      <section id="validator-map-panel" class="hv-map-panel" hidden="" aria-label="Mapa de coleta">
-        <div class="hv-map-heading">
-          <div>
-            <strong>Mapa de coleta</strong>
-            <span>Visualização simples dos pontos enviados na planilha. Pontos com erro aparecem destacados.</span>
+      <div class="tsr-pane" id="tsr-pane-map" role="tabpanel" data-pane="map" hidden="">
+        <section id="validator-map-panel" class="tsr-map-panel" aria-label="Mapa de coleta">
+          <div class="tsr-map-bar">
+            <div class="tsr-seg" id="tsr-map-filters" role="group" aria-label="Mostrar pontos por situação"></div>
+            <div class="tsr-seg" id="tsr-map-base" role="group" aria-label="Mapa base">
+              <button type="button" class="tsr-seg-btn is-active" data-base="map">Mapa</button>
+              <button type="button" class="tsr-seg-btn" data-base="sat">Satélite</button>
+              <button type="button" class="tsr-seg-btn" data-base="topo">Relevo</button>
+            </div>
           </div>
-          <button type="button" class="hv-map-close" id="map-close">Fechar mapa</button>
-        </div>
-        <div id="validator-map" class="hv-map"></div>
-      </section>
-
-      <div class="hv-sheet-caption">
-        <strong>Planilha anotada</strong>
-        <span>As mensagens aparecem dentro da célula onde o problema foi detectado. Na planilha anotada baixada, os valores originais são preservados e as mensagens ficam nos comentários das células, com um resumo na aba “Validação Tsiino”.</span>
+          <div class="tsr-map-layout">
+            <div id="validator-map" class="tsr-map"></div>
+            <div class="tsr-map-side" id="tsr-map-side"></div>
+          </div>
+        </section>
       </div>
 
-      <div class="hv-sheet-wrap" aria-label="Planilha anotada">
-        <table id="validator-sheet" class="hv-sheet"></table>
-      </div>
-      <div id="validator-pager" class="tsiino-pager" aria-live="polite"></div>
-
-      <details class="hv-issues-details">
-        <summary>Lista auxiliar de erros e alertas</summary>
-        <div class="hv-issues-wrap">
-          <table id="validator-issues" class="hv-issues-table"></table>
+      <div class="tsr-pane" id="tsr-pane-sheet" role="tabpanel" data-pane="sheet" hidden="">
+        <div class="tsr-toolbar" aria-label="Filtros da planilha anotada">
+          <div class="tsr-seg" role="group" aria-label="Filtrar linhas">
+            <button type="button" class="hv-filter tsr-seg-btn is-active" data-filter="all">Todas</button>
+            <button type="button" class="hv-filter tsr-seg-btn" data-filter="error">Com erro</button>
+            <button type="button" class="hv-filter tsr-seg-btn" data-filter="warning">Só alertas</button>
+            <button type="button" class="hv-filter tsr-seg-btn" data-filter="clear">Sem problemas</button>
+          </div>
+          <label class="tsr-field tsr-search">
+            <span class="tsr-sr">Buscar na planilha</span>
+            <input type="search" id="validator-search" placeholder="Buscar valor, nome, coletor…" autocomplete="off">
+          </label>
+          <label class="tsr-field">
+            <span class="tsr-sr">Tipo de ocorrência</span>
+            <select id="validator-code-filter"><option value="">Todas as ocorrências</option></select>
+          </label>
+          <label class="tsr-check"><input type="checkbox" id="validator-show-info" checked=""> Mostrar notas</label>
+          <label class="tsr-check"><input type="checkbox" id="validator-only-issue-cols"> Só colunas com ocorrência</label>
         </div>
-      </details>
+        <p class="tsr-caption">As mensagens aparecem na célula onde o problema foi detectado. Na planilha anotada baixada, os valores originais são preservados e as mensagens ficam nos comentários das células, com um resumo na aba “Validação Tsiino”.</p>
+        <div class="tsr-sheet-wrap" aria-label="Planilha anotada">
+          <table id="validator-sheet" class="tsr-sheet"></table>
+        </div>
+        <div id="validator-pager" class="tsr-pager" aria-live="polite"></div>
+      </div>
+
+      <div class="tsr-pane" id="tsr-pane-issues" role="tabpanel" data-pane="issues" hidden="">
+        <p class="tsr-caption">Ocorrências agrupadas por tipo, da mais grave para a mais frequente. Clique em uma linha para vê-la na planilha.</p>
+        <div id="validator-issues" class="tsr-issue-groups"></div>
+      </div>
     </section>
   </main>
 </div>
-<script src="../../assets/js/herb-validator.js?v=20261112-v2"></script>
+<script src="../../assets/js/herb-validator.js?v=20261113-r1"></script>
 
 
 

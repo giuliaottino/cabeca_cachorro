@@ -199,3 +199,67 @@ def test_rejects_non_xlsx():
 
 def test_missing_job_is_404():
     assert client.get("/api/validator/jobs/nao-existe").status_code == 404
+
+
+# ---------------------------------------------------------------- correções e colunas arrastadas
+def dragged_workbook(extra_rows: int = 6) -> bytes:
+    """3 coletas reais e, abaixo, a coluna 'project' arrastada por mais `extra_rows` linhas."""
+    rows = [{**BASE, "number": n, "project": "Tsiino"} for n in (1, 2, 3)]
+    rows += [{"project": "Tsiino"} for _ in range(extra_rows)]
+    return inpa_workbook(rows)
+
+
+@needs_refs
+def test_detects_column_dragged_beyond_data():
+    res = upload(dragged_workbook()).json()
+    tf = res["trailing_fill"]
+    assert tf and tf["count"] == 6 and tf["first_row"] == 6 and tf["last_data_row"] == 5
+    assert [c["field"] for c in tf["columns"]] == ["project"] and tf["columns"][0]["pattern"] == "repeated"
+    assert tf["issue_count"] > 6 * 5
+
+    # Mesmo quando as linhas arrastadas são a maioria da planilha.
+    many = upload(dragged_workbook(extra_rows=400)).json()["trailing_fill"]
+    assert many and many["count"] == 400
+    glob = [i for i in res["issues"] if i["code"] == "TRAILING_FILLED_ROWS"]
+    assert len(glob) == 1 and glob[0]["row_number"] is None
+
+
+def test_no_trailing_fill_on_clean_sheet():
+    from app.services.corrections import detect_trailing_fill
+    recs = [{"_row_number": i, "_raw": {c: BASE.get(c) for c in CANONICAL_COLUMNS}} for i in range(3, 8)]
+    assert detect_trailing_fill(recs, CANONICAL_COLUMNS) is None
+    # Uma coleta real incompleta no meio não é tratada como arrasto.
+    recs.insert(2, {"_row_number": 99, "_raw": {"project": "x"}})
+    assert detect_trailing_fill(recs, CANONICAL_COLUMNS) is None
+
+
+@needs_refs
+def test_apply_clears_rows_edits_cells_and_revalidates():
+    res = upload(dragged_workbook()).json()
+    job = res["job_id"]
+    genus_issue_row = 3  # primeira linha de dados (linha 2 = cabeçalho técnico)
+    body = {"clear_rows": res["trailing_fill"]["rows"],
+            "edits": [{"row": genus_issue_row, "column": "genus", "value": "Frullania"},
+                      {"row": genus_issue_row, "column": "lat", "value": "-0.2"}]}
+    new = client.post(f"/api/validator/jobs/{job}/apply", json=body)
+    assert new.status_code == 200, new.text
+    data = new.json()
+    assert data["job_id"] != job
+    assert data["summary"]["total_rows"] == 3 and data["trailing_fill"] is None
+    assert data["summary"]["corrections"] == {**data["summary"]["corrections"], "edits": 2, "cleared_rows": 6, "parent_job": job}
+    assert data["summary"]["error_count"] < res["summary"]["error_count"]
+
+    dl = client.get(f"/api/validator/jobs/{data['job_id']}/corrected.xlsx")
+    assert dl.status_code == 200 and "corrigida_tsiino" in dl.headers["content-disposition"]
+    ws = load_workbook(BytesIO(dl.content))["Espécimes"]
+    assert ws.cell(row=3, column=CANONICAL_COLUMNS.index("lat") + 1).value == -0.2   # texto virou número
+    assert ws.cell(row=3, column=1).parent is ws and ws.cell(row=2, column=1).value == CANONICAL_COLUMNS[0]
+    assert all(ws.cell(row=r, column=CANONICAL_COLUMNS.index("project") + 1).value is None for r in range(6, 12))
+
+
+def test_apply_rejects_unknown_cells():
+    res = upload(inpa_workbook([BASE])).json()
+    bad = client.post(f"/api/validator/jobs/{res['job_id']}/apply", json={"edits": [{"row": 999, "column": "genus", "value": "x"}]})
+    assert bad.status_code == 400
+    empty = client.post(f"/api/validator/jobs/{res['job_id']}/apply", json={})
+    assert empty.status_code == 400

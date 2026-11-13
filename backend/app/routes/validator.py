@@ -1,15 +1,18 @@
 """Rotas de validação. Endpoints síncronos: o FastAPI os executa no threadpool, sem bloquear o loop."""
 from __future__ import annotations
 
+from io import BytesIO
 from typing import Annotated, Any
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
 from app.config import settings
 from app.services import geography_ibge_sqlite as geo
 from app.services import taxonomy_ffb_sqlite as tax
 from app.services.annotate import annotated_workbook
+from app.services.corrections import apply_corrections
 from app.services.job_store import JOBS
 from app.services.spreadsheet_converter import convert_spreadsheet
 from app.services.validation import ReferenceNotReady, run_validation
@@ -118,6 +121,63 @@ def download_annotated(job_id: str) -> StreamingResponse:
         output,
         media_type=XLSX,
         headers={"Content-Disposition": f'attachment; filename="{safe}_anotada_tsiino.{ext}"'},
+    )
+
+
+class CellEdit(BaseModel):
+    row: int
+    column: str
+    value: str | int | float | None = None
+
+
+class CorrectionRequest(BaseModel):
+    edits: list[CellEdit] = Field(default_factory=list, max_length=50000)
+    clear_rows: list[int] = Field(default_factory=list, max_length=50000)
+
+
+def _safe_base(job: dict[str, Any]) -> tuple[str, str]:
+    base = str(job.get("filename") or "planilha").rsplit(".", 1)[0]
+    for tail in ("_corrigida_tsiino",):
+        base = base[: -len(tail)] if base.endswith(tail) else base
+    ext = "xlsm" if str(job.get("filename", "")).lower().endswith(".xlsm") else "xlsx"
+    return "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in base)[:80] or "planilha", ext
+
+
+@router.post("/jobs/{job_id}/apply")
+def apply_job_corrections(job_id: str, body: CorrectionRequest) -> dict[str, Any]:
+    """Aplica sugestões aceitas e limpa linhas indicadas; revalida e devolve um novo resultado completo."""
+    job = _job(job_id)
+    if not body.edits and not body.clear_rows:
+        raise HTTPException(status_code=400, detail="Nenhuma correção enviada.")
+    try:
+        content = apply_corrections(job, [e.model_dump() for e in body.edits], body.clear_rows)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    summary = job["summary"]
+    result = _validate(content, job["filename"], sheet_name=job.get("sheet_name"),
+                       validate_taxonomy=summary.get("validate_taxonomy", True),
+                       validate_geography=summary.get("validate_geography", True),
+                       converted_from=summary.get("converted_from"))
+    previous = summary.get("corrections") or {}
+    result["summary"]["corrections"] = {
+        "edits": int(previous.get("edits", 0)) + len(body.edits),
+        "cleared_rows": int(previous.get("cleared_rows", 0)) + len(set(body.clear_rows)),
+        "parent_job": job_id,
+        "previous_error_count": summary.get("error_count"),
+        "previous_warning_count": summary.get("warning_count"),
+    }
+    return result
+
+
+@router.get("/jobs/{job_id}/corrected.xlsx")
+def download_corrected(job_id: str) -> StreamingResponse:
+    """Planilha com as correções aplicadas, sem anotações (pronta para seguir o fluxo de depósito)."""
+    job = _job(job_id)
+    safe, ext = _safe_base(job)
+    return StreamingResponse(
+        BytesIO(job["file_bytes"]),
+        media_type=XLSX,
+        headers={"Content-Disposition": f'attachment; filename="{safe}_corrigida_tsiino.{ext}"'},
     )
 
 
