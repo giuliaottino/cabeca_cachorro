@@ -1,0 +1,53 @@
+ assets/css/herb-validator.css                  |   44 [32m+[m
+ assets/js/herb-converter.js                    |  398 [31m-----[m
+ assets/js/herb-issue-geography.js              |   37 [31m-[m
+ assets/js/herb-mapper-loader.js                |   84 [31m--[m
+ assets/js/herb-mapper-result-flow.js           |   66 [31m-[m
+ assets/js/herb-results-table.js                |  466 [31m------[m
+ assets/js/herb-standard-first-flow.js          |  264 [31m----[m
+ assets/js/herb-upload-formdata.js              |   40 [31m-[m
+ assets/js/herb-validator-flow.js               |   85 [31m--[m
+ assets/js/herb-validator.js                    | 1235 [32m++++++++[m[31m--------[m
+ backend/.env.example                           |    9 [32m+[m[31m-[m
+ backend/Dockerfile                             |   15 [32m+[m[31m-[m
+ backend/README.md                              |   47 [32m+[m
+ backend/app/{db.py => __init__.py}             |    0
+ backend/app/config.py                          |   52 [32m+[m
+ backend/app/main.py                            |   77 [32m+[m[31m-[m
+ backend/app/routes/converter.py                |  966 [32m+[m[31m-----------[m
+ backend/app/routes/validator.py                |  462 [32m++[m[31m----[m
+ backend/app/routes/validator_db_postgis.py     |    0
+ backend/app/services/annotate.py               |  116 [32m++[m
+ backend/app/services/geography_ibge_sqlite.py  |  904 [32m++++[m[31m--------[m
+ backend/app/services/geography_service.py      |    0
+ backend/app/services/inpa_schema.py            |  313 [32m+++[m[31m-[m
+ backend/app/services/issue_postprocess.py      |  313 [32m+[m[31m---[m
+ backend/app/services/job_service.py            |  183 [31m---[m
+ backend/app/services/job_store.py              |   45 [32m+[m
+ backend/app/services/normalization.py          |  152 [32m+[m[31m-[m
+ backend/app/services/rule_engine.py            |  459 [32m+++[m[31m---[m
+ backend/app/services/schema_detector.py        |  341 [31m-----[m
+ backend/app/services/spreadsheet_converter.py  |  657 [32m+++[m[31m------[m
+ backend/app/services/spreadsheet_reader.py     |  298 [32m++[m[31m--[m
+ backend/app/services/taxonomy_ffb_sqlite.py    | 1859 [32m++++[m[31m--------------------[m
+ backend/app/services/taxonomy_service.py       |    0
+ backend/app/services/validation.py             |  105 [32m++[m
+ backend/pyproject.toml                         |   20 [32m+[m[31m-[m
+ backend/scripts/import_ffb_dwca.py             |  163 [31m---[m
+ backend/tests/test_validator.py                |  201 [32m+++[m
+ docker-compose.yml                             |   29 [32m+[m[31m-[m
+ docs/assets/css/herb-validator.css             |   44 [32m+[m
+ docs/assets/js/herb-converter.js               |  398 [31m-----[m
+ docs/assets/js/herb-issue-geography.js         |   37 [31m-[m
+ docs/assets/js/herb-mapper-loader.js           |   84 [31m--[m
+ docs/assets/js/herb-mapper-result-flow.js      |   66 [31m-[m
+ docs/assets/js/herb-results-table.js           |  466 [31m------[m
+ docs/assets/js/herb-standard-first-flow.js     |  264 [31m----[m
+ docs/assets/js/herb-upload-formdata.js         |   40 [31m-[m
+ docs/assets/js/herb-validator-flow.js          |   85 [31m--[m
+ docs/assets/js/herb-validator.js               | 1235 [32m++++++++[m[31m--------[m
+ docs/ferramentas/validador-herbario/index.html |   28 [32m+[m[31m-[m
+ docs/search.json                               |    4 [32m+[m[31m-[m
+ ferramentas/validador-herbario/index.qmd       |   33 [32m+[m[31m-[m
+ tools/patch_validator_ffb_sqlite.py            |   50 [31m-[m
+ 52 files changed, 3889 insertions(+), 9450 deletions(-)

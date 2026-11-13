@@ -1,618 +1,358 @@
+"""Validação geográfica contra a Malha Municipal Digital do IBGE (SQLite local, sem PostGIS).
+
+Desenho:
+- metadados dos 5.573 municípios (nome, UF, bbox) ficam em memória;
+- o teste ponto-em-polígono usa paridade de cruzamentos vetorizada em numpy sobre todos os anéis
+  do município (contempla multipolígonos e buracos);
+- geometrias são carregadas sob demanda e mantidas num cache LRU; resultados por coordenada também.
+"""
 from __future__ import annotations
 
+import difflib
 import json
-import re
+import math
 import sqlite3
-import unicodedata
+import threading
+from collections import OrderedDict
+from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 from typing import Any
 
+import numpy as np
+
+from app.config import settings
 from app.schemas.issues import ValidationIssue
+from app.services.normalization import Coordinate, norm, parse_coordinate
 from app.services.rule_engine import issue
 
 SOURCE = "IBGE Malha Municipal Digital"
-DEFAULT_DB = Path(__file__).resolve().parents[2] / "reference" / "ibge_geography.sqlite"
+BRAZIL_NAMES = {"brasil", "brazil", "br", "bra"}
+BOUNDARY_TOLERANCE_KM = 1.0     # fora do município por menos que isso => alerta, não erro
+NEAR_LAND_KM = 10.0             # fora do Brasil, mas perto da costa/fronteira => alerta
+GEOM_CACHE_SIZE = 160
 
 
-def _norm(value: Any) -> str:
-    text = "" if value is None else str(value)
-    text = unicodedata.normalize("NFKD", text)
-    text = "".join(ch for ch in text if not unicodedata.combining(ch))
-    text = text.lower().strip()
-    text = re.sub(r"[^a-z0-9]+", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
+@dataclass(frozen=True)
+class Municipality:
+    id: int
+    code: str
+    name: str
+    norm_name: str
+    uf_sigla: str
+    uf_name: str
+    min_lon: float
+    min_lat: float
+    max_lon: float
+    max_lat: float
+
+    @property
+    def label(self) -> str:
+        return f"{self.name} ({self.uf_sigla})"
 
 
-def _as_float(value: Any) -> float | None:
-    if value is None or value == "":
+class _Edges:
+    """Arestas de todos os anéis de uma geometria, prontas para operações vetorizadas."""
+    __slots__ = ("x0", "y0", "x1", "y1", "dy")
+
+    def __init__(self, rings: list[list[list[float]]]):
+        x0, y0, x1, y1 = [], [], [], []
+        for ring in rings:
+            if len(ring) < 3:
+                continue
+            pts = np.asarray(ring, dtype=np.float64)
+            if not np.array_equal(pts[0], pts[-1]):
+                pts = np.vstack([pts, pts[:1]])
+            x0.append(pts[:-1, 0])
+            y0.append(pts[:-1, 1])
+            x1.append(pts[1:, 0])
+            y1.append(pts[1:, 1])
+        self.x0 = np.concatenate(x0) if x0 else np.empty(0)
+        self.y0 = np.concatenate(y0) if y0 else np.empty(0)
+        self.x1 = np.concatenate(x1) if x1 else np.empty(0)
+        self.y1 = np.concatenate(y1) if y1 else np.empty(0)
+        dy = self.y1 - self.y0
+        dy[dy == 0] = 1e-15
+        self.dy = dy
+
+    def contains(self, lon: float, lat: float) -> bool:
+        crosses = (self.y0 > lat) != (self.y1 > lat)
+        if not crosses.any():
+            return False
+        xi = self.x0[crosses] + (lat - self.y0[crosses]) * (self.x1[crosses] - self.x0[crosses]) / self.dy[crosses]
+        return bool(np.count_nonzero(lon < xi) % 2)
+
+    def distance_km(self, lon: float, lat: float) -> float:
+        """Distância aproximada (projeção equiretangular local) do ponto até a borda."""
+        kx = 111.320 * math.cos(math.radians(lat))
+        ky = 110.574
+        ax, ay = (self.x0 - lon) * kx, (self.y0 - lat) * ky
+        bx, by = (self.x1 - lon) * kx, (self.y1 - lat) * ky
+        dx, dy = bx - ax, by - ay
+        seg = dx * dx + dy * dy
+        seg[seg == 0] = 1e-12
+        t = np.clip(-(ax * dx + ay * dy) / seg, 0.0, 1.0)
+        px, py = ax + t * dx, ay + t * dy
+        return float(np.sqrt((px * px + py * py).min())) if px.size else float("inf")
+
+
+class GeographyReference:
+    def __init__(self, db_path=None):
+        self.db_path = db_path or settings.geography_db
+        self._local = threading.local()
+        self._lock = threading.Lock()
+        self._geom_lock = threading.Lock()
+        self._munis: list[Municipality] | None = None
+        self._by_name: dict[str, list[Municipality]] = {}
+        self._by_uf: dict[str, list[Municipality]] = {}
+        self._states: dict[str, tuple[str, str]] = {}      # alias normalizado -> (sigla, nome)
+        self._state_names: dict[str, str] = {}             # sigla -> nome por extenso
+        self._bbox: np.ndarray | None = None
+        self._geoms: OrderedDict[int, _Edges] = OrderedDict()
+        self._meta: dict[str, Any] = {}
+
+    def _con(self) -> sqlite3.Connection:
+        con = getattr(self._local, "con", None)
+        if con is None:
+            uri = f"file:{self.db_path.as_posix()}?mode=ro&immutable=1"
+            con = sqlite3.connect(uri, uri=True, check_same_thread=False)
+            con.row_factory = sqlite3.Row
+            self._local.con = con
+        return con
+
+    def available(self) -> bool:
+        return self.db_path.exists()
+
+    def load(self) -> None:
+        if self._munis is not None:
+            return
+        with self._lock:
+            if self._munis is not None:
+                return
+            con = self._con()
+            munis = [
+                Municipality(r["id"], r["code"], r["name"], r["norm_name"], r["uf_sigla"], r["uf_name"],
+                             r["min_lon"], r["min_lat"], r["max_lon"], r["max_lat"])
+                for r in con.execute(
+                    """SELECT id, code, name, norm_name, uf_sigla, uf_name, min_lon, min_lat, max_lon, max_lat
+                       FROM ibge_admin WHERE level = 'municipality'""")
+            ]
+            for m in munis:
+                self._by_name.setdefault(m.norm_name, []).append(m)
+                self._by_uf.setdefault(m.uf_sigla, []).append(m)
+            for r in con.execute("SELECT alias, uf_sigla, uf_name FROM ibge_state_alias"):
+                self._states[r["alias"]] = (r["uf_sigla"], r["uf_name"])
+                self._state_names[r["uf_sigla"]] = r["uf_name"]
+            for r in con.execute("SELECT uf_sigla, name, norm_name FROM ibge_admin WHERE level = 'state'"):
+                self._states.setdefault(r["norm_name"], (r["uf_sigla"], r["name"]))
+                self._state_names.setdefault(r["uf_sigla"], r["name"])
+            self._meta = {r["key"]: r["value"] for r in con.execute("SELECT key, value FROM reference_metadata")}
+            self._bbox = np.array([[m.min_lon, m.min_lat, m.max_lon, m.max_lat] for m in munis], dtype=np.float64)
+            self._munis = munis
+
+    # -- lookups -------------------------------------------------------------
+    def state(self, value: Any) -> tuple[str, str] | None:
+        self.load()
+        return self._states.get(norm(value))
+
+    def state_name(self, sigla: str) -> str | None:
+        self.load()
+        return self._state_names.get(sigla)
+
+    def municipalities(self, name: Any, uf: str | None = None) -> list[Municipality]:
+        self.load()
+        found = self._by_name.get(norm(name), [])
+        return [m for m in found if m.uf_sigla == uf] if uf else list(found)
+
+    @lru_cache(maxsize=2048)
+    def suggest_municipality(self, name_norm: str, uf: str | None) -> tuple[str, ...]:
+        self.load()
+        pool = self._by_uf.get(uf, []) if uf else self._munis or []
+        names = {m.norm_name: m for m in pool}
+        hits = difflib.get_close_matches(name_norm, list(names), n=3, cutoff=0.75)
+        return tuple(names[h].label if not uf else names[h].name for h in hits)
+
+    def _edges(self, muni: Municipality) -> _Edges:
+        with self._geom_lock:
+            cached = self._geoms.get(muni.id)
+            if cached is not None:
+                self._geoms.move_to_end(muni.id)
+                return cached
+        row = self._con().execute("SELECT geom_json FROM ibge_admin WHERE id = ?", (muni.id,)).fetchone()
+        edges = _Edges(json.loads(row["geom_json"]))
+        with self._geom_lock:
+            self._geoms[muni.id] = edges
+            while len(self._geoms) > GEOM_CACHE_SIZE:
+                self._geoms.popitem(last=False)
+        return edges
+
+    def _bbox_candidates(self, lon: float, lat: float, pad_deg: float = 0.0) -> list[Municipality]:
+        self.load()
+        b = self._bbox
+        assert b is not None and self._munis is not None
+        mask = (b[:, 0] - pad_deg <= lon) & (b[:, 2] + pad_deg >= lon) & (b[:, 1] - pad_deg <= lat) & (b[:, 3] + pad_deg >= lat)
+        return [self._munis[i] for i in np.flatnonzero(mask)]
+
+    @lru_cache(maxsize=8192)
+    def locate(self, lon: float, lat: float) -> Municipality | None:
+        for m in self._bbox_candidates(lon, lat):
+            if self._edges(m).contains(lon, lat):
+                return m
         return None
-    try:
-        if isinstance(value, str):
-            value = value.strip().replace(",", ".")
-        return float(value)
-    except Exception:
-        return None
+
+    @lru_cache(maxsize=4096)
+    def nearest(self, lon: float, lat: float, max_km: float = NEAR_LAND_KM) -> tuple[Municipality, float] | None:
+        pad = max_km / 100.0
+        best: tuple[Municipality, float] | None = None
+        for m in self._bbox_candidates(lon, lat, pad):
+            d = self._edges(m).distance_km(lon, lat)
+            if d <= max_km and (best is None or d < best[1]):
+                best = (m, d)
+        return best
+
+    def distance_to(self, muni: Municipality, lon: float, lat: float) -> float:
+        return self._edges(muni).distance_km(lon, lat)
+
+    def status(self) -> dict[str, Any]:
+        base = {"mode": "ibge_sqlite", "path": str(self.db_path)}
+        if not self.available():
+            return {**base, "status": "missing", "message": "Base geográfica IBGE ainda não foi construída."}
+        try:
+            self.load()
+        except Exception as exc:  # pragma: no cover
+            return {**base, "status": "error", "message": str(exc)}
+        return {
+            **base,
+            "status": "ready",
+            "source": self._meta.get("source", SOURCE),
+            "source_url": self._meta.get("source_url"),
+            "source_version": self._meta.get("source_version"),
+            "created_at_utc": self._meta.get("created_at_utc"),
+            "municipality_count": len(self._munis or []),
+            "state_count": len({m.uf_sigla for m in self._munis or []}),
+        }
 
 
-def _connect() -> sqlite3.Connection:
-    con = sqlite3.connect(DEFAULT_DB)
-    con.row_factory = sqlite3.Row
-    return con
-
-
-def _metadata(con: sqlite3.Connection) -> dict[str, Any]:
-    rows = con.execute("SELECT key, value FROM reference_metadata").fetchall()
-    meta = {r["key"]: r["value"] for r in rows}
-    for key in ("municipality_count", "state_count", "country_count"):
-        if key in meta:
-            try:
-                meta[key] = int(meta[key])
-            except Exception:
-                pass
-    return meta
+REFERENCE = GeographyReference()
 
 
 def reference_status() -> dict[str, Any]:
-    if not DEFAULT_DB.exists():
-        return {
-            "mode": "ibge_sqlite",
-            "status": "missing",
-            "path": str(DEFAULT_DB),
-            "message": "Base geográfica IBGE ainda não foi construída.",
-        }
-    try:
-        with _connect() as con:
-            meta = _metadata(con)
-        return {
-            "mode": "ibge_sqlite",
-            "status": "ready",
-            "path": str(DEFAULT_DB),
-            "source": meta.get("source", SOURCE),
-            "source_url": meta.get("source_url"),
-            "source_version": meta.get("source_version"),
-            "created_at_utc": meta.get("created_at_utc"),
-            "municipality_count": meta.get("municipality_count"),
-            "state_count": meta.get("state_count"),
-            "country_count": meta.get("country_count"),
-        }
-    except Exception as exc:
-        return {
-            "mode": "ibge_sqlite",
-            "status": "error",
-            "path": str(DEFAULT_DB),
-            "message": str(exc),
-        }
-
-
-def _point_in_ring(lon: float, lat: float, ring: list[list[float]]) -> bool:
-    inside = False
-    n = len(ring)
-    if n < 4:
-        return False
-    j = n - 1
-    for i in range(n):
-        xi, yi = ring[i]
-        xj, yj = ring[j]
-        intersects = ((yi > lat) != (yj > lat)) and (
-            lon < (xj - xi) * (lat - yi) / ((yj - yi) or 1e-15) + xi
-        )
-        if intersects:
-            inside = not inside
-        j = i
-    return inside
-
-
-def _point_in_geom(lon: float, lat: float, geom_json: str) -> bool:
-    try:
-        rings = json.loads(geom_json)
-    except Exception:
-        return False
-    # Primeiro momento: qualquer anel contendo o ponto conta como dentro.
-    # Isso evita dependência de GEOS/PostGIS no Hugging Face gratuito.
-    return any(_point_in_ring(lon, lat, ring) for ring in rings)
-
-
-@lru_cache(maxsize=512)
-def _resolve_state(state_norm: str) -> dict[str, Any] | None:
-    if not state_norm or not DEFAULT_DB.exists():
-        return None
-    with _connect() as con:
-        row = con.execute(
-            "SELECT uf_sigla, uf_name, uf_code FROM ibge_state_alias WHERE alias = ?",
-            (state_norm,),
-        ).fetchone()
-        if row:
-            return dict(row)
-        row = con.execute(
-            "SELECT code AS uf_code, name AS uf_name, uf_sigla FROM ibge_admin WHERE level='state' AND norm_name = ? LIMIT 1",
-            (state_norm,),
-        ).fetchone()
-        return dict(row) if row else None
-
-
-@lru_cache(maxsize=4096)
-def _resolve_municipality(muni_norm: str, uf_sigla: str | None = None) -> list[dict[str, Any]]:
-    if not muni_norm or not DEFAULT_DB.exists():
-        return []
-    with _connect() as con:
-        if uf_sigla:
-            rows = con.execute(
-                """
-                SELECT * FROM ibge_admin
-                WHERE level='municipality' AND norm_name = ? AND uf_sigla = ?
-                ORDER BY name
-                """,
-                (muni_norm, uf_sigla),
-            ).fetchall()
-            if rows:
-                return [dict(r) for r in rows]
-        rows = con.execute(
-            """
-            SELECT * FROM ibge_admin
-            WHERE level='municipality' AND norm_name = ?
-            ORDER BY uf_sigla, name
-            """,
-            (muni_norm,),
-        ).fetchall()
-        return [dict(r) for r in rows]
-
-
-def _find_containing(level: str, lat: float, lon: float) -> list[dict[str, Any]]:
-    if not DEFAULT_DB.exists():
-        return []
-    with _connect() as con:
-        rows = con.execute(
-            """
-            SELECT * FROM ibge_admin
-            WHERE level = ?
-              AND min_lon <= ? AND max_lon >= ?
-              AND min_lat <= ? AND max_lat >= ?
-            """,
-            (level, lon, lon, lat, lat),
-        ).fetchall()
-    matches = []
-    for row in rows:
-        d = dict(row)
-        if _point_in_geom(lon, lat, d["geom_json"]):
-            matches.append(d)
-    return matches
+    return REFERENCE.status()
 
 
 def _country_is_brazil(value: Any) -> bool:
-    if value is None or value == "":
-        return True
-    n = _norm(value)
-    return n in {"brasil", "brazil", "br"}
+    return not value or norm(value) in BRAZIL_NAMES
+
+
+def resolve_uf(record: dict[str, Any]) -> str | None:
+    """Sigla da UF informada (usada também pela taxonomia para checar distribuição)."""
+    found = REFERENCE.state(record.get("majorarea")) if record.get("majorarea") else None
+    return found[0] if found else None
+
+
+def _fmt(lat: float, lon: float) -> str:
+    return f"{lat:.6f}, {lon:.6f}".replace(".000000", "")
 
 
 def validate_geography_ibge(record: dict[str, Any]) -> list[ValidationIssue]:
+    ref = REFERENCE
     row = record.get("_row_number")
-    country = record.get("country")
-    majorarea = record.get("majorarea")
-    minorarea = record.get("minorarea")
-    lat_raw = record.get("lat")
-    lon_raw = record.get("long")
-    ns = record.get("NS") or record.get("ns")
-    ew = record.get("EW") or record.get("ew")
     issues: list[ValidationIssue] = []
-
-    if not DEFAULT_DB.exists():
-        return [issue(
-            row, "_row", "warning", "IBGE_REFERENCE_MISSING",
-            "Base geográfica IBGE ainda não está disponível no servidor.",
-            None,
-            source=SOURCE,
-        )]
+    country, majorarea, minorarea = record.get("country"), record.get("majorarea"), record.get("minorarea")
 
     if country and not _country_is_brazil(country):
-        issues.append(issue(
-            row, "country", "warning", "COUNTRY_NOT_BRAZIL",
-            "País informado não é Brasil/Brazil; a validação geográfica atual usa a malha territorial do IBGE para o Brasil.",
-            country,
-            suggestion="Brasil",
-            source=SOURCE,
-        ))
+        issues.append(issue(row, "country", "warning", "COUNTRY_NOT_BRAZIL",
+                            "País diferente de Brasil: a checagem de estado, município e coordenada usa a malha do IBGE "
+                            "e foi ignorada nesta linha.", country, source=SOURCE))
+        return issues
+    if country and norm(country) != "brasil":
+        issues.append(issue(row, "country", "info", "COUNTRY_FORMAT", "Escreva o país por extenso em português.",
+                            country, suggestion="Brasil", source=SOURCE))
 
-    state = _resolve_state(_norm(majorarea)) if majorarea else None
+    state = ref.state(majorarea) if majorarea else None
+    uf = state[0] if state else None
     if majorarea and not state:
-        issues.append(issue(
-            row, "majorarea", "warning", "STATE_NOT_FOUND_IBGE",
-            "Estado/UF não encontrado na base do IBGE.",
-            majorarea,
-            source=SOURCE,
-        ))
+        issues.append(issue(row, "majorarea", "error", "STATE_NOT_FOUND_IBGE", "Estado não encontrado na base do IBGE.",
+                            majorarea, source=SOURCE))
+    elif state and norm(majorarea) == state[0].lower():
+        issues.append(issue(row, "majorarea", "warning", "STATE_ABBREVIATION",
+                            "Use o nome do estado por extenso, não a sigla.", majorarea, suggestion=state[1], source=SOURCE))
 
-    uf_sigla = state.get("uf_sigla") if state else None
-    muni_matches = _resolve_municipality(_norm(minorarea), uf_sigla) if minorarea else []
-    muni_any_state = _resolve_municipality(_norm(minorarea), None) if minorarea else []
+    stated: list[Municipality] = []
+    if minorarea:
+        stated = ref.municipalities(minorarea, uf)
+        if not stated:
+            elsewhere = ref.municipalities(minorarea)
+            if elsewhere and uf:
+                issues.append(issue(row, "minorarea", "error", "MUNICIPALITY_STATE_MISMATCH",
+                                    f"Município existe no IBGE, mas não em {uf}.", minorarea,
+                                    suggestion=", ".join(m.label for m in elsewhere[:5]), source=SOURCE))
+            elif elsewhere:
+                stated = elsewhere
+            else:
+                sugg = ref.suggest_municipality(norm(minorarea), uf)
+                issues.append(issue(row, "minorarea", "error", "MUNICIPALITY_NOT_FOUND_IBGE",
+                                    "Município não encontrado na Malha Municipal do IBGE." + (f" (UF {uf})" if uf else ""),
+                                    minorarea, suggestion=", ".join(sugg) or None, source=SOURCE))
 
-    if minorarea and not muni_any_state:
-        issues.append(issue(
-            row, "minorarea", "warning", "MUNICIPALITY_NOT_FOUND_IBGE",
-            "Município não encontrado na Malha Municipal do IBGE.",
-            minorarea,
-            source=SOURCE,
-        ))
-    elif minorarea and state and not muni_matches:
-        suggestions = sorted({f"{m['name']} - {m.get('uf_sigla') or ''}" for m in muni_any_state})
-        issues.append(issue(
-            row, "minorarea", "error", "MUNICIPALITY_STATE_MISMATCH",
-            "Município encontrado no IBGE, mas não pertence ao estado/UF informado.",
-            minorarea,
-            suggestion=", ".join(suggestions[:5]) if suggestions else None,
-            source=SOURCE,
-        ))
+    lat_c: Coordinate = record.get("_lat") or parse_coordinate(record.get("lat"))
+    lon_c: Coordinate = record.get("_long") or parse_coordinate(record.get("long"))
+    lat, lon = lat_c.value, lon_c.value
+    if lat is None or lon is None or not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        return issues  # ausência/formato/intervalo já tratados no rule_engine
 
-    lat = _as_float(lat_raw)
-    lon = _as_float(lon_raw)
-    if lat_raw not in (None, "") and lat is None:
-        issues.append(issue(row, "lat", "error", "INVALID_LATITUDE", "Latitude não é numérica.", lat_raw, source=SOURCE))
-    if lon_raw not in (None, "") and lon is None:
-        issues.append(issue(row, "long", "error", "INVALID_LONGITUDE", "Longitude não é numérica.", lon_raw, source=SOURCE))
-
-    if lat is None or lon is None:
-        return issues
-
-    if not (-90 <= lat <= 90):
-        issues.append(issue(row, "lat", "error", "LATITUDE_OUT_OF_RANGE", "Latitude fora do intervalo -90 a 90.", lat_raw, source=SOURCE))
-    if not (-180 <= lon <= 180):
-        issues.append(issue(row, "long", "error", "LONGITUDE_OUT_OF_RANGE", "Longitude fora do intervalo -180 a 180.", lon_raw, source=SOURCE))
-    if issues and any(i.code in {"LATITUDE_OUT_OF_RANGE", "LONGITUDE_OUT_OF_RANGE"} for i in issues):
-        return issues
-
-    if ns and str(ns).strip().upper().startswith("S") and lat > 0:
-        issues.append(issue(row, "NS", "warning", "NS_SIGN_MISMATCH", "Campo NS indica Sul, mas latitude está positiva.", ns, suggestion="Latitude negativa ou NS=N", source=SOURCE))
-    if ns and str(ns).strip().upper().startswith("N") and lat < 0:
-        issues.append(issue(row, "NS", "warning", "NS_SIGN_MISMATCH", "Campo NS indica Norte, mas latitude está negativa.", ns, suggestion="Latitude positiva ou NS=S", source=SOURCE))
-    if ew and str(ew).strip().upper().startswith("W") and lon > 0:
-        issues.append(issue(row, "EW", "warning", "EW_SIGN_MISMATCH", "Campo EW indica Oeste, mas longitude está positiva.", ew, suggestion="Longitude negativa ou EW=E", source=SOURCE))
-    if ew and str(ew).strip().upper().startswith("E") and lon < 0:
-        issues.append(issue(row, "EW", "warning", "EW_SIGN_MISMATCH", "Campo EW indica Leste, mas longitude está negativa.", ew, suggestion="Longitude positiva ou EW=W", source=SOURCE))
-
-    containing_munis = _find_containing("municipality", lat, lon)
-    containing_states = _find_containing("state", lat, lon)
-
-    if not containing_munis and not containing_states:
-        swapped_munis = _find_containing("municipality", lon, lat) if -90 <= lon <= 90 and -180 <= lat <= 180 else []
-        if swapped_munis:
-            m = swapped_munis[0]
-            issues.append(issue(
-                row, "lat", "error", "LAT_LONG_POSSIBLY_SWAPPED",
-                "A coordenada não cai no Brasil como informada, mas cai se latitude e longitude forem invertidas.",
-                f"{lat}, {lon}",
-                suggestion=f"lat={lon}, long={lat} ({m['name']} - {m.get('uf_sigla')})",
-                source=SOURCE,
-            ))
+    found = ref.locate(round(lon, 6), round(lat, 6))
+    if found is None:
+        # Tenta correções comuns: sinal trocado e lat/long invertidas.
+        candidates = []
+        if lon > 0:
+            candidates.append(("longitude com sinal invertido", lat, -lon))
+        candidates.append(("latitude com sinal invertido", -lat, lon))
+        if lon > 0:
+            candidates.append(("latitude e longitude com sinais invertidos", -lat, -lon))
+        if -90 <= lon <= 90:
+            candidates.append(("latitude e longitude invertidas", lon, lat))
+            candidates.append(("latitude e longitude invertidas", -lon if lon > 0 else lon, lat))
+        fixes = [(why, la, lo, ref.locate(round(lo, 6), round(la, 6))) for why, la, lo in candidates]
+        fixes = [f for f in fixes if f[3] is not None]
+        preferred = [f for f in fixes if stated and f[3] in stated] or fixes
+        if preferred:
+            why, la, lo, m = preferred[0]
+            issues.append(issue(row, "lat", "error", "COORDINATE_LIKELY_SWAPPED_OR_SIGN",
+                                f"A coordenada não cai no Brasil, mas cai em {m.label} se corrigida ({why}).",
+                                _fmt(lat, lon), suggestion=f"lat={la:g}, long={lo:g}", source=SOURCE))
+            return issues
+        near = ref.nearest(round(lon, 4), round(lat, 4))
+        if near:
+            m, d = near
+            issues.append(issue(row, "lat", "warning", "POINT_OUTSIDE_LAND_LIMIT",
+                                f"Coordenada fora dos limites municipais do IBGE, a {d:.1f} km de {m.label} "
+                                "(possível ponto em rio largo, costa ou fronteira). Confira.",
+                                _fmt(lat, lon), suggestion=m.name, source=SOURCE))
         else:
-            issues.append(issue(
-                row, "lat", "error", "POINT_OUTSIDE_BRAZIL",
-                "Coordenada não cai na Malha Municipal/UF do IBGE para o Brasil.",
-                f"{lat}, {lon}",
-                source=SOURCE,
-            ))
+            issues.append(issue(row, "lat", "error", "POINT_OUTSIDE_BRAZIL",
+                                "Coordenada fora do território brasileiro segundo a malha do IBGE.",
+                                _fmt(lat, lon), source=SOURCE))
         return issues
 
-    actual_state_siglas = {m.get("uf_sigla") for m in containing_munis if m.get("uf_sigla")}
-    actual_state_siglas.update({s.get("uf_sigla") for s in containing_states if s.get("uf_sigla")})
-
-    if state and uf_sigla and actual_state_siglas and uf_sigla not in actual_state_siglas:
-        suggestion = ", ".join(sorted(actual_state_siglas))
+    if uf and found.uf_sigla != uf:
+        issues.append(issue(row, "majorarea", "error", "POINT_OUTSIDE_STATE",
+                            f"A coordenada cai em {found.label}, fora do estado informado ({uf}).",
+                            _fmt(lat, lon), suggestion=ref.state_name(found.uf_sigla), source=SOURCE))
+    if stated and found not in stated:
+        target = stated[0]
+        dist = ref.distance_to(target, lon, lat)
+        near_boundary = dist <= BOUNDARY_TOLERANCE_KM
         issues.append(issue(
-            row, "majorarea", "error", "POINT_OUTSIDE_STATE",
-            "Coordenada não cai dentro do estado/UF informado segundo a malha do IBGE.",
-            f"{lat}, {lon}",
-            suggestion=suggestion,
-            source=SOURCE,
-        ))
-
-    if minorarea and muni_matches:
-        expected_codes = {m.get("code") for m in muni_matches}
-        actual_codes = {m.get("code") for m in containing_munis}
-        if expected_codes and actual_codes and not (expected_codes & actual_codes):
-            suggestions = sorted({f"{m['name']} - {m.get('uf_sigla') or ''}" for m in containing_munis})
-            issues.append(issue(
-                row, "minorarea", "error", "POINT_OUTSIDE_MUNICIPALITY",
-                "Coordenada não cai dentro do município informado segundo a malha do IBGE.",
-                f"{lat}, {lon}",
-                suggestion=", ".join(suggestions[:5]) if suggestions else None,
-                source=SOURCE,
-            ))
-
+            row, "minorarea", "warning" if near_boundary else "error", "POINT_OUTSIDE_MUNICIPALITY",
+            f"A coordenada cai em {found.label}, a {dist:.1f} km do limite de {target.label}. "
+            + ("Ponto muito próximo da divisa: confira." if near_boundary else "Confira o município ou a coordenada."),
+            _fmt(lat, lon), suggestion=found.name, source=SOURCE))
+    elif not minorarea:
+        issues.append(issue(row, "minorarea", "info", "MUNICIPALITY_FROM_COORDINATE",
+                            f"Município vazio; pela coordenada, a coleta está em {found.label}.", None,
+                            suggestion=found.name, source=SOURCE))
+    if not majorarea:
+        issues.append(issue(row, "majorarea", "info", "STATE_FROM_COORDINATE",
+                            f"Estado vazio; pela coordenada: {ref.state_name(found.uf_sigla)}.", None,
+                            suggestion=ref.state_name(found.uf_sigla), source=SOURCE))
     return issues
-
-# TSIINO_COMPAT_GEOGRAPHY_ALIASES
-if "reference_status" not in globals():
-    def reference_status():
-        for name in ("ibge_reference_status", "geography_reference_status", "get_reference_status", "status"):
-            fn = globals().get(name)
-            if callable(fn):
-                return fn()
-        return {"mode": "ibge_sqlite", "status": "unknown"}
-
-if "validate_geography_ibge" not in globals():
-    def validate_geography_ibge(*args, **kwargs):
-        for name in ("validate_geography", "validate_row_geography", "validate_ibge_geography", "validate_location"):
-            fn = globals().get(name)
-            if callable(fn):
-                return fn(*args, **kwargs)
-        return []
-
-# TSIINO_GEOGRAPHY_MUNICIPALITY_SUGGESTION_V35
-# Sugere o município/UF onde a coordenada cai quando ela não coincide com o município informado.
-# Implementação conservadora: não substitui a validação IBGE existente;
-# apenas acrescenta uma mensagem orientativa quando há evidência espacial suficiente.
-try:
-    from functools import lru_cache as _tsiino_v35_lru_cache
-except Exception:  # pragma: no cover
-    _tsiino_v35_lru_cache = None
-
-
-def _tsiino_v35_clean(value):
-    if value is None:
-        return ""
-    return str(value).strip()
-
-
-def _tsiino_v35_norm(value):
-    try:
-        return _norm(value)
-    except Exception:
-        import unicodedata
-        s = _tsiino_v35_clean(value).lower()
-        s = "".join(ch for ch in unicodedata.normalize("NFKD", s) if not unicodedata.combining(ch))
-        return " ".join(s.replace("-", " ").split())
-
-
-def _tsiino_v35_row_value(row, *keys):
-    if not isinstance(row, dict):
-        return None
-    norm_keys = {_tsiino_v35_norm(k): k for k in row.keys()}
-    for key in keys:
-        if key in row and row.get(key) not in (None, ""):
-            return row.get(key)
-        nk = _tsiino_v35_norm(key)
-        if nk in norm_keys and row.get(norm_keys[nk]) not in (None, ""):
-            return row.get(norm_keys[nk])
-    return None
-
-
-def _tsiino_v35_float(value):
-    try:
-        return _as_float(value)
-    except Exception:
-        pass
-    if value is None or value == "":
-        return None
-    try:
-        return float(str(value).replace(",", ".").strip())
-    except Exception:
-        return None
-
-
-def _tsiino_v35_lat_lon_from_row(row):
-    lat = _tsiino_v35_float(_tsiino_v35_row_value(row, "lat", "latitude", "Lat", "Latitude"))
-    lon = _tsiino_v35_float(_tsiino_v35_row_value(row, "long", "lon", "longitude", "Long", "Longitude"))
-    if lat is None or lon is None:
-        return None, None
-    ns = _tsiino_v35_norm(_tsiino_v35_row_value(row, "NS", "ns", "hemisferio latitude", "hemisphere_lat") or "")
-    ew = _tsiino_v35_norm(_tsiino_v35_row_value(row, "EW", "ew", "hemisferio longitude", "hemisphere_lon") or "")
-    if ns in {"s", "sul", "south"} and lat > 0:
-        lat = -lat
-    elif ns in {"n", "norte", "north"} and lat < 0:
-        lat = abs(lat)
-    if ew in {"w", "o", "oeste", "west"} and lon > 0:
-        lon = -lon
-    elif ew in {"e", "l", "este", "east"} and lon < 0:
-        lon = abs(lon)
-    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
-        return None, None
-    return lat, lon
-
-
-def _tsiino_v35_result_name(result, *keys):
-    if result is None:
-        return ""
-    if isinstance(result, (list, tuple)) and result and not isinstance(result, str):
-        if isinstance(result[0], dict):
-            result = result[0]
-    if isinstance(result, dict):
-        lower = {str(k).lower(): v for k, v in result.items()}
-        norm = {_tsiino_v35_norm(k): v for k, v in result.items()}
-        for key in keys:
-            if key in result and result.get(key):
-                return _tsiino_v35_clean(result.get(key))
-            lk = key.lower()
-            if lk in lower and lower[lk]:
-                return _tsiino_v35_clean(lower[lk])
-            nk = _tsiino_v35_norm(key)
-            if nk in norm and norm[nk]:
-                return _tsiino_v35_clean(norm[nk])
-    return ""
-
-
-def _tsiino_v35_normalize_containing_result(result):
-    if result is None:
-        return None
-    if isinstance(result, (list, tuple)) and result and isinstance(result[0], dict):
-        result = result[0]
-    municipality = _tsiino_v35_result_name(
-        result,
-        "municipality", "municipio", "minorarea", "name", "nome", "nome_municipio",
-        "nm_mun", "NM_MUN", "municipality_name", "mun_name",
-    )
-    state = _tsiino_v35_result_name(
-        result,
-        "state", "uf", "majorarea", "sigla_uf", "uf_sigla", "NM_UF", "nm_uf",
-        "state_name", "nome_uf", "uf_name",
-    )
-    if not municipality and isinstance(result, (list, tuple)):
-        vals = [_tsiino_v35_clean(v) for v in result if _tsiino_v35_clean(v)]
-        if len(vals) >= 2:
-            vals_sorted = sorted(vals[:2], key=len, reverse=True)
-            municipality = vals_sorted[0]
-            state = vals_sorted[1]
-    if municipality:
-        return {"municipality": municipality, "state": state}
-    return None
-
-
-def _tsiino_v35_try_find_containing(lat, lon):
-    fn = globals().get("_find_containing")
-    if not callable(fn):
-        return None
-    calls = [
-        (lat, lon),
-        (lon, lat),
-        ("municipality", lat, lon),
-        ("municipality", lon, lat),
-        ("municipalities", lat, lon),
-        ("municipalities", lon, lat),
-        ("municipio", lat, lon),
-        ("municipio", lon, lat),
-    ]
-    for args in calls:
-        try:
-            result = fn(*args)
-            normalized = _tsiino_v35_normalize_containing_result(result)
-            if normalized:
-                return normalized
-        except TypeError:
-            continue
-        except Exception:
-            continue
-    return None
-
-
-if _tsiino_v35_lru_cache:
-    @_tsiino_v35_lru_cache(maxsize=4096)
-    def _tsiino_v35_find_municipality_cached(lat_rounded, lon_rounded):
-        return _tsiino_v35_try_find_containing(float(lat_rounded), float(lon_rounded))
-else:
-    def _tsiino_v35_find_municipality_cached(lat_rounded, lon_rounded):
-        return _tsiino_v35_try_find_containing(float(lat_rounded), float(lon_rounded))
-
-
-def _tsiino_v35_find_municipality(lat, lon):
-    if lat is None or lon is None:
-        return None
-    return _tsiino_v35_find_municipality_cached(round(float(lat), 6), round(float(lon), 6))
-
-
-def _tsiino_v35_issue_text(item):
-    if isinstance(item, dict):
-        return _tsiino_v35_clean(item.get("message") or item.get("msg") or "")
-    return _tsiino_v35_clean(getattr(item, "message", "") or getattr(item, "msg", "") or "")
-
-
-def _tsiino_v35_issue_code(item):
-    if isinstance(item, dict):
-        return _tsiino_v35_clean(item.get("code") or "")
-    return _tsiino_v35_clean(getattr(item, "code", "") or "")
-
-
-def _tsiino_v35_make_issue(row_number, message):
-    code = "GEOGRAPHY_COORDINATE_MUNICIPALITY_SUGGESTION"
-    field = "minorarea"
-    fn = globals().get("issue")
-    if callable(fn):
-        attempts = (
-            lambda: fn(row_number=row_number, field=field, severity="warning", code=code, message=message),
-            lambda: fn(row_number=row_number, column=field, severity="warning", code=code, message=message),
-            lambda: fn(row_number, field, "warning", code, message),
-            lambda: fn(row_number, field, code, message, severity="warning"),
-            lambda: fn(row_number, field, message, severity="warning", code=code),
-        )
-        for attempt in attempts:
-            try:
-                return attempt()
-            except Exception:
-                pass
-    cls = globals().get("ValidationIssue")
-    if cls is not None:
-        payloads = (
-            dict(row_number=row_number, field=field, severity="warning", code=code, message=message),
-            dict(row=row_number, column=field, severity="warning", code=code, message=message),
-            dict(row_number=row_number, column=field, severity="warning", code=code, message=message),
-        )
-        for payload in payloads:
-            try:
-                return cls(**payload)
-            except Exception:
-                pass
-    return {"row_number": row_number, "field": field, "severity": "warning", "code": code, "message": message}
-
-
-def _tsiino_v35_dedupe_issues(items):
-    out = []
-    seen = set()
-    for item in items or []:
-        if isinstance(item, dict):
-            row = item.get("row_number") or item.get("row") or item.get("linha")
-            field = item.get("field") or item.get("column") or ""
-        else:
-            row = getattr(item, "row_number", None) or getattr(item, "row", None) or getattr(item, "linha", None)
-            field = getattr(item, "field", "") or getattr(item, "column", "") or ""
-        key = (row, field, _tsiino_v35_issue_code(item), _tsiino_v35_issue_text(item))
-        if key not in seen:
-            seen.add(key)
-            out.append(item)
-    return out
-
-
-_tsiino_v35_original_validate_geography_ibge = validate_geography_ibge
-
-
-def validate_geography_ibge(*args, **kwargs):
-    issues = list(_tsiino_v35_original_validate_geography_ibge(*args, **kwargs) or [])
-    row = None
-    for arg in args:
-        if isinstance(arg, dict):
-            row = arg
-            break
-    if row is None:
-        row = kwargs.get("row") or kwargs.get("record") or kwargs.get("data")
-    if not isinstance(row, dict):
-        return _tsiino_v35_dedupe_issues(issues)
-
-    row_number = kwargs.get("row_number") or kwargs.get("row") or row.get("_ROW_NUMBER") or row.get("row_number") or row.get("linha")
-    lat, lon = _tsiino_v35_lat_lon_from_row(row)
-    if lat is None or lon is None:
-        return _tsiino_v35_dedupe_issues(issues)
-
-    informed_mun = _tsiino_v35_clean(_tsiino_v35_row_value(row, "minorarea", "municipio", "município", "municipality"))
-    informed_state = _tsiino_v35_clean(_tsiino_v35_row_value(row, "majorarea", "estado", "uf", "state"))
-    if not informed_mun:
-        return _tsiino_v35_dedupe_issues(issues)
-
-    found = _tsiino_v35_find_municipality(lat, lon)
-    if not found or not found.get("municipality"):
-        return _tsiino_v35_dedupe_issues(issues)
-
-    suggested_mun = _tsiino_v35_clean(found.get("municipality"))
-    suggested_state = _tsiino_v35_clean(found.get("state"))
-    same_mun = _tsiino_v35_norm(informed_mun) == _tsiino_v35_norm(suggested_mun)
-    same_state = (not informed_state or not suggested_state or _tsiino_v35_norm(informed_state) == _tsiino_v35_norm(suggested_state))
-    if same_mun and same_state:
-        return _tsiino_v35_dedupe_issues(issues)
-
-    previous_text = "\n".join(_tsiino_v35_issue_text(i).lower() for i in issues)
-    has_geo_mismatch = any(token in previous_text for token in ("município", "municipio", "coordenada", "fora", "localidade"))
-    if not has_geo_mismatch and same_state:
-        return _tsiino_v35_dedupe_issues(issues)
-
-    if suggested_state:
-        msg = (
-            f"A coordenada informada cai em {suggested_mun} ({suggested_state}), "
-            f"não em {informed_mun}" + (f" ({informed_state})" if informed_state else "") + ". "
-            "Confira município/UF ou latitude/longitude."
-        )
-    else:
-        msg = (
-            f"A coordenada informada cai em {suggested_mun}, não em {informed_mun}. "
-            "Confira município/UF ou latitude/longitude."
-        )
-    if not any("coordenada informada cai em" in _tsiino_v35_issue_text(i).lower() for i in issues):
-        issues.append(_tsiino_v35_make_issue(row_number, msg))
-    return _tsiino_v35_dedupe_issues(issues)
-

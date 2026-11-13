@@ -1,478 +1,261 @@
+"""Mapeador/conversor de planilhas fora do padrão para o template INPA/BRAHMS."""
 from __future__ import annotations
 
 import json
 import re
-import unicodedata
-from dataclasses import dataclass
 from io import BytesIO
-from pathlib import Path
 from typing import Any
 
-from openpyxl import Workbook, load_workbook
-from openpyxl.utils import get_column_letter, column_index_from_string
-from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import column_index_from_string, get_column_letter
 
-CANONICAL_COLUMNS = [
-    'accession', 'collector', 'prefix', 'number', 'suffix', 'addcoll',
-    'colldd', 'collmm', 'collyy', 'initial', 'family', 'genus', 'detstatus',
-    'sp1', 'rank1', 'sp2', 'detby', 'detdd', 'detmm', 'detyy', 'country',
-    'majorarea', 'minorarea', 'gazetteer', 'locnotes', 'habitattxt', 'lat',
-    'NS', 'long', 'EW', 'llunit', 'alt', 'alt1', 'plantdesc', 'vernacular',
-    'dups', 'project', 'genbank'
-]
+from app.services.inpa_schema import (
+    CANONICAL_COLUMNS, FIELD_HELP, FIELD_LABELS, INPA_FIELDS, REQUIRED_FIELDS, HeaderDetection, detect_header,
+    detect_standard_header, unique_headers,
+)
+from app.services.normalization import cell_text, json_value, norm, parse_coordinate
+from app.services.spreadsheet_reader import EXAMPLE_MARKERS, SheetData, read_sheet
 
-REQUIRED_FIELDS = {
-    'collector', 'number', 'colldd', 'collmm', 'collyy', 'family', 'genus',
-    'country', 'majorarea', 'minorarea', 'lat', 'long', 'plantdesc'
-}
-
-FIELD_LABELS = {
-    'accession': 'Registro INPA', 'collector': 'Coletor principal', 'prefix': 'Prefixo',
-    'number': 'Número de coleta', 'suffix': 'Sufixo', 'addcoll': 'Coletores adicionais',
-    'colldd': 'Dia da coleta', 'collmm': 'Mês da coleta', 'collyy': 'Ano da coleta',
-    'initial': 'Nº de amostras', 'family': 'Família', 'genus': 'Gênero',
-    'detstatus': 'cf./aff.', 'sp1': 'Epíteto específico', 'rank1': 'Rank infraespecífico',
-    'sp2': 'Epíteto infraespecífico', 'detby': 'Determinador', 'detdd': 'Dia da determinação',
-    'detmm': 'Mês da determinação', 'detyy': 'Ano da determinação', 'country': 'País',
-    'majorarea': 'Estado', 'minorarea': 'Município', 'gazetteer': 'Localidade',
-    'locnotes': 'Notas de localidade', 'habitattxt': 'Habitat', 'lat': 'Latitude',
-    'NS': 'N/S', 'long': 'Longitude', 'EW': 'E/W', 'llunit': 'Unidade lat/long',
-    'alt': 'Altitude', 'alt1': 'Altitude máxima', 'plantdesc': 'Descrição da planta',
-    'vernacular': 'Nome vernacular', 'dups': 'Duplicatas', 'project': 'Projeto', 'genbank': 'GenBank'
-}
-
-FIELD_HELP = {
-    'collector': 'Nome do coletor principal. Formato: Sobrenome, Iniciais.',
-    'number': 'Número da coleta do coletor principal. Evite s.n.',
-    'colldd': 'Dia da coleta, em número.', 'collmm': 'Mês da coleta, em número.',
-    'collyy': 'Ano da coleta com quatro dígitos.', 'family': 'Família botânica.',
-    'genus': 'Gênero botânico.', 'sp1': 'Epíteto específico, sem escrever sp.',
-    'country': 'País da coleta.', 'majorarea': 'Estado por extenso.',
-    'minorarea': 'Município.', 'gazetteer': 'Localidade principal.',
-    'locnotes': 'Detalhes do ponto/local onde a coleta foi feita.',
-    'habitattxt': 'Descrição do habitat.', 'lat': 'Latitude em graus decimais.',
-    'long': 'Longitude em graus decimais.', 'plantdesc': 'Descrição detalhada da planta.',
-}
-
-RECOMMENDATIONS = [FIELD_LABELS.get(c, c) for c in CANONICAL_COLUMNS]
-
-BAD_HEADER_HINTS = [
-    'notas para voce seguir', 'recomendacoes no preenchimento', 'linha de exemplo',
-]
+RECOMMENDATIONS = [FIELD_HELP[c] for c in CANONICAL_COLUMNS]
 
 
-def strip_accents(value: str) -> str:
-    return ''.join(ch for ch in unicodedata.normalize('NFKD', value) if not unicodedata.combining(ch))
+def _fallback_header(sheet: SheetData) -> HeaderDetection:
+    for idx, values in enumerate(sheet.rows[:30], start=1):
+        if sum(1 for v in values if v is not None) >= 2:
+            headers = unique_headers(values)
+            return HeaderDetection(idx, {}, headers, list(REQUIRED_FIELDS), [h for h in headers if h])
+    raise ValueError("Não encontrei uma linha de cabeçalho na planilha.")
 
 
-def norm(value: Any) -> str:
-    if value is None:
-        return ''
-    s = str(value).strip()
-    s = s.replace('\xa0', ' ')
-    s = strip_accents(s).lower()
-    s = re.sub(r'[^a-z0-9]+', ' ', s)
-    return re.sub(r'\s+', ' ', s).strip()
-
-
-def compact(value: Any) -> str:
-    return norm(value).replace(' ', '')
-
-
-def clean_cell(value: Any) -> Any:
-    if value is None:
-        return None
-    if isinstance(value, str):
-        s = value.replace('\xa0', ' ').strip()
-        return s if s else None
-    return value
-
-
-def is_blank(value: Any) -> bool:
-    return value is None or (isinstance(value, str) and not value.strip())
-
-
-def map_header_to_field(value: Any) -> str | None:
-    t = norm(value)
-    c = compact(value)
-    if not t:
-        return None
-    if t in CANONICAL_COLUMNS:
-        return t
-    if c in CANONICAL_COLUMNS:
-        return c
-
-    # Não usar texto de orientação geral como coluna de dados.
-    if any(h in t for h in BAD_HEADER_HINTS):
-        return None
-
-    # Regras específicas primeiro, para evitar falsos positivos.
-    if 'graus minutos' in t or 'dms' in t or 'sistema de graus' in t:
-        return 'llunit'
-    if 'numero de duplicatas' in t or 'duplicatas coletadas' in t or t == 'duplicatas':
-        return 'dups'
-    if 'numero de coleta' in t or 'seu numero de coleta' in t or t == 'numero' or t == 'n coleta':
-        return 'number'
-    if 'nome do coletor principal' in t or t == 'coletor' or 'coletor principal' in t:
-        return 'collector'
-    if 'coletores adicionais' in t or 'demais pessoas' in t or t == 'addcoll':
-        return 'addcoll'
-    if t in {'dia', 'dia coleta'} or 'dia da coleta' in t:
-        return 'colldd'
-    if t in {'mes', 'mes coleta'} or 'mes da coleta' in t:
-        return 'collmm'
-    if t == 'ano' or 'ano da coleta' in t:
-        return 'collyy'
-    if 'numero de amostras' in t or 'amostras por coleta' in t:
-        return 'initial'
-    if t == 'familia' or t.startswith('familia ') or 'familia botanica' in t:
-        return 'family'
-    if t == 'genero' or t.startswith('genero ') or 'grafia correta do nome do genero' in t:
-        return 'genus'
-    if 'epiteto especifico' in t or 'epitito da especie' in t or 'epiteto da especie' in t:
-        return 'sp1'
-    if 'subespecie' in t or 'variedade' in t or 'infraespecific' in t:
-        return 'sp2'
-    if 'determinador' in t:
-        return 'detby'
-    if 'dia de determinacao' in t:
-        return 'detdd'
-    if 'mes de determinacao' in t:
-        return 'detmm'
-    if 'ano de determinacao' in t:
-        return 'detyy'
-    if t in {'pais', 'país'} or t == 'country':
-        return 'country'
-    if t.startswith('estado') or t == 'uf' or t == 'majorarea':
-        return 'majorarea'
-    if t.startswith('municipio') or t == 'minorarea':
-        return 'minorarea'
-    if t.startswith('localidade') or t == 'gazetteer':
-        return 'gazetteer'
-    if 'detalhes de onde' in t or 'notas de localidade' in t or t == 'locnotes':
-        return 'locnotes'
-    if 'tipo de habitat' in t or t == 'habitat' or t == 'habitattxt':
-        return 'habitattxt'
-    if 'latitude' in t:
-        return 'lat'
-    if 'longitude' in t:
-        return 'long'
-    if t in {'ns', 'n s', 'norte sul'}:
-        return 'NS'
-    if t in {'ew', 'e w', 'leste oeste'}:
-        return 'EW'
-    if t.startswith('altitude maxima') or 'maximo' in t and 'altitude' in t:
-        return 'alt1'
-    if t.startswith('altitude'):
-        return 'alt'
-    if 'descricao detalhada' in t or 'descricao da planta' in t or 'descrição detalhada' in str(value).lower():
-        return 'plantdesc'
-    if 'nome vernacular' in t or 'nome popular' in t:
-        return 'vernacular'
-    if 'herbario de deposito' in t or t == 'herbario' or t == 'herbarios':
-        return 'dups'
-    if 'projeto' in t or 'financiamento' in t:
-        return 'project'
-    if 'genbank' in t or 'sequencias' in t:
-        return 'genbank'
-    if 'prefixo' in t:
-        return 'prefix'
-    if 'sufixo' in t:
-        return 'suffix'
-    if 'cf' in t or 'aff' in t:
-        return 'detstatus'
-    if 'registro inpa' in t or 'numero de registro' in t:
-        return 'accession'
-    return None
-
-
-def row_values(ws: Worksheet, row_idx: int) -> list[Any]:
-    return [clean_cell(ws.cell(row_idx, col).value) for col in range(1, ws.max_column + 1)]
-
-
-def select_sheet(wb, sheet_name: str | None = None) -> Worksheet:
-    if sheet_name and sheet_name in wb.sheetnames:
-        return wb[sheet_name]
-    for preferred in ('Espécimes', 'Especimes', 'Specimens', 'Sheet1'):
-        if preferred in wb.sheetnames:
-            return wb[preferred]
-    return wb[wb.sheetnames[0]]
-
-
-@dataclass
-class HeaderInfo:
-    row: int
-    exact_count: int
-    mapped_count: int
-    mapping: dict[str, int]  # field -> 1-based source column
-    headers: list[Any]
-
-
-def score_header_row(ws: Worksheet, row_idx: int) -> HeaderInfo:
-    headers = row_values(ws, row_idx)
-    mapping: dict[str, int] = {}
-    exact_count = 0
-    mapped_count = 0
-    for i, raw in enumerate(headers, start=1):
-        if is_blank(raw):
+def _infer_coordinates(sheet: SheetData, header: HeaderDetection) -> dict[str, str]:
+    """Quando latitude/longitude não foram reconhecidas pelo nome, tenta pelos valores."""
+    have = set(header.mapping.values())
+    extra: dict[str, str] = {}
+    if {"lat", "long"} <= have:
+        return extra
+    data = sheet.rows[header.header_row: header.header_row + 30]
+    used = set(header.mapping)
+    scores: dict[str, tuple[int, int]] = {}
+    for pos, name in enumerate(header.raw_headers):
+        if not name or name in used:
             continue
-        n = norm(raw)
-        field = map_header_to_field(raw)
-        if field:
-            mapped_count += 1
-            # Se o campo já existe, fica com o cabeçalho mais curto/específico.
-            prev = mapping.get(field)
-            if prev is None or len(str(raw)) < len(str(headers[prev - 1] or '')):
-                mapping[field] = i
-            if n in CANONICAL_COLUMNS:
-                exact_count += 1
-    return HeaderInfo(row_idx, exact_count, len(set(mapping)), mapping, headers)
-
-
-def detect_header(ws: Worksheet) -> HeaderInfo:
-    candidates = [score_header_row(ws, r) for r in range(1, min(ws.max_row, 15) + 1)]
-    def key(info: HeaderInfo):
-        required_hits = len(set(info.mapping) & REQUIRED_FIELDS)
-        avg_len = sum(len(str(v or '')) for v in info.headers) / max(1, len([v for v in info.headers if not is_blank(v)]))
-        long_penalty = 1 if avg_len > 80 else 0
-        return (info.exact_count >= 8, info.exact_count * 4 + required_hits * 2 + info.mapped_count - long_penalty, -info.row)
-    best = max(candidates, key=key)
-    if best.mapped_count < 3:
-        raise ValueError('Não foi possível detectar uma linha de cabeçalho na planilha enviada.')
-    return postprocess_mapping(ws, best)
-
-
-def col_samples(ws: Worksheet, col_idx: int, start_row: int, limit: int = 8) -> list[Any]:
-    vals = []
-    for r in range(start_row, min(ws.max_row, start_row + limit - 1) + 1):
-        v = clean_cell(ws.cell(r, col_idx).value)
-        if not is_blank(v):
-            vals.append(v)
-    return vals
-
-
-def as_float(v: Any) -> float | None:
-    if v is None:
-        return None
-    if isinstance(v, (int, float)):
-        return float(v)
-    s = str(v).replace(',', '.').strip()
-    m = re.search(r'-?\d+(?:\.\d+)?', s)
-    if not m:
-        return None
-    try:
-        return float(m.group(0))
-    except Exception:
-        return None
-
-
-def infer_numeric_col(ws: Worksheet, start_row: int, used_cols: set[int], kind: str) -> int | None:
-    best = None
-    best_score = -1
-    for col in range(1, ws.max_column + 1):
-        if col in used_cols:
+        vals = [parse_coordinate(r[pos]).value for r in data if pos < len(r)]
+        vals = [v for v in vals if v is not None]
+        if len(vals) < 3:
             continue
-        nums = [as_float(ws.cell(r, col).value) for r in range(start_row, min(ws.max_row, start_row + 20) + 1)]
-        nums = [x for x in nums if x is not None]
-        if len(nums) < 3:
+        lat_like = sum(1 for v in vals if -34 <= v <= 6 and v != int(v))
+        lon_like = sum(1 for v in vals if -74 <= v <= -28 and v != int(v))
+        scores[name] = (lat_like, lon_like)
+    if "lat" not in have and scores:
+        name, (s, _) = max(scores.items(), key=lambda kv: kv[1][0])
+        if s >= 3:
+            extra[name] = "lat"
+    if "long" not in have and scores:
+        name, (_, s) = max(scores.items(), key=lambda kv: kv[1][1])
+        if s >= 3 and name not in extra:
+            extra[name] = "long"
+    return extra
+
+
+def analyse(content: bytes, sheet_name: str | None = None, max_rows: int = 5000) -> tuple[SheetData, HeaderDetection]:
+    sheet = read_sheet(content, sheet_name=sheet_name, max_rows=max_rows)
+    header = detect_standard_header(sheet.rows)
+    if header is None:
+        try:
+            header = detect_header(sheet.rows)
+        except ValueError:
+            header = _fallback_header(sheet)
+        header.mapping.update(_infer_coordinates(sheet, header))
+    return sheet, header
+
+
+def _data_rows(sheet: SheetData, header: HeaderDetection):
+    for idx0 in range(header.header_row, len(sheet.rows)):
+        values = sheet.rows[idx0]
+        if any(v is not None for v in values):
+            yield idx0 + 1, values
+
+
+def preview_spreadsheet(content: bytes, sheet_name: str | None = None, max_rows: int = 80) -> dict[str, Any]:
+    sheet, header = analyse(content, sheet_name)
+    field_to_header = header.field_to_header
+    header_to_field = header.mapping
+    samples: dict[str, list[Any]] = {h: [] for h in header.raw_headers if h}
+    rows: list[dict[str, Any]] = []
+    limit = max(1, min(int(max_rows or 80), 300))
+    for row_number, values in _data_rows(sheet, header):
+        if len(rows) >= limit:
+            break
+        row: dict[str, Any] = {"_row_number": row_number}
+        for pos, name in enumerate(header.raw_headers):
+            if not name:
+                continue
+            value = json_value(values[pos]) if pos < len(values) else None
+            row[name] = "" if value is None else value
+            if value not in (None, "") and len(samples[name]) < 5:
+                samples[name].append(value)
+        rows.append(row)
+
+    columns = []
+    for pos, name in enumerate(header.raw_headers):
+        if not name:
             continue
-        if kind == 'lat':
-            score = sum(1 for x in nums if -35 <= x <= 10)
-        else:
-            score = sum(1 for x in nums if -80 <= x <= -30 or 30 <= x <= 80)
-        if score > best_score:
-            best_score = score
-            best = col
-    return best if best_score >= 3 else None
-
-
-def postprocess_mapping(ws: Worksheet, info: HeaderInfo) -> HeaderInfo:
-    mapping = dict(info.mapping)
-    headers = info.headers
-    def h(field):
-        c = mapping.get(field)
-        return norm(headers[c - 1]) if c else ''
-    # Corrige falsos positivos comuns nas planilhas de campo.
-    if 'duplicatas' in h('collyy') or 'numero de duplicatas' in h('collyy'):
-        mapping['dups'] = mapping.pop('collyy')
-    if h('initial') == 'ano' or 'ano da coleta' in h('initial'):
-        mapping['collyy'] = mapping.pop('initial')
-    if 'epiteto' in h('alt'):
-        mapping['sp1'] = mapping.pop('alt')
-    if 'notas para voce seguir' in h('plantdesc'):
-        mapping.pop('plantdesc', None)
-    if 'sistema de graus' in h('long') or 'dms' in h('long'):
-        mapping['llunit'] = mapping.pop('long')
-    used = set(mapping.values())
-    start_row = info.row + 1
-    if 'lat' not in mapping:
-        col = infer_numeric_col(ws, start_row, used, 'lat')
-        if col:
-            mapping['lat'] = col
-            used.add(col)
-    if 'long' not in mapping:
-        col = infer_numeric_col(ws, start_row, used, 'long')
-        if col:
-            mapping['long'] = col
-            used.add(col)
-    return HeaderInfo(info.row, info.exact_count, len(set(mapping)), mapping, headers)
-
-
-def is_standard(info: HeaderInfo) -> bool:
-    # Padrão INPA/BRAHMS só quando a própria linha de cabeçalho é técnica.
-    # Descrições/aliases como "Nome do coletor principal" ou "Estado por extenso"
-    # NÃO devem ser tratadas como padrão; elas entram no mapeador.
-    fields = set(info.mapping)
-    ordered_hits = 0
-    for raw, canonical in zip(info.headers, CANONICAL_COLUMNS):
-        if norm(raw) == canonical:
-            ordered_hits += 1
-    required_core = {'accession', 'collector', 'number', 'family', 'genus', 'country', 'majorarea', 'minorarea', 'lat', 'long'}
-    return info.exact_count >= 25 and ordered_hits >= 20 and required_core.issubset(fields)
-
-
-def parse_mapping_json(value: Any) -> dict[str, Any]:
-    if not value:
-        return {}
-    if isinstance(value, dict):
-        return value
-    try:
-        return json.loads(str(value))
-    except Exception:
-        return {}
-
-
-def mapping_to_indices(mapping: dict[str, Any], fallback: HeaderInfo) -> dict[str, int]:
-    out: dict[str, int] = {}
-    src = mapping or {}
-    if 'mapping' in src and isinstance(src['mapping'], dict):
-        src = src['mapping']
-    for field, val in src.items():
-        if field not in CANONICAL_COLUMNS or val in (None, ''):
-            continue
-        if isinstance(val, int):
-            out[field] = val
-        else:
-            sval = str(val).strip()
-            if re.fullmatch(r'[A-Za-z]+', sval):
-                out[field] = column_index_from_string(sval.upper())
-            elif sval.isdigit():
-                out[field] = int(sval)
-    # Preenche com sugestão se o usuário não mexeu naquele campo.
-    for field, idx in fallback.mapping.items():
-        out.setdefault(field, idx)
-    return out
-
-
-def preview_spreadsheet(file_bytes: bytes, sheet_name: str | None = None) -> dict[str, Any]:
-    wb = load_workbook(BytesIO(file_bytes), data_only=True)
-    ws = select_sheet(wb, sheet_name)
-    info = detect_header(ws)
-    data_start = info.row + 1
-    source_columns = []
-    for col in range(1, ws.max_column + 1):
-        raw = clean_cell(ws.cell(info.row, col).value)
-        if is_blank(raw):
-            continue
-        letter = get_column_letter(col)
-        mapped = None
-        for field, idx in info.mapping.items():
-            if idx == col:
-                mapped = field
-                break
-        source_columns.append({
-            'letter': letter,
-            'index': col,
-            'header': raw,
-            'mapped_field': mapped,
-            'samples': col_samples(ws, col, data_start, 5),
+        columns.append({
+            "index": pos + 1, "column_index": pos, "letter": get_column_letter(pos + 1),
+            "key": name, "name": name, "header": name,
+            "mapped_field": header_to_field.get(name), "canonical": header_to_field.get(name),
+            "samples": samples.get(name, []),
         })
-    rows = []
-    for r in range(data_start, min(ws.max_row, data_start + 19) + 1):
-        rows.append({
-            'row_number': r,
-            'values': [clean_cell(ws.cell(r, c).value) for c in range(1, ws.max_column + 1)],
-        })
-    fields = [{
-        'name': c,
-        'key': c,
-        'label': FIELD_LABELS.get(c, c),
-        'required': c in REQUIRED_FIELDS,
-        'help': FIELD_HELP.get(c, FIELD_LABELS.get(c, c)),
-    } for c in CANONICAL_COLUMNS]
-    mapping_letters = {field: get_column_letter(idx) for field, idx in info.mapping.items()}
     return {
-        'detected_standard': is_standard(info),
-        'sheet_name': ws.title,
-        'header_row': info.row,
-        'data_start_row': data_start,
-        'fields': fields,
-        'standard_fields': fields,
-        'source_columns': source_columns,
-        'columns': source_columns,
-        'rows': rows,
-        'preview_rows': rows,
-        'mapping': mapping_letters,
-        'suggested_mapping': mapping_letters,
-        'field_to_column': mapping_letters,
-        'missing_required': [c for c in REQUIRED_FIELDS if c not in info.mapping],
+        "status": "ok",
+        "detected_standard": header.is_standard,
+        "is_standard": header.is_standard,
+        "sheet_name": sheet.sheet_name,
+        "sheet_names": sheet.sheet_names,
+        "header_row": header.header_row,
+        "data_start_row": header.header_row + 1,
+        "row_count": len(rows),
+        "fields": INPA_FIELDS,
+        "standard_fields": INPA_FIELDS,
+        "canonical_fields": CANONICAL_COLUMNS,
+        "field_help": FIELD_HELP,
+        "recommendations": FIELD_HELP,
+        "source_columns": columns,
+        "columns": columns,
+        "headers": [c["name"] for c in columns],
+        "mapping": field_to_header,
+        "suggested_mapping": field_to_header,
+        "canonical_mapping": field_to_header,
+        "missing_required": [f for f in REQUIRED_FIELDS if f not in field_to_header],
+        "rows": rows,
+        "preview_rows": rows,
+        "data_rows": rows,
     }
 
 
-def row_is_empty_for_mapping(ws: Worksheet, r: int, mapping: dict[str, int]) -> bool:
-    meaningful = ['collector', 'number', 'family', 'genus', 'country', 'majorarea', 'minorarea', 'lat', 'long', 'plantdesc']
-    vals = [ws.cell(r, mapping[f]).value for f in meaningful if f in mapping]
-    return all(is_blank(v) for v in vals)
+# ---------------------------------------------------------------------------
+# Conversão
+# ---------------------------------------------------------------------------
+def parse_mapping(value: Any) -> dict[str, Any]:
+    """Aceita {campo: origem}, {origem: campo}, {"mapping": {...}} ou [{canonical, source}]."""
+    if not value:
+        return {}
+    if isinstance(value, (str, bytes)):
+        try:
+            value = json.loads(value)
+        except (TypeError, ValueError):
+            return {}
+    if isinstance(value, dict) and isinstance(value.get("mapping"), (dict, list)):
+        value = value["mapping"]
+    out: dict[str, Any] = {}
+    if isinstance(value, list):
+        for item in value:
+            if isinstance(item, dict):
+                canon = item.get("canonical") or item.get("target") or item.get("field") or item.get("inpa")
+                src = item.get("source") or item.get("header") or item.get("name") or item.get("column") or item.get("index")
+                if canon in CANONICAL_COLUMNS and src not in (None, ""):
+                    out[canon] = src
+        return out
+    if isinstance(value, dict):
+        for key, src in value.items():
+            if isinstance(src, dict):
+                src = src.get("source") or src.get("header") or src.get("name") or src.get("column") or src.get("index")
+            if src in (None, ""):
+                continue
+            if key in CANONICAL_COLUMNS:
+                out[key] = src
+            elif isinstance(src, str) and src in CANONICAL_COLUMNS:
+                out[src] = key
+    return out
 
 
-def convert_spreadsheet(file_bytes: bytes, mapping: dict[str, Any] | None = None, sheet_name: str | None = None, *, include_recommendations: bool = False) -> bytes:
-    wb_in = load_workbook(BytesIO(file_bytes), data_only=True)
-    ws_in = select_sheet(wb_in, sheet_name)
-    info = detect_header(ws_in)
-    idx_map = mapping_to_indices(mapping or {}, info)
+def _resolve(source: Any, headers: list[str]) -> int | None:
+    """Posição (0-based) da coluna de origem: por nome, letra da coluna ou índice 1-based."""
+    if isinstance(source, bool):
+        return None
+    if isinstance(source, int):
+        return source - 1 if 1 <= source <= len(headers) else None
+    text = str(source).strip()
+    if text in headers:
+        return headers.index(text)
+    n = norm(text)
+    for pos, h in enumerate(headers):
+        if h and norm(h) == n:
+            return pos
+    if re.fullmatch(r"[A-Za-z]{1,3}", text):
+        pos = column_index_from_string(text.upper()) - 1
+        return pos if pos < max(len(headers), 1) + 200 else None
+    if text.isdigit():
+        return int(text) - 1
+    return None
 
-    wb_out = Workbook()
-    ws = wb_out.active
-    ws.title = 'Espécimes'
+
+def build_canonical_rows(sheet: SheetData, header: HeaderDetection, mapping: dict[str, Any]) -> tuple[list[list[Any]], dict[str, int]]:
+    headers = header.raw_headers
+    if mapping:
+        positions = {f: p for f, src in mapping.items() if (p := _resolve(src, headers)) is not None}
+    else:
+        positions = {f: headers.index(h) for f, h in header.field_to_header.items()}
+    out: list[list[Any]] = []
+    meaningful = [positions[f] for f in ("collector", "number", "family", "genus", "lat", "long", "minorarea") if f in positions]
+    for _, values in _data_rows(sheet, header):
+        row = [values[positions[f]] if f in positions and positions[f] < len(values) else None for f in CANONICAL_COLUMNS]
+        check = meaningful or list(positions.values())
+        if not any(values[p] is not None for p in check if p < len(values)):
+            continue
+        joined = " ".join(str(v).lower() for v in row[:6] if v is not None)
+        if any(m in joined for m in EXAMPLE_MARKERS):
+            continue
+        out.append(row)
+    return out, positions
+
+
+def convert_spreadsheet(content: bytes, mapping: Any = None, sheet_name: str | None = None, *,
+                        include_recommendations: bool = False) -> bytes:
+    sheet, header = analyse(content, sheet_name)
+    rows, positions = build_canonical_rows(sheet, header, parse_mapping(mapping))
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Espécimes"
     if include_recommendations:
         ws.append(RECOMMENDATIONS)
     ws.append(CANONICAL_COLUMNS)
-    data_start = info.row + 1
-    written = 0
-    for r in range(data_start, ws_in.max_row + 1):
-        if row_is_empty_for_mapping(ws_in, r, idx_map):
-            continue
-        row = []
-        for field in CANONICAL_COLUMNS:
-            col = idx_map.get(field)
-            row.append(clean_cell(ws_in.cell(r, col).value) if col else None)
-        # Ignora linha de exemplo se existir.
-        joined = norm(' '.join(str(x or '') for x in row[:6]))
-        if 'linha de exemplo' in joined:
-            continue
-        ws.append(row)
-        written += 1
-    # Aba de auditoria do mapeamento.
-    audit = wb_out.create_sheet('Mapeamento')
-    audit.append(['Campo INPA/BRAHMS', 'Coluna de origem', 'Cabeçalho de origem'])
-    for field in CANONICAL_COLUMNS:
-        col = idx_map.get(field)
-        audit.append([field, get_column_letter(col) if col else None, clean_cell(ws_in.cell(info.row, col).value) if col else None])
+    head = ws.max_row
+    for cell in ws[head]:
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill("solid", fgColor="E4ECD7")
+    for row in rows:
+        ws.append([v if not hasattr(v, "isoformat") else cell_text(v) for v in row])
     for col in range(1, len(CANONICAL_COLUMNS) + 1):
         ws.column_dimensions[get_column_letter(col)].width = 16
+    ws.freeze_panes = ws.cell(row=head + 1, column=1).coordinate
+
+    audit = wb.create_sheet("Mapeamento")
+    audit.append(["Campo INPA/BRAHMS", "Descrição", "Coluna de origem", "Cabeçalho de origem"])
+    for field in CANONICAL_COLUMNS:
+        pos = positions.get(field)
+        audit.append([field, FIELD_LABELS[field], get_column_letter(pos + 1) if pos is not None else None,
+                      header.raw_headers[pos] if pos is not None and pos < len(header.raw_headers) else None])
+    audit.append([])
+    audit.append(["Planilha de origem", sheet.sheet_name, "Linha de cabeçalho", header.header_row])
     bio = BytesIO()
-    wb_out.save(bio)
+    wb.save(bio)
     return bio.getvalue()
 
 
 def build_template_workbook() -> bytes:
     wb = Workbook()
     ws = wb.active
-    ws.title = 'Espécimes'
+    ws.title = "Espécimes"
     ws.append(RECOMMENDATIONS)
     ws.append(CANONICAL_COLUMNS)
+    for cell in ws[2]:
+        cell.font = Font(bold=True)
     for col in range(1, len(CANONICAL_COLUMNS) + 1):
-        ws.column_dimensions[get_column_letter(col)].width = 16
+        ws.column_dimensions[get_column_letter(col)].width = 18
+    ws.freeze_panes = "A3"
     bio = BytesIO()
     wb.save(bio)
     return bio.getvalue()

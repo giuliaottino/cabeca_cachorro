@@ -1,5 +1,5 @@
-/* Tsiino Hiiwiida PT/EN dictionary — 2026-09-21.
- * Updated against the supplied data, expeditions, team and validator QMDs.
+/* Tsiino Hiiwiida PT/EN dictionary — 2026-10-27.
+ * Updated against the current index, species records, expeditions, team and validator QMDs.
  */
 window.TsiinoTranslations = {
   "defaultLanguage": "pt",
@@ -430,12 +430,20 @@ window.TsiinoTranslations = {
       "Bioinformática": "Bioinformatics",
       "O projeto integra registros históricos acumulados em herbários, bases públicas e plataformas agregadoras com as coletas realizadas nas expedições atuais. Essa leitura conjunta evidencia o que já foi documentado, onde ainda existem vazios de amostragem e a contribuição das expedições do projeto para a documentação da Cabeça do Cachorro.": "The project integrates historical records from herbaria, public databases and aggregator platforms with collections made during current expeditions. Together, these data show what has already been documented, where sampling gaps remain and how the project's expeditions contribute to documenting Cabeça do Cachorro.",
       "O painel geral e os painéis por grupo mostram o total e a proporção de registros das expedições Tsiino Hiiwiida em relação ao conjunto de dados. O painel geral também mostra o nível de identificação dos registros — até espécie, até gênero, até família ou indeterminados — para acompanhar a qualidade taxonômica da base.": "The overall dashboard and group dashboards show the number and proportion of records from the Tsiino Hiiwiida expeditions within the dataset. The overall dashboard also shows the identification level of records — to species, genus, family or undetermined — to track the taxonomic quality of the dataset.",
-      "A lista mostra apenas nomes completos identificados em nível de espécie, já normalizados no script externo, com família associada. Clique ou passe o cursor sobre o táxon para ver seus registros; o ícone abre a página na Flora e Funga do Brasil.": "The list shows complete names identified to species level, already standardized in the external script, with their associated family. Click or hover over a taxon to view its records; the icon opens its page in Flora e Funga do Brasil.",
+      "A lista reúne nomes completos em nível de espécie. Use + para abrir os links minerados e os registros de coleta, com dados primários, data e localidade disponíveis; registros GBIF identificáveis têm link direto.": "The list shows full species names. Use + to open mined links and collection records, with available primary data, date and locality; records with identifiable GBIF IDs have direct links.",
+      "Buscar por espécie ou família": "Search by species or family",
+      "Ex.: Pouteria ou Sapotaceae": "E.g., Pouteria or Sapotaceae",
+      "Taxonomia e ocorrência": "Taxonomy and occurrence",
+      "Sequências, literatura e interações": "Sequences, literature and interactions",
+      "Taxonomia de fungos": "Fungal taxonomy",
+      "Mostrar registros": "Show records",
+      "Nenhum link ou registro disponível para esta espécie.": "No links or records are available for this species.",
+      "Registros de ocorrência": "Occurrence records",
       "Síntese integrada da flora e funga documentada pelas coleções existentes e pelas expedições atuais. O painel reúne fanerógamas, criptógamas e fungos, evidenciando riqueza, gêneros, famílias, registros, georreferenciamento e a contribuição das expedições do projeto.": "Integrated overview of the flora and funga documented by existing collections and current expeditions. The dashboard brings together seed plants, cryptogams and fungi, showing richness, genera, families, records, georeferencing and the contribution of the project's expeditions.",
       "registros das expedições": "expedition records",
-      "Registros do táxon": "Taxon records",
       "Flora e Funga do Brasil": "Flora e Funga do Brasil",
       "não informado": "not reported",
+      "não informada": "not reported",
       "Coletor não informado": "Collector not reported",
       "georreferenciados": "georeferenced",
       "Geral": "Overall",
@@ -552,6 +560,8 @@ window.TsiinoTranslations = {
       "Ir para o objetivo ": "Go to objective ",
       "Grupo ": "Group ",
       "Expedição ": "Expedition ",
+      "Expandir links e registros para ": "Expand links and records for ",
+      "Recolher links e registros de ": "Collapse links and records for ",
       "Foto da expedição ": "Photo from expedition ",
       "Imagens do Objetivo ": "Images for Objective ",
       "Arquivo validado não encontrado para ": "Validated file not found for ",
@@ -652,12 +662,22 @@ window.TsiinoTranslations = {
       "Indicadores": "Indicators",
       "lista completa de espécies": "full species list",
       "Lista completa de espécies": "Full species list",
+      "na lista": "in the list",
+      "registro": "record",
+      "Registro": "Record",
+      "link": "link",
+      "links": "links",
       "Coleta e voucher": "Collection and voucher",
       "Coleta": "Collection",
       "coleta": "collection",
       "coletas": "collections",
       "localidade": "locality",
       "Localidade": "Locality",
+      "Localidade não informada": "Locality not reported",
+      "Data não informada": "Date not reported",
+      "Coordenadas": "Coordinates",
+      "Catálogo": "Catalog number",
+      "Tipo": "Type",
       "comunidade": "community",
       "Comunidade": "Community",
       "Município": "Municipality",
@@ -708,6 +728,12 @@ window.TsiinoTranslations = {
       {
         "pattern": "^(\\d[\\d.,]*)% dos registros deste painel foram coletados nas expedições Tsiino Hiiwiida\\.$",
         "replacement": "$1% of records in this dashboard were collected during the Tsiino Hiiwiida expeditions.",
+        "flags": "",
+        "terminal": true
+      },
+      {
+        "pattern": "^Registros de ocorrência · ([\\d.,]+)$",
+        "replacement": "Occurrence records · $1",
         "flags": "",
         "terminal": true
       },

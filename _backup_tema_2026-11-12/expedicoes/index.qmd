@@ -1,0 +1,2872 @@
+---
+title: "Expedições"
+subtitle: "Trilhas, coletas e registros de campo do projeto Tsiino Hiiwiida"
+format:
+  html:
+    toc: false
+    page-layout: full
+execute:
+  echo: false
+  eval: true
+  freeze: false
+  cache: false
+  warning: false
+  message: false
+resources:
+  - ../figures/
+  - ../figures/brand/
+  - ../figures/video/
+  - ../_input_data/
+  - ../_input_data/expedicoes_fotos/
+  - ../_input_data/kml_expedições/
+  - ../_input_data/limites/
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+find_up <- function(rel_path, start = getwd(), max_levels = 8) {
+  d <- normalizePath(start, winslash = "/", mustWork = FALSE)
+  for (i in 0:max_levels) {
+    cand <- file.path(d, rel_path)
+    if (file.exists(cand)) return(cand)
+    parent <- dirname(d)
+    if (identical(parent, d)) break
+    d <- parent
+  }
+  NA_character_
+}
+
+nz <- function(x) {
+  !is.na(x) & nzchar(trimws(as.character(x)))
+}
+
+safe_html <- function(x) {
+  x <- as.character(x)
+  x[is.na(x) | trimws(x) == ""] <- "—"
+  htmltools::htmlEscape(x)
+}
+
+slugify <- function(x) {
+  x <- as.character(x)
+  x[is.na(x) | trimws(x) == ""] <- "expedicao"
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- tolower(x)
+  x <- gsub("[^a-z0-9]+", "-", x)
+  x <- gsub("(^-+|-+$)", "", x)
+  x[x == ""] <- "expedicao"
+  make.unique(x, sep = "-")
+}
+
+clean_photo_folder <- function(x) {
+  x <- as.character(x)
+  x[is.na(x)] <- ""
+  x <- gsub("\u00A0", " ", x, fixed = TRUE)
+  x <- trimws(x)
+  x <- gsub("\\\\", "/", x)
+  x <- gsub("^\\./+", "", x)
+  x <- gsub("^/+|/+$", "", x)
+  x <- gsub("^_input_data/expedicoes_fotos/+", "", x)
+  x <- gsub("^expedicoes_fotos/+", "", x)
+  x[x == ""] <- NA_character_
+  x
+}
+```
+
+```{=html}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+<style>
+  :root{
+    --red: #A93632;
+    --red-dark: #6E1F1D;
+    --green: #626A38;
+    --green-map: #59602F;
+    --green-dark: #2E3B24;
+    --green-soft: #D7DDC5;
+    --ochre: #D99A27;
+    --cream: #F6F1E8;
+    --paper: #FFFDF7;
+    --ink: #171717;
+    --muted: #675F55;
+    --line: rgba(98,106,56,0.24);
+    --page-max: 1740px;
+  }
+
+  *{
+    box-sizing: border-box;
+  }
+
+  html{
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    background: #120706;
+  }
+
+  body{
+    overflow-x: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    background:
+      linear-gradient(90deg, rgba(7,4,4,0.76), rgba(86,16,13,0.64)),
+      url("../figures/tsiino_bg.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center top;
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: var(--cream);
+  }
+
+  body.nav-fixed{
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  #quarto-content,
+  .page-columns,
+  .page-layout-full,
+  main.content,
+  main,
+  .content{
+    width: 100%;
+    max-width: none !important;
+    background: transparent !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  main.content{
+    padding-bottom: 4rem;
+  }
+
+  .quarto-title-block{
+    display: none !important;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* NAVBAR SOBRE O HERO                                                */
+  /* ------------------------------------------------------------------ */
+
+  #quarto-header{
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10000 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  #quarto-header .navbar{
+    position: relative !important;
+    top: 0 !important;
+    margin-top: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    min-height: 76px;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  #quarto-header::before{
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 130px;
+    background: linear-gradient(
+      180deg,
+      rgba(0,0,0,0.62) 0%,
+      rgba(0,0,0,0.24) 58%,
+      rgba(0,0,0,0) 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  #quarto-header .navbar-brand{
+    display: none !important;
+  }
+
+  #quarto-header .navbar .nav-link,
+  #quarto-header .navbar .nav-link:visited{
+    color: #fff !important;
+    font-family: 'Montserrat', Arial, sans-serif;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.78);
+  }
+
+  #quarto-header .navbar .nav-link.active,
+  #quarto-header .navbar .nav-link:hover{
+    color: var(--ochre) !important;
+  }
+
+  #quarto-header .navbar svg,
+  #quarto-header .navbar i,
+  #quarto-header .navbar .bi,
+  #quarto-header .quarto-navbar-tools a,
+  #quarto-header .quarto-navbar-tools button,
+  #quarto-header .aa-DetachedSearchButton,
+  #quarto-header .aa-DetachedSearchButtonIcon,
+  #quarto-header .quarto-color-scheme-toggle{
+    color: #fff !important;
+    fill: #fff !important;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.58));
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* HERO COM VÍDEO                                                     */
+  /* ------------------------------------------------------------------ */
+
+  .page-hero{
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    min-height: min(82vh, 860px);
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+      linear-gradient(rgba(38,5,4,0.35), rgba(20,4,3,0.68)),
+      url("../figures/tsiino_bg.png") center / cover no-repeat;
+  }
+
+  .hero-video{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: -4;
+  }
+
+  .page-hero-overlay{
+  display: none;
+  }
+
+  .page-hero-pattern{
+  display: none;
+  }
+
+  .page-hero-logo{
+    position: absolute;
+    top: clamp(5.4rem, 9vw, 7.4rem);
+    left: clamp(1.5rem, 3.5vw, 3.6rem);
+    width: clamp(82px, 7vw, 118px);
+    z-index: 5;
+  }
+
+  .page-hero-logo img{
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.46));
+  }
+
+  .page-hero-content{
+    position: absolute;
+    left: clamp(2rem, 5vw, 5.5rem);
+    top: clamp(14rem, 33vh, 20rem);
+    width: min(930px, calc(100% - 4rem));
+    color: #fff;
+    z-index: 4;
+  }
+
+  .hero-kicker{
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.68rem, 1vw, 0.82rem);
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ochre);
+    margin-bottom: 0.55rem;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.78);
+  }
+
+  .page-hero-content h1{
+    margin: 0;
+    color: #fff;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(3.5rem, 7.5vw, 7rem);
+    line-height: 0.90;
+    font-weight: 900;
+    letter-spacing: -0.07em;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.82);
+  }
+
+  .hero-subtitle{
+    margin: 1rem 0 0 0 !important;
+    color: #F6F1E8 !important;
+    font-family: 'Space Mono', monospace !important;
+    font-size: clamp(0.78rem, 1.35vw, 1.05rem) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.45 !important;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.78);
+  }
+
+  .hero-description{
+    margin: 0.9rem 0 0 0 !important;
+    color: rgba(255,255,255,0.94) !important;
+    font-size: clamp(1rem, 1.5vw, 1.24rem) !important;
+    line-height: 1.58 !important;
+    max-width: 790px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.72);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* LAYOUT PRINCIPAL                                                   */
+  /* ------------------------------------------------------------------ */
+
+  .content-card{
+    width: min(var(--page-max), calc(100vw - 4rem));
+    margin: 3.2rem auto 0 auto;
+    padding: clamp(1.5rem, 3vw, 2.7rem);
+    background: rgba(255,253,247,0.975);
+    color: var(--ink);
+    box-shadow: 0 22px 54px rgba(0,0,0,0.32);
+    position: relative;
+    z-index: 2;
+    border-top: 5px solid var(--green);
+    border-radius: 2px;
+  }
+
+  .section-title{
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 0.85rem;
+    align-items: center;
+    margin-bottom: 1.3rem;
+  }
+
+  .section-title::before{
+    content: "";
+    display: block;
+    height: 1px;
+    background: var(--ink);
+  }
+
+  .section-title h2{
+    margin: 0;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid rgba(98,106,56,0.18);
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    font-weight: 800;
+    color: var(--red);
+    letter-spacing: 0.01em;
+  }
+
+  .content-card p{
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.72;
+    color: var(--ink);
+    margin: 0 0 1rem 0;
+  }
+
+  .lead,
+  .map-lead{
+    font-family: 'DM Sans', 'Montserrat', Arial, sans-serif !important;
+    font-size: clamp(1rem, 1.45vw, 1.18rem) !important;
+    line-height: 1.55 !important;
+    font-weight: 500 !important;
+    color: #26231F !important;
+    border: 0 !important;
+    padding-left: 0 !important;
+    margin: 0 0 1.1rem 0 !important;
+    max-width: 980px;
+  }
+
+  .bg-window{
+    width: 100%;
+    height: 3.6rem;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* LEAFLET                                                            */
+  /* ------------------------------------------------------------------ */
+
+  .leaflet-container{
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 16px 34px rgba(0,0,0,0.18);
+    font-family: 'Montserrat', Arial, sans-serif;
+    border: 1px solid rgba(98,106,56,0.22);
+  }
+
+  .leaflet-control,
+  .leaflet-bar,
+  .leaflet-control-layers{
+    border-radius: 10px !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.16) !important;
+    border: 1px solid rgba(98,106,56,0.26) !important;
+    background: rgba(255,253,247,0.96) !important;
+  }
+
+  .leaflet-bar a{
+    border-radius: 8px !important;
+    color: var(--green-dark) !important;
+  }
+
+  .leaflet-popup-content-wrapper{
+    border-radius: 14px !important;
+    background: rgba(255,253,247,0.99) !important;
+    border: 1px solid rgba(98,106,56,0.24) !important;
+    box-shadow: 0 14px 26px rgba(0,0,0,0.18) !important;
+  }
+
+  .leaflet-popup-content{
+    margin: 14px 16px !important;
+    max-height: 390px;
+    overflow-y: auto;
+  }
+
+  .leaflet-popup-tip{
+    background: rgba(255,253,247,0.99) !important;
+  }
+
+  .map-logo{
+    width: 76px;
+    padding: 7px;
+    background: rgba(255,253,247,0.92);
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+  }
+
+  .map-logo img{
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .popup-card{
+    min-width: 250px;
+    max-width: 380px;
+  }
+
+  .popup-title{
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 800;
+    font-size: 1.03rem;
+    color: var(--green-dark);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .popup-title.popup-taxon{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 1.18rem;
+    line-height: 1.22;
+    margin-bottom: 0.10rem;
+  }
+
+  .popup-family{
+    font-family: 'DM Sans', 'Montserrat', Arial, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--muted);
+    margin: 0 0 0.58rem 0;
+  }
+
+  .popup-sub{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.67rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+  }
+
+  .popup-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+  }
+
+  .popup-table td{
+    padding: 0.24rem 0;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(98,106,56,0.08);
+  }
+
+  .popup-k{
+    color: var(--red);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-right: 0.65rem !important;
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  .popup-v{
+    color: var(--ink);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .popup-source{
+    margin-top: 0.6rem;
+    padding-top: 0.48rem;
+    border-top: 1px solid rgba(98,106,56,0.16);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    line-height: 1.35;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+
+  /* Legenda recolhida por padrão */
+  .map-legend-control{
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .map-legend-details{
+    width: min(235px, 58vw);
+    font-family: 'Montserrat', Arial, sans-serif;
+  }
+
+  .map-legend-details > summary{
+    cursor: pointer;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    float: right;
+    padding: 0.42rem 0.62rem;
+    border-radius: 999px;
+    background: rgba(255,253,247,0.96);
+    color: var(--green-dark);
+    border: 1px solid rgba(98,106,56,0.28);
+    box-shadow: 0 7px 15px rgba(0,0,0,0.18);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .map-legend-details > summary::-webkit-details-marker{
+    display: none;
+  }
+
+  .map-legend-details[open] > summary{
+    margin-bottom: 0.35rem;
+  }
+
+  .map-legend{
+    clear: both;
+    padding: 0.58rem 0.65rem;
+    background: rgba(255,253,247,0.965);
+    border: 1px solid rgba(98,106,56,0.24);
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.18);
+    max-height: 230px;
+    overflow-y: auto;
+  }
+
+  .map-legend .legend-title{
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.34rem;
+  }
+
+  .map-legend .legend-row{
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-top: 0.22rem;
+  }
+
+  .map-legend .dot{
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: 0 0 9px;
+    display: inline-block;
+    border: 1.5px solid rgba(255,255,255,0.95);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.20);
+  }
+
+  .map-legend .line{
+    width: 16px;
+    height: 0;
+    flex: 0 0 16px;
+    display: inline-block;
+    border-top: 3px solid var(--ochre);
+  }
+
+  /* Cluster de coletas: número = quantidade de registros agrupados */
+  .tsiino-cluster{
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+  .tsiino-cluster-bubble{
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(132,36,32,0.94);
+    border: 3px solid rgba(255,253,247,0.94);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.38);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.73rem;
+    font-weight: 700;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* EXPEDIÇÕES + CARROSSEL                                             */
+  /* ------------------------------------------------------------------ */
+
+  .expeditions-shell{
+    width: 100%;
+    margin: 4.8rem auto 0 auto;
+  }
+
+  .expeditions-heading{
+    width: min(var(--page-max), calc(100vw - 4rem));
+    margin: 0 auto 1.5rem auto;
+    color: #fff;
+  }
+
+  .expeditions-heading .eyebrow{
+    font-family: 'Space Mono', monospace;
+    color: var(--ochre);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .expeditions-heading h2{
+    margin: 0.35rem 0 0 0;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(2.2rem, 4.8vw, 4.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    color: #fff;
+    font-weight: 900;
+    text-shadow: 0 4px 22px rgba(0,0,0,0.55);
+  }
+
+  .expeditions-heading p{
+    max-width: 850px;
+    color: rgba(246,241,232,0.88);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: clamp(1.05rem, 1.7vw, 1.28rem);
+    line-height: 1.65;
+    margin-top: 0.85rem;
+  }
+
+  .expedition-grid{
+    display: grid;
+    gap: 0;
+    width: 100%;
+  }
+
+  .expedition-card{
+    width: min(var(--page-max), calc(100vw - 4rem));
+    margin: 0 auto;
+    scroll-margin-top: 5rem;
+    background: rgba(255,253,247,0.975);
+    color: var(--ink);
+    border-top: 5px solid var(--green);
+    box-shadow: 0 22px 56px rgba(0,0,0,0.31);
+    padding: clamp(1.45rem, 3vw, 2.7rem);
+    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+  }
+
+  .expedition-card.is-active{
+    border-top-color: var(--ochre);
+    box-shadow: 0 26px 66px rgba(0,0,0,0.38);
+  }
+
+  .expedition-eyebrow{
+    font-family: 'Space Mono', monospace;
+    color: var(--red);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin-bottom: 0.28rem;
+  }
+
+  .expedition-card h3{
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: var(--green-dark);
+    font-size: clamp(1.55rem, 3vw, 2.8rem);
+    line-height: 1.05;
+    font-weight: 850;
+    margin: 0 0 0.8rem 0;
+    letter-spacing: -0.025em;
+  }
+
+  .expedition-meta{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .meta-pill{
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(98,106,56,0.25);
+    background: rgba(246,241,232,0.85);
+    color: var(--green-dark);
+    padding: 0.32rem 0.68rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .expedition-summary{
+    max-width: 1050px;
+    margin: 0 0 1.35rem 0 !important;
+    color: var(--ink) !important;
+    font-family: 'Source Serif 4', Georgia, serif !important;
+    font-size: clamp(1.04rem, 1.55vw, 1.2rem) !important;
+    line-height: 1.66 !important;
+  }
+
+  .exp-carousel{
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #0d0c0a;
+    border-radius: 14px;
+    border: 1px solid rgba(98,106,56,0.22);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.20);
+  }
+
+  .exp-carousel-track{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    transition: transform 0.75s cubic-bezier(.22,.61,.36,1);
+    will-change: transform;
+  }
+
+  .exp-slide{
+    flex: 0 0 100%;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #0d0c0a;
+  }
+
+  .exp-slide img{
+    width: 100%;
+    height: auto;
+    max-height: 78vh;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .exp-slide figcaption{
+    width: 100%;
+    padding: 0.52rem 0.8rem 0.62rem;
+    background: rgba(17,16,13,0.94);
+    color: rgba(246,241,232,0.82);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.02em;
+  }
+
+  .exp-carousel-nav{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.42);
+    background: rgba(16,14,12,0.64);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+    cursor: pointer;
+    font-size: 1.28rem;
+    line-height: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+
+  .exp-carousel-nav:hover{
+    background: rgba(169,54,50,0.86);
+  }
+
+  .exp-carousel-prev{ left: 0.8rem; }
+  .exp-carousel-next{ right: 0.8rem; }
+
+  .exp-carousel-dots{
+    position: absolute;
+    left: 50%;
+    bottom: 2.4rem;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    gap: 0.38rem;
+    padding: 0.34rem 0.48rem;
+    border-radius: 999px;
+    background: rgba(10,9,8,0.54);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  .exp-carousel-dot{
+    width: 7px;
+    height: 7px;
+    border: 0;
+    border-radius: 50%;
+    padding: 0;
+    background: rgba(255,255,255,0.45);
+    cursor: pointer;
+  }
+
+  .exp-carousel-dot.is-current{
+    background: var(--ochre);
+    transform: scale(1.22);
+  }
+
+  .exp-carousel[data-single="true"] .exp-carousel-nav,
+  .exp-carousel[data-single="true"] .exp-carousel-dots{
+    display: none;
+  }
+
+  .empty-gallery{
+    padding: 1.15rem;
+    border-radius: 12px;
+    background: rgba(98,106,56,0.10);
+    border: 1px dashed rgba(217,154,39,0.60);
+    color: var(--green-dark);
+    font-size: 0.92rem;
+  }
+
+  /* Foto de transição entre expedições */
+  .expedition-break{
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    margin: clamp(2.8rem, 7vw, 6rem) 0;
+    overflow: hidden;
+    background: #110706;
+    box-shadow: 0 20px 54px rgba(0,0,0,0.28);
+  }
+
+  .expedition-break img{
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 72vh;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.80) saturate(0.92);
+  }
+
+  .expedition-break::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(18,7,6,0.22), rgba(18,7,6,0.02), rgba(80,13,11,0.18));
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* RESPONSIVO                                                         */
+  /* ------------------------------------------------------------------ */
+
+  @media (max-width: 991.98px){
+    .page-hero{
+      min-height: 100vh;
+    }
+
+    .page-hero-logo{
+      top: 4.9rem;
+      left: 0.85rem;
+      width: 78px;
+    }
+
+    .page-hero-content{
+      top: 12rem;
+      left: 0.9rem;
+      width: calc(100% - 1.8rem);
+    }
+
+    #quarto-header .navbar-collapse.show,
+    #quarto-header .navbar-collapse.collapsing{
+      margin-top: 0.6rem;
+      padding: 0.85rem 1rem;
+      width: min(280px, calc(100vw - 2rem));
+      background: rgba(23,23,23,0.78) !important;
+      border: 1px solid rgba(246,241,232,0.22);
+      border-radius: 18px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.28);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    #quarto-header .navbar-collapse.show .nav-link,
+    #quarto-header .navbar-collapse.collapsing .nav-link{
+      color: #F6F1E8 !important;
+      font-weight: 600;
+      padding: 0.45rem 0.25rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+    }
+
+    .content-card,
+    .expedition-card,
+    .expeditions-heading{
+      width: calc(100vw - 1.2rem);
+    }
+
+    .section-title{
+      grid-template-columns: 56px 1fr;
+    }
+
+    .map-logo{
+      width: 68px;
+    }
+
+    .exp-slide img{
+      max-height: 68vh;
+    }
+
+    .expedition-break img{
+      max-height: 58vh;
+    }
+  }
+
+  @media (max-width: 767.98px){
+    .page-hero-content h1{
+      font-size: clamp(2.4rem, 10.5vw, 3.2rem);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+    }
+  }
+
+  @media (max-width: 520px){
+    .page-hero-logo{
+      display: none;
+    }
+
+    .page-hero-content h1{
+      font-size: clamp(2.15rem, 10vw, 2.85rem);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+    }
+
+    .content-card,
+    .expedition-card{
+      padding: 1.25rem 0.85rem;
+    }
+
+    .exp-carousel-nav{
+      width: 36px;
+      height: 36px;
+    }
+
+    .exp-carousel-prev{ left: 0.4rem; }
+    .exp-carousel-next{ right: 0.4rem; }
+
+    .exp-carousel-dots{
+      bottom: 2.25rem;
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* AJUSTES DE LARGURA, CENTRALIZAÇÃO E TEMA ESCURO DAS EXPEDIÇÕES     */
+  /* ------------------------------------------------------------------ */
+
+  /* Nesta página não há sidebar/TOC. Remover a grade assimétrica do
+     Quarto impede que os blocos largos fiquem deslocados para a direita
+     em notebooks e mantém o centro geométrico da viewport. */
+  #quarto-content.page-columns{
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #quarto-content > main.content,
+  main#quarto-document-content{
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #mapa-expedicoes,
+  #lista-expedicoes{
+    grid-column: screen-start / screen-end !important;
+    justify-self: center !important;
+  }
+
+  .content-card{
+    width: min(var(--page-max), calc(100vw - clamp(1.5rem, 4vw, 4.5rem))) !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .expeditions-shell{
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .expeditions-heading,
+  .expedition-card{
+    width: min(var(--page-max), calc(100vw - clamp(1.5rem, 4vw, 4.5rem))) !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* As expedições ficam integradas ao fundo da página, sem cartão claro
+     nem filete superior. */
+  .expedition-card{
+    background:
+      linear-gradient(135deg, rgba(12,8,7,0.94), rgba(31,11,9,0.90)) !important;
+    color: var(--cream) !important;
+    border: 1px solid rgba(246,241,232,0.12) !important;
+    border-top: 0 !important;
+    border-radius: 16px;
+    box-shadow: 0 26px 64px rgba(0,0,0,0.36) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .expedition-card.is-active{
+    border-color: rgba(217,154,39,0.34) !important;
+    box-shadow:
+      0 0 0 1px rgba(217,154,39,0.10),
+      0 30px 72px rgba(0,0,0,0.46) !important;
+  }
+
+  .expedition-eyebrow{
+    color: var(--ochre) !important;
+  }
+
+  .expedition-card h3{
+    color: #FFFDF7 !important;
+    text-shadow: 0 3px 18px rgba(0,0,0,0.38);
+  }
+
+  .meta-pill{
+    background: rgba(246,241,232,0.07) !important;
+    color: rgba(255,253,247,0.92) !important;
+    border-color: rgba(246,241,232,0.18) !important;
+  }
+
+  .expedition-summary{
+    color: rgba(246,241,232,0.90) !important;
+  }
+
+  .empty-gallery{
+    background: rgba(255,255,255,0.035) !important;
+    color: rgba(246,241,232,0.82) !important;
+    border-color: rgba(217,154,39,0.34) !important;
+  }
+
+  .exp-carousel{
+    border: 1px solid rgba(246,241,232,0.10) !important;
+    border-radius: 12px;
+    box-shadow: 0 18px 42px rgba(0,0,0,0.36) !important;
+  }
+
+  .exp-slide img{
+    max-height: 84vh;
+  }
+
+  /* Mapa responsivo: grande em desktop e proporcional em notebook/mobile. */
+  #mapa-expedicoes .leaflet.html-widget,
+  #mapa-expedicoes .leaflet-container{
+    height: clamp(600px, 76vh, 920px) !important;
+  }
+
+  /* Heatmap e transição visual por escala. */
+  .tsiino-heat-layer{
+    mix-blend-mode: screen;
+    transition: opacity 0.22s ease;
+  }
+
+  .leaflet-container.zoom-heat path.collection-marker,
+  .leaflet-container.zoom-heat .tsiino-cluster{
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .leaflet-container.zoom-points .tsiino-cluster-bubble{
+    width: 16px;
+    height: 16px;
+    margin: 13px;
+    border-width: 2px;
+    box-shadow: 0 2px 9px rgba(0,0,0,0.34);
+  }
+
+  .leaflet-container.zoom-points .tsiino-cluster-bubble span{
+    display: none;
+  }
+
+  .leaflet-container.zoom-counts .tsiino-cluster-bubble{
+    transition: width .18s ease, height .18s ease, margin .18s ease;
+  }
+
+  .collection-number-tooltip{
+    border: 0 !important;
+    border-radius: 999px !important;
+    padding: 4px 7px !important;
+    background: rgba(14,11,9,0.88) !important;
+    color: #FFFDF7 !important;
+    box-shadow: 0 4px 11px rgba(0,0,0,0.30) !important;
+    font-family: 'Space Mono', monospace !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+  }
+
+  .collection-number-tooltip::before{
+    display: none !important;
+  }
+
+  /* Controle de tela cheia criado diretamente no widget, sem pacote extra. */
+  .tsiino-fullscreen-control a{
+    width: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+    text-align: center;
+    font-size: 20px !important;
+    font-weight: 700;
+    color: #2E3B24 !important;
+    text-decoration: none !important;
+  }
+
+  .leaflet-container:fullscreen,
+  .leaflet-container:-webkit-full-screen,
+  .leaflet-container.tsiino-faux-fullscreen{
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    z-index: 999999 !important;
+  }
+
+  .leaflet-container.tsiino-faux-fullscreen{
+    position: fixed !important;
+    inset: 0 !important;
+  }
+
+  body.tsiino-map-fullscreen{
+    overflow: hidden !important;
+  }
+
+  @media (min-width: 1800px){
+    :root{
+      --page-max: 1760px;
+    }
+
+    .content-card,
+    .expeditions-heading,
+    .expedition-card{
+      width: min(var(--page-max), calc(100vw - 5rem)) !important;
+    }
+
+    .exp-slide img{
+      max-height: 86vh;
+    }
+  }
+
+  @media (max-width: 991.98px){
+    .content-card,
+    .expeditions-heading,
+    .expedition-card{
+      width: calc(100vw - 1.25rem) !important;
+    }
+
+    #mapa-expedicoes .leaflet.html-widget,
+    #mapa-expedicoes .leaflet-container{
+      height: min(74vh, 720px) !important;
+      min-height: 520px;
+    }
+
+    .expedition-card{
+      padding: clamp(1rem, 3vw, 1.5rem) !important;
+      border-radius: 12px;
+    }
+
+    .exp-slide img{
+      max-height: 76vh;
+    }
+  }
+
+  @media (max-width: 520px){
+    .content-card,
+    .expeditions-heading,
+    .expedition-card{
+      width: calc(100vw - 0.75rem) !important;
+    }
+
+    .content-card{
+      padding: 1rem 0.65rem !important;
+    }
+
+    #mapa-expedicoes .leaflet.html-widget,
+    #mapa-expedicoes .leaflet-container{
+      height: 70svh !important;
+      min-height: 470px;
+      border-radius: 10px;
+    }
+
+    .expedition-card{
+      padding: 0.8rem !important;
+      border-radius: 10px;
+    }
+
+    .exp-slide img{
+      max-height: 72svh;
+    }
+
+    .expedition-break{
+      margin: 2.2rem 0;
+    }
+  }
+
+</style>
+
+<script>
+(function(){
+  function initExpeditionCarousels(){
+    const cards = Array.from(document.querySelectorAll('.expedition-card'));
+
+    function stopCarousel(carousel){
+      if(carousel && carousel._tsiinoTimer){
+        window.clearInterval(carousel._tsiinoTimer);
+        carousel._tsiinoTimer = null;
+      }
+    }
+
+    function goTo(carousel, index){
+      if(!carousel) return;
+      const slides = Array.from(carousel.querySelectorAll('.exp-slide'));
+      if(!slides.length) return;
+
+      const n = slides.length;
+      const idx = ((index % n) + n) % n;
+      carousel.dataset.index = String(idx);
+
+      const track = carousel.querySelector('.exp-carousel-track');
+      if(track){
+        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      }
+
+      carousel.querySelectorAll('.exp-carousel-dot').forEach((dot, i) => {
+        dot.classList.toggle('is-current', i === idx);
+        dot.setAttribute('aria-current', i === idx ? 'true' : 'false');
+      });
+    }
+
+    function startCarousel(carousel){
+      if(!carousel || carousel.dataset.single === 'true') return;
+      stopCarousel(carousel);
+      carousel._tsiinoTimer = window.setInterval(() => {
+        const current = Number(carousel.dataset.index || '0');
+        goTo(carousel, current + 1);
+      }, 4200);
+    }
+
+    document.querySelectorAll('.exp-carousel').forEach(carousel => {
+      goTo(carousel, 0);
+
+      const prev = carousel.querySelector('.exp-carousel-prev');
+      const next = carousel.querySelector('.exp-carousel-next');
+
+      if(prev){
+        prev.addEventListener('click', () => {
+          goTo(carousel, Number(carousel.dataset.index || '0') - 1);
+          if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
+        });
+      }
+
+      if(next){
+        next.addEventListener('click', () => {
+          goTo(carousel, Number(carousel.dataset.index || '0') + 1);
+          if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
+        });
+      }
+
+      carousel.querySelectorAll('.exp-carousel-dot').forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+          goTo(carousel, i);
+          if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
+        });
+      });
+
+      carousel.addEventListener('mouseenter', () => stopCarousel(carousel));
+      carousel.addEventListener('mouseleave', () => {
+        if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
+      });
+    });
+
+    if('IntersectionObserver' in window){
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          const card = entry.target;
+          const carousel = card.querySelector('.exp-carousel');
+
+          if(entry.isIntersecting){
+            cards.forEach(other => {
+              if(other !== card){
+                other.classList.remove('is-active');
+                stopCarousel(other.querySelector('.exp-carousel'));
+              }
+            });
+
+            card.classList.add('is-active');
+            startCarousel(carousel);
+          } else {
+            card.classList.remove('is-active');
+            stopCarousel(carousel);
+          }
+        });
+      }, {
+        root: null,
+        rootMargin: '-34% 0px -34% 0px',
+        threshold: 0
+      });
+
+      cards.forEach(card => observer.observe(card));
+    } else {
+      const first = cards[0];
+      if(first){
+        first.classList.add('is-active');
+        startCarousel(first.querySelector('.exp-carousel'));
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initExpeditionCarousels);
+})();
+</script>
+```
+
+```{=html}
+<section class="page-hero page-hero-expeditions" aria-label="Abertura da página de expedições" data-i18n-aria="expeditions.hero.aria">
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    aria-hidden="true"
+  >
+    <source src="../figures/video/exp_hero.mp4" type="video/mp4">
+  </video>
+
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-pattern"></div>
+
+  <div class="page-hero-logo" aria-label="Logo Tsiino Hiiwiida" data-i18n-aria="expeditions.hero.logoAria">
+    <img
+      src="../figures/logo_tsiino.png"
+      alt="Logo Tsiino Hiiwiida"
+      data-i18n-alt="expeditions.hero.logoAlt"
+      onerror="this.style.display='none';"
+    >
+  </div>
+
+  <div class="page-hero-content">
+    <div class="hero-kicker" data-i18n="expeditions.hero.kicker">Expedições · Alto Rio Negro</div>
+    <h1 data-i18n="expeditions.hero.title">Expedições</h1>
+    <p class="hero-subtitle" data-i18n="expeditions.hero.subtitle">Trilhas, coletas, fotos e registros de campo</p>
+    <p class="hero-description" data-i18n="expeditions.hero.description"></p>
+
+  </div>
+</section>
+```
+
+```{=html}
+<section id="mapa-expedicoes" class="content-card">
+  <div class="section-title">
+    <h2 data-i18n="expeditions.map.title">Mapa das expedições</h2>
+  </div>
+
+  <p class="lead" data-i18n-html="expeditions.map.lead">
+    O mapa reúne alguns trajetos das expedições e pontos de coleta do projeto Tsiino Hiiwiida.
+  </p>
+```
+
+```{r mapa-expedicoes}
+library(leaflet)
+library(htmlwidgets)
+library(dplyr)
+library(htmltools)
+library(sf)
+
+# =========================================================================
+# 1) CAMINHOS DE INPUT
+# =========================================================================
+
+find_existing_dir <- function(candidates) {
+  for (rel in candidates) {
+    hit <- find_up(rel)
+    if (!is.na(hit) && dir.exists(hit)) return(hit)
+  }
+  NA_character_
+}
+
+find_existing_file <- function(candidates) {
+  for (rel in candidates) {
+    hit <- find_up(rel)
+    if (!is.na(hit) && file.exists(hit)) return(hit)
+  }
+  NA_character_
+}
+
+kml_dir <- find_existing_dir(c(
+  file.path("_input_data", "kml_expedições"),
+  file.path("_input_data", "kml_expedicoes")
+))
+
+# O código aceita tanto uma pasta de coletas quanto o arquivo validado que
+# aparece diretamente em _input_data.
+project_dirs <- c(
+  file.path("_input_data", "expedições"),
+  file.path("_input_data", "expedicoes"),
+  file.path("_input_data", "coletas_expedições"),
+  file.path("_input_data", "coletas_expedicoes"),
+  file.path("_input_data", "expedicoes_coletas")
+)
+
+project_direct_files <- c(
+  file.path("_input_data", "dwc_expedicoes_tsiino_validado.xlsx"),
+  file.path("_input_data", "dwc_expedicoes_tsiino.xlsx"),
+  file.path("_input_data", "coletas_expedicoes.xlsx"),
+  file.path("_input_data", "coletas_expedições.xlsx")
+)
+
+# =========================================================================
+# 2) HELPERS PARA PLANILHAS E DWC
+# =========================================================================
+
+norm_name <- function(x) {
+  x <- iconv(as.character(x), from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- tolower(x)
+  gsub("[^a-z0-9]", "", x)
+}
+
+find_col_ci <- function(data, candidates, required = FALSE, label = NULL) {
+  nms <- names(data)
+  hit <- match(norm_name(candidates), norm_name(nms))
+  hit <- hit[!is.na(hit)]
+
+  if (length(hit) > 0) return(nms[hit[1]])
+
+  if (required) {
+    stop(
+      "Não encontrei a coluna ",
+      ifelse(is.null(label), paste(candidates, collapse = "/"), label),
+      ". Colunas disponíveis: ", paste(nms, collapse = ", ")
+    )
+  }
+
+  NA_character_
+}
+
+get_col_chr <- function(data, candidates) {
+  col <- find_col_ci(data, candidates, required = FALSE)
+  if (is.na(col)) return(rep(NA_character_, nrow(data)))
+  as.character(data[[col]])
+}
+
+first_nonempty <- function(...) {
+  xs <- list(...)
+  if (length(xs) == 0) return(character())
+
+  n <- max(vapply(xs, length, integer(1)))
+  out <- rep(NA_character_, n)
+
+  for (x in xs) {
+    x <- rep_len(as.character(x), n)
+    use <- !nz(out) & nz(x)
+    out[use] <- x[use]
+  }
+
+  out
+}
+
+# Se o Darwin Core trouxer todos os coletores em recordedBy separados por
+# ponto e vírgula, usa o primeiro como coletor principal e mantém os demais
+# como coletores adicionais. O mesmo tratamento vale para uma coluna
+# collector que eventualmente contenha a equipe inteira.
+split_collectors <- function(x) {
+  x <- as.character(x)
+  primary <- rep(NA_character_, length(x))
+  additional <- rep(NA_character_, length(x))
+
+  for (i in seq_along(x)) {
+    if (!nz(x[i])) next
+
+    parts <- trimws(unlist(strsplit(x[i], "\\s*;\\s*", perl = TRUE)))
+    parts <- parts[nz(parts)]
+
+    if (length(parts) > 0) primary[i] <- parts[1]
+    if (length(parts) > 1) additional[i] <- paste(parts[-1], collapse = "; ")
+  }
+
+  list(primary = primary, additional = additional)
+}
+
+parse_coord_one <- function(value, hemi = NA_character_) {
+  if (length(value) == 0 || is.na(value)) return(NA_real_)
+
+  s <- trimws(as.character(value))
+  if (!nzchar(s)) return(NA_real_)
+  s <- gsub(",", ".", s, fixed = TRUE)
+
+  direct <- suppressWarnings(as.numeric(s))
+
+  if (!is.na(direct)) {
+    val <- direct
+  } else {
+    nums <- regmatches(
+      s,
+      gregexpr("-?[0-9]+(?:\\.[0-9]+)?", s, perl = TRUE)
+    )[[1]]
+
+    if (length(nums) == 0 || identical(nums, character(0))) return(NA_real_)
+
+    z <- suppressWarnings(as.numeric(nums))
+    z <- z[!is.na(z)]
+    if (length(z) == 0) return(NA_real_)
+
+    sign0 <- ifelse(z[1] < 0, -1, 1)
+    z <- abs(z)
+
+    val <- z[1]
+    if (length(z) >= 2) val <- val + z[2] / 60
+    if (length(z) >= 3) val <- val + z[3] / 3600
+    val <- sign0 * val
+  }
+
+  hs <- toupper(trimws(as.character(hemi)))
+  full <- toupper(s)
+
+  if (
+    (!is.na(hs) && hs %in% c("S", "W", "O")) ||
+    grepl("(^|[^A-Z])(S|W|O)($|[^A-Z])", full)
+  ) {
+    val <- -abs(val)
+  } else if (
+    (!is.na(hs) && hs %in% c("N", "E", "L")) ||
+    grepl("(^|[^A-Z])(N|E|L)($|[^A-Z])", full)
+  ) {
+    val <- abs(val)
+  }
+
+  val
+}
+
+parse_coord <- function(x, hemi = NULL) {
+  if (is.null(hemi)) hemi <- rep(NA_character_, length(x))
+  mapply(parse_coord_one, x, hemi, USE.NAMES = FALSE)
+}
+
+read_delimited_auto <- function(path) {
+  first <- readLines(path, n = 1, warn = FALSE, encoding = "UTF-8")
+  if (length(first) == 0) return(data.frame())
+
+  counts <- c(
+    comma = lengths(regmatches(first, gregexpr(",", first, fixed = TRUE))),
+    semicolon = lengths(regmatches(first, gregexpr(";", first, fixed = TRUE))),
+    tab = lengths(regmatches(first, gregexpr("\t", first, fixed = TRUE)))
+  )
+
+  sep <- c(comma = ",", semicolon = ";", tab = "\t")[[names(which.max(counts))]]
+
+  read.table(
+    path,
+    header = TRUE,
+    sep = sep,
+    quote = "\"",
+    comment.char = "",
+    stringsAsFactors = FALSE,
+    check.names = FALSE,
+    fileEncoding = "UTF-8-BOM",
+    na.strings = c("", "NA", "NaN", "NULL"),
+    fill = TRUE
+  )
+}
+
+read_collection_file <- function(path) {
+  ext <- tolower(tools::file_ext(path))
+
+  if (ext %in% c("xlsx", "xls")) {
+    if (!requireNamespace("readxl", quietly = TRUE)) {
+      warning("Pacote 'readxl' não instalado; ignorando: ", basename(path))
+      return(list())
+    }
+
+    sheets <- tryCatch(readxl::excel_sheets(path), error = function(e) character())
+    if (length(sheets) == 0) return(list())
+
+    out <- lapply(sheets, function(sh) {
+      x <- tryCatch(
+        readxl::read_excel(path, sheet = sh, .name_repair = "minimal"),
+        error = function(e) NULL
+      )
+      if (is.null(x)) return(NULL)
+      x <- as.data.frame(x, stringsAsFactors = FALSE, check.names = FALSE)
+      attr(x, "source_sheet") <- sh
+      x
+    })
+
+    return(Filter(Negate(is.null), out))
+  }
+
+  if (ext %in% c("csv", "tsv", "txt")) {
+    x <- tryCatch(read_delimited_auto(path), error = function(e) NULL)
+    if (is.null(x)) return(list())
+    attr(x, "source_sheet") <- NA_character_
+    return(list(x))
+  }
+
+  list()
+}
+
+make_date_from_parts <- function(data) {
+  dd <- get_col_chr(data, c("colldd", "day", "dia", "eventday"))
+  mm <- get_col_chr(data, c("collmm", "month", "mes", "mês", "eventmonth"))
+  yy <- get_col_chr(data, c("collyy", "year", "ano", "eventyear"))
+
+  have_any <- nz(dd) | nz(mm) | nz(yy)
+  out <- rep(NA_character_, nrow(data))
+
+  if (any(have_any)) {
+    dd_num <- suppressWarnings(as.integer(dd))
+    mm_num <- suppressWarnings(as.integer(mm))
+
+    out[have_any] <- paste(
+      ifelse(nz(dd[have_any]) & !is.na(dd_num[have_any]), sprintf("%02d", dd_num[have_any]), "??"),
+      ifelse(nz(mm[have_any]) & !is.na(mm_num[have_any]), sprintf("%02d", mm_num[have_any]), "??"),
+      ifelse(nz(yy[have_any]), yy[have_any], "????"),
+      sep = "/"
+    )
+  }
+
+  out
+}
+
+make_taxon_from_parts <- function(data) {
+  genus <- get_col_chr(data, c("genus", "genero", "gênero"))
+  sp <- get_col_chr(data, c("specificEpithet", "sp1", "species", "especie", "espécie"))
+  out <- rep(NA_character_, nrow(data))
+  ok <- nz(genus) | nz(sp)
+  out[ok] <- trimws(paste(
+    ifelse(nz(genus[ok]), genus[ok], ""),
+    ifelse(nz(sp[ok]), sp[ok], "")
+  ))
+  out[!nz(out)] <- NA_character_
+  out
+}
+
+standardize_collection <- function(data, source_kind, source_label, source_file, source_sheet = NA_character_) {
+  if (is.null(data) || nrow(data) == 0) return(NULL)
+
+  lat_col <- find_col_ci(
+    data,
+    c("decimalLatitude", "decimal_latitude", "latitude", "lat", "verbatimLatitude", "y")
+  )
+
+  lon_col <- find_col_ci(
+    data,
+    c("decimalLongitude", "decimal_longitude", "longitude", "lon", "long", "lng", "verbatimLongitude", "x")
+  )
+
+  if (is.na(lat_col) || is.na(lon_col)) return(NULL)
+
+  ns <- get_col_chr(data, c("NS", "latHemisphere", "latitudeHemisphere"))
+  ew <- get_col_chr(data, c("EW", "longHemisphere", "lonHemisphere", "longitudeHemisphere"))
+
+  collector_raw <- first_nonempty(
+    get_col_chr(data, c("collector", "coletor", "collectorName", "primaryCollector")),
+    get_col_chr(data, c("recordedBy")),
+    get_col_chr(data, c("collectors"))
+  )
+
+  collector_parts <- split_collectors(collector_raw)
+  collector <- collector_parts$primary
+
+  additional_collectors <- first_nonempty(
+    get_col_chr(data, c(
+      "addcoll", "additionalCollectors", "additionalCollector",
+      "associatedCollectors", "coletores_adicionais", "coletores adicionais",
+      "additional_collectors"
+    )),
+    collector_parts$additional
+  )
+
+  number <- first_nonempty(
+    get_col_chr(data, c("recordNumber")),
+    get_col_chr(data, c("number", "numero", "número", "numero_coleta", "collectionNumber", "fieldNumber")),
+    get_col_chr(data, c("catalogNumber"))
+  )
+
+  locality <- first_nonempty(
+    get_col_chr(data, c("locality", "localidade")),
+    get_col_chr(data, c("verbatimLocality", "locnotes")),
+    get_col_chr(data, c("gazetteer")),
+    get_col_chr(data, c("minorarea", "municipality", "municipio", "município"))
+  )
+
+  event_date <- first_nonempty(
+    get_col_chr(data, c("eventDate", "event_date")),
+    get_col_chr(data, c("date", "data", "collectionDate")),
+    make_date_from_parts(data)
+  )
+
+  scientific_name <- first_nonempty(
+    get_col_chr(data, c("scientificName", "scientific_name", "currentFullSpeciesName", "Corrected Full Species Name")),
+    make_taxon_from_parts(data)
+  )
+
+  family <- first_nonempty(
+    get_col_chr(data, c("family", "familia", "família", "currentFamily", "Corrected Family"))
+  )
+
+  habitat <- first_nonempty(
+    get_col_chr(data, c("habitat", "habitattxt", "habitatText"))
+  )
+
+  remarks <- first_nonempty(
+    get_col_chr(data, c("occurrenceRemarks", "plantdesc", "notes", "observacoes", "observações", "remarks"))
+  )
+
+  institution <- first_nonempty(
+    get_col_chr(data, c("institutionCode", "institution", "herbarium", "collectionCode"))
+  )
+
+  catalog_number <- first_nonempty(
+    get_col_chr(data, c("catalogNumber", "accession", "barcode"))
+  )
+
+  expedition <- first_nonempty(
+    get_col_chr(data, c("expedition", "expedicao", "expedição", "campaign", "campanha"))
+  )
+
+  out <- data.frame(
+    latitude = parse_coord(data[[lat_col]], ns),
+    longitude = parse_coord(data[[lon_col]], ew),
+    collector = collector,
+    additional_collectors = additional_collectors,
+    number = number,
+    locality = locality,
+    event_date = event_date,
+    scientific_name = scientific_name,
+    family = family,
+    habitat = habitat,
+    remarks = remarks,
+    institution = institution,
+    catalog_number = catalog_number,
+    expedition = expedition,
+    source_kind = source_kind,
+    source_label = source_label,
+    source_file = basename(source_file),
+    source_sheet = rep_len(source_sheet, nrow(data)),
+    stringsAsFactors = FALSE
+  )
+
+  # Corrige longitudes amazônicas sem sinal quando claramente informadas como oeste.
+  out$longitude <- ifelse(
+    !is.na(out$longitude) & out$longitude > 0 & out$longitude <= 80,
+    -out$longitude,
+    out$longitude
+  )
+
+  out <- out[
+    !is.na(out$latitude) &
+      !is.na(out$longitude) &
+      out$latitude >= -90 & out$latitude <= 90 &
+      out$longitude >= -180 & out$longitude <= 180,
+    ,
+    drop = FALSE
+  ]
+
+  if (nrow(out) == 0) return(NULL)
+  out
+}
+
+collect_input_files <- function(dir_candidates, direct_candidates) {
+  out <- character()
+
+  for (rel in dir_candidates) {
+    d <- find_up(rel)
+    if (!is.na(d) && dir.exists(d)) {
+      out <- c(
+        out,
+        list.files(
+          d,
+          pattern = "\\.(xlsx|xls|csv|tsv|txt)$",
+          full.names = TRUE,
+          recursive = TRUE,
+          ignore.case = TRUE
+        )
+      )
+    }
+  }
+
+  for (rel in direct_candidates) {
+    f <- find_up(rel)
+    if (!is.na(f) && file.exists(f)) out <- c(out, f)
+  }
+
+  out <- unique(out)
+  out <- out[!grepl("(^|[/\\\\])~\\$", out)]
+  out
+}
+
+read_collection_files <- function(files, source_kind, source_label) {
+  if (length(files) == 0) return(data.frame())
+
+  all_rows <- list()
+  k <- 0L
+
+  for (f in files) {
+    tables <- read_collection_file(f)
+    if (length(tables) == 0) next
+
+    for (tb in tables) {
+      z <- standardize_collection(
+        tb,
+        source_kind = source_kind,
+        source_label = source_label,
+        source_file = f,
+        source_sheet = attr(tb, "source_sheet")
+      )
+
+      if (!is.null(z) && nrow(z) > 0) {
+        k <- k + 1L
+        all_rows[[k]] <- z
+      }
+    }
+  }
+
+  if (length(all_rows) == 0) return(data.frame())
+  dplyr::bind_rows(all_rows)
+}
+
+# =========================================================================
+# 3) TRILHAS KML — LEITURA AUTOMÁTICA
+# =========================================================================
+
+read_one_kml <- function(path) {
+  layers <- tryCatch(sf::st_layers(path)$name, error = function(e) character())
+  if (length(layers) == 0) return(NULL)
+
+  parts <- lapply(layers, function(layer_name) {
+    x <- tryCatch(
+      sf::st_read(path, layer = layer_name, quiet = TRUE),
+      error = function(e) NULL
+    )
+
+    if (is.null(x) || nrow(x) == 0) return(NULL)
+
+    x <- tryCatch(sf::st_transform(x, 4326), error = function(e) NULL)
+    if (is.null(x)) return(NULL)
+
+    x <- suppressWarnings(sf::st_zm(x, drop = TRUE, what = "ZM"))
+    geom_type <- as.character(sf::st_geometry_type(x))
+    x <- x[geom_type %in% c("LINESTRING", "MULTILINESTRING"), , drop = FALSE]
+
+    if (nrow(x) == 0) return(NULL)
+
+    sf::st_sf(
+      kml_name = tools::file_path_sans_ext(basename(path)),
+      kml_file = basename(path),
+      geometry = sf::st_geometry(x)
+    )
+  })
+
+  parts <- Filter(Negate(is.null), parts)
+  if (length(parts) == 0) return(NULL)
+  do.call(rbind, parts)
+}
+
+kml_files <- if (!is.na(kml_dir) && dir.exists(kml_dir)) {
+  list.files(
+    kml_dir,
+    pattern = "\\.kml$",
+    full.names = TRUE,
+    recursive = FALSE,
+    ignore.case = TRUE
+  )
+} else {
+  character()
+}
+
+trail_list <- lapply(kml_files, read_one_kml)
+trail_list <- Filter(Negate(is.null), trail_list)
+
+trails_sf <- if (length(trail_list) > 0) {
+  do.call(rbind, trail_list)
+} else {
+  NULL
+}
+
+trail_names <- if (!is.null(trails_sf) && nrow(trails_sf) > 0) {
+  unique(trails_sf$kml_name)
+} else {
+  character()
+}
+
+trail_colors <- if (length(trail_names) > 0) {
+  grDevices::hcl.colors(length(trail_names), palette = "Dark 3")
+} else {
+  character()
+}
+
+trail_color <- setNames(trail_colors, trail_names)
+
+# =========================================================================
+# 4) PONTOS DE COLETA
+# =========================================================================
+
+project_files <- collect_input_files(project_dirs, project_direct_files)
+
+project_points <- read_collection_files(
+  project_files,
+  source_kind = "project",
+  source_label = "Coleta do projeto Tsiino Hiiwiida"
+)
+
+if (nrow(project_points) > 0) {
+  project_points$point_color <- "#A93632"
+}
+
+# O mapa exibe exclusivamente as coletas realizadas pelo projeto.
+# O arquivo de coleções pretéritas permanece fora desta visualização para
+# evitar mistura entre esforço de coleta do Tsiino Hiiwiida e registros
+# históricos de herbário.
+collection_points <- project_points
+
+make_collection_label <- function(number, collector) {
+  number <- as.character(number)
+  collector <- as.character(collector)
+
+  if (nz(number)) return(number)
+  if (nz(collector)) return(collector)
+  "Coleta"
+}
+
+popup_row <- function(label, value) {
+  value <- as.character(value)[1]
+  if (!nz(value)) return("")
+  paste0(
+    "<tr><td class='popup-k'>", safe_html(label), "</td>",
+    "<td class='popup-v'>", safe_html(value), "</td></tr>"
+  )
+}
+
+make_collection_popup <- function(data) {
+  if (nrow(data) == 0) return(character())
+
+  vapply(seq_len(nrow(data)), function(i) {
+    x <- data[i, , drop = FALSE]
+
+    has_taxon <- nz(x$scientific_name)
+    title_html <- if (has_taxon) {
+      paste0("<em>", safe_html(x$scientific_name), "</em>")
+    } else {
+      "Coleta botânica"
+    }
+
+    title_class <- if (has_taxon) "popup-title popup-taxon" else "popup-title"
+
+    paste0(
+      "<div class='popup-card'>",
+      "<div class='", title_class, "'>", title_html, "</div>",
+      if (nz(x$family)) paste0("<div class='popup-family'>", safe_html(x$family), "</div>") else "",
+      "<table class='popup-table'>",
+      popup_row("Coletor principal", x$collector),
+      popup_row("Coletores adicionais", x$additional_collectors),
+      popup_row("Número", x$number),
+      popup_row("Localidade", x$locality),
+      popup_row("Data", x$event_date),
+      popup_row("Expedição", x$expedition),
+      popup_row("Habitat", x$habitat),
+      popup_row("Características", x$remarks),
+      popup_row("Instituição", x$institution),
+      popup_row("Catálogo", x$catalog_number),
+      "</table>",
+      "<div class='popup-source'>", safe_html(x$source_label),
+      if (nz(x$source_file)) paste0(" · ", safe_html(x$source_file)) else "",
+      "</div>",
+      "</div>"
+    )
+  }, character(1))
+}
+
+if (nrow(collection_points) > 0) {
+  collection_points$popup_html <- make_collection_popup(collection_points)
+  collection_points$label_text <- mapply(
+    make_collection_label,
+    collection_points$number,
+    collection_points$collector,
+    USE.NAMES = FALSE
+  )
+}
+
+# =========================================================================
+# 5) LIMITE MUNICIPAL DE SÃO GABRIEL DA CACHOEIRA
+# =========================================================================
+
+limite_path <- find_up(file.path(
+  "_input_data",
+  "limites",
+  "sao_gabriel_da_cachoeira.geojson"
+))
+
+municipio_sf <- NULL
+
+if (!is.na(limite_path) && file.exists(limite_path)) {
+  municipio_sf <- tryCatch({
+    x <- sf::st_read(limite_path, quiet = TRUE)
+    x <- sf::st_transform(x, 4326)
+    sf::st_make_valid(x)
+  }, error = function(e) NULL)
+}
+
+input_dir_abs <- find_up("_input_data")
+
+if (is.null(municipio_sf) && requireNamespace("geobr", quietly = TRUE) && !is.na(input_dir_abs)) {
+  limite_dir_abs <- file.path(input_dir_abs, "limites")
+  dir.create(limite_dir_abs, recursive = TRUE, showWarnings = FALSE)
+  limite_path_new <- file.path(limite_dir_abs, "sao_gabriel_da_cachoeira.geojson")
+
+  municipio_sf <- tryCatch({
+    x <- geobr::read_municipality(
+      code_muni = 1303809,
+      year = 2020,
+      simplified = TRUE,
+      showProgress = FALSE
+    )
+
+    x <- sf::st_transform(x, 4326)
+    x <- sf::st_make_valid(x)
+
+    sf::st_write(
+      x,
+      limite_path_new,
+      delete_dsn = TRUE,
+      quiet = TRUE
+    )
+
+    x
+  }, error = function(e) NULL)
+}
+
+if (!is.null(municipio_sf)) {
+  municipio_sf <- sf::st_transform(municipio_sf, 4326)
+  municipio_bbox <- sf::st_bbox(municipio_sf)
+  municipio_label_pt <- suppressWarnings(
+    sf::st_point_on_surface(sf::st_geometry(municipio_sf))
+  )
+  municipio_label_xy <- sf::st_coordinates(municipio_label_pt)[1, ]
+}
+
+# =========================================================================
+# 6) MAPA
+# =========================================================================
+
+logo_src <- if (exists("logo_map_uri") && nzchar(logo_map_uri)) {
+  logo_map_uri
+} else {
+  "../figures/brand/logo_tsiino_symbol.png"
+}
+
+map <- leaflet(
+  width = "100%",
+  height = 780,
+  options = leafletOptions(
+    minZoom = 3,
+    maxZoom = 22,
+    preferCanvas = TRUE
+  )
+) %>%
+  addProviderTiles(providers$Esri.WorldImagery, group = "Satélite") %>%
+  addProviderTiles(providers$OpenStreetMap, group = "OSM") %>%
+  addProviderTiles(providers$Esri.WorldStreetMap, group = "ESRI Street") %>%
+  addProviderTiles(providers$OpenTopoMap, group = "OpenTopo") %>%
+  addControl(
+    html = paste0(
+      "<div class='map-logo'>",
+      "<img src='", logo_src, "' alt='Logo Tsiino Hiiwiida'>",
+      "</div>"
+    ),
+    position = "topright",
+    className = "map-logo-control"
+  ) %>%
+  addControl(
+    html = paste0(
+      "<div style='text-align:left;line-height:1.18;padding:6px 8px;",
+      "background:rgba(250,246,238,0.93);border-radius:8px;",
+      "box-shadow:0 1px 5px rgba(0,0,0,0.20);'>",
+      "<div style='font-size:15px;font-weight:800;color:#203B23;'>Tsiino Hiiwiida</div>",
+      "<div style='font-size:10px;font-weight:700;color:#A94F35;'>Trilhas e coletas · Cabeça do Cachorro</div>",
+      "</div>"
+    ),
+    position = "topleft",
+    className = "custom-title"
+  )
+
+# Limite municipal
+if (!is.null(municipio_sf)) {
+  map <- map %>%
+    addPolygons(
+      data = municipio_sf,
+      group = "São Gabriel da Cachoeira",
+      color = "#D99A27",
+      weight = 2,
+      opacity = 1,
+      fillColor = "#59602F",
+      fillOpacity = 0.07,
+      label = "São Gabriel da Cachoeira (AM)",
+      popup = "<strong>São Gabriel da Cachoeira (AM)</strong>"
+    ) %>%
+    addLabelOnlyMarkers(
+      lng = municipio_label_xy[1],
+      lat = municipio_label_xy[2],
+      label = "São Gabriel da Cachoeira",
+      labelOptions = labelOptions(
+        noHide = TRUE,
+        direction = "center",
+        textOnly = TRUE,
+        style = list(
+          "font-weight" = "800",
+          "font-size" = "13px",
+          "color" = "#FAF6EE",
+          "text-shadow" = "0 1px 4px rgba(0,0,0,0.9)"
+        )
+      )
+    ) %>%
+    fitBounds(
+      lng1 = as.numeric(municipio_bbox["xmin"]),
+      lat1 = as.numeric(municipio_bbox["ymin"]),
+      lng2 = as.numeric(municipio_bbox["xmax"]),
+      lat2 = as.numeric(municipio_bbox["ymax"])
+    )
+} else {
+  map <- map %>% setView(lng = -67.09, lat = -0.13, zoom = 7)
+}
+
+# Cada arquivo KML é uma camada independente e recebe uma cor própria.
+if (!is.null(trails_sf) && nrow(trails_sf) > 0) {
+  for (trail_nm in trail_names) {
+    x <- trails_sf[trails_sf$kml_name == trail_nm, , drop = FALSE]
+
+    length_km <- tryCatch({
+      sum(as.numeric(sf::st_length(x)), na.rm = TRUE) / 1000
+    }, error = function(e) NA_real_)
+
+    route_popup <- paste0(
+      "<div class='popup-card'>",
+      "<div class='popup-title'>", safe_html(trail_nm), "</div>",
+      "<div class='popup-sub'>Trajeto da expedição</div>",
+      "<table class='popup-table'>",
+      popup_row("KML", unique(x$kml_file)[1]),
+      if (!is.na(length_km)) popup_row("Extensão", paste0(format(round(length_km, 1), decimal.mark = ","), " km")) else "",
+      "</table>",
+      "</div>"
+    )
+
+    map <- map %>%
+      addPolylines(
+        data = x,
+        group = trail_nm,
+        color = unname(trail_color[trail_nm]),
+        weight = 4,
+        opacity = 0.94,
+        smoothFactor = 0.45,
+        label = trail_nm,
+        popup = route_popup
+      )
+  }
+}
+
+# Todas as coletas do projeto entram no mesmo cluster. Registros com a mesma
+# coordenada permanecem agrupados e podem ser separados pelo spiderfy.
+if (nrow(collection_points) > 0) {
+  cluster_icon_js <- htmlwidgets::JS(
+    "function(cluster) {",
+    "  var count = cluster.getChildCount();",
+    "  return new L.DivIcon({",
+    "    html: '<div class=\"tsiino-cluster-bubble\"><span>' + count + '</span></div>',",
+    "    className: 'tsiino-cluster',",
+    "    iconSize: new L.Point(42, 42)",
+    "  });",
+    "}"
+  )
+
+  map <- map %>%
+    addCircleMarkers(
+      data = collection_points,
+      lng = ~longitude,
+      lat = ~latitude,
+      radius = 6.5,
+      color = "#FFFDF7",
+      fillColor = ~point_color,
+      fillOpacity = 0.96,
+      opacity = 0.96,
+      weight = 1.2,
+      group = "Coletas",
+      popup = ~popup_html,
+      label = ~label_text,
+      labelOptions = labelOptions(
+        direction = "auto",
+        textsize = "12px",
+        opacity = 0.93,
+        className = "collection-number-tooltip"
+      ),
+      options = pathOptions(className = "collection-marker"),
+      clusterOptions = markerClusterOptions(
+        showCoverageOnHover = FALSE,
+        spiderfyOnMaxZoom = TRUE,
+        spiderfyDistanceMultiplier = 1.7,
+        zoomToBoundsOnClick = TRUE,
+        removeOutsideVisibleBounds = TRUE,
+        maxClusterRadius = 28,
+        iconCreateFunction = cluster_icon_js
+      ),
+      clusterId = "coletas-cluster"
+    )
+}
+
+# Controle de camadas: recolhido por padrão.
+overlay_groups <- c(
+  if (!is.null(municipio_sf)) "São Gabriel da Cachoeira",
+  trail_names,
+  if (nrow(collection_points) > 0) "Coletas"
+)
+
+map <- map %>%
+  addLayersControl(
+    baseGroups = c("Satélite", "OSM", "ESRI Street", "OpenTopo"),
+    overlayGroups = overlay_groups,
+    position = "bottomleft",
+    options = layersControlOptions(
+      collapsed = TRUE,
+      autoZIndex = TRUE
+    )
+  )
+
+# Legenda compacta e fechada por padrão.
+trail_legend_html <- if (length(trail_names) > 0) {
+  paste0(
+    vapply(trail_names, function(nm) {
+      paste0(
+        "<div class='legend-row'>",
+        "<span class='line' style='border-top-color:", trail_color[[nm]], ";'></span>",
+        "<span>", safe_html(nm), "</span>",
+        "</div>"
+      )
+    }, character(1)),
+    collapse = ""
+  )
+} else {
+  ""
+}
+
+legend_html <- paste0(
+  "<details class='map-legend-details'>",
+  "<summary>Legenda</summary>",
+  "<div class='map-legend'>",
+  "<div class='legend-title'>Camadas</div>",
+  if (!is.null(municipio_sf)) {
+    "<div class='legend-row'><span class='line' style='border-top-color:#D99A27;'></span><span>São Gabriel da Cachoeira</span></div>"
+  } else "",
+  trail_legend_html,
+  if (nrow(project_points) > 0) {
+    paste0(
+      "<div class='legend-row'><span class='dot' style='background:#A93632;'></span>",
+      "<span>Coletas do projeto (n = ", nrow(project_points), ")</span></div>"
+    )
+  } else "",
+  "<div class='legend-row' style='margin-top:.42rem;color:#675F55;'>",
+  "Clique em um agrupamento numerado para aproximar; no zoom máximo, o grupo abre as coletas sobrepostas.",
+  "</div>",
+  "</div>",
+  "</details>"
+)
+
+map <- map %>%
+  addControl(
+    html = legend_html,
+    position = "bottomright",
+    className = "map-legend-control"
+  )
+
+
+# Heatmap suave por escala + modo ponto/contagem + números das coletas em
+# escala próxima + controle de tela cheia. O mapa continua funcionando se
+# o plugin de heatmap não estiver disponível.
+heat_payload <- if (nrow(collection_points) > 0) {
+  lapply(seq_len(nrow(collection_points)), function(i) {
+    list(
+      as.numeric(collection_points$latitude[i]),
+      as.numeric(collection_points$longitude[i]),
+      1
+    )
+  })
+} else {
+  list()
+}
+
+map <- htmlwidgets::onRender(
+  map,
+  "
+  function(el, x, data) {
+    var map = this;
+    var container = map.getContainer();
+    var heat = null;
+    var clusterGroup = null;
+
+    function findClusterGroup(){
+      if(clusterGroup) return clusterGroup;
+      Object.keys(map._layers || {}).some(function(k){
+        var layer = map._layers[k];
+        if(layer && typeof layer.getAllChildMarkers === 'function' &&
+           typeof layer.refreshClusters === 'function'){
+          clusterGroup = layer;
+          return true;
+        }
+        return false;
+      });
+      return clusterGroup;
+    }
+
+    if(window.L && typeof L.heatLayer === 'function' &&
+       data && data.heat && data.heat.length){
+      heat = L.heatLayer(data.heat, {
+        radius: 25,
+        blur: 22,
+        maxZoom: 10,
+        minOpacity: 0.10,
+        gradient: {
+          0.20: '#6E1F1D',
+          0.48: '#A93632',
+          0.72: '#C46A2A',
+          1.00: '#D99A27'
+        }
+      }).addTo(map);
+
+      if(heat._canvas){
+        heat._canvas.classList.add('tsiino-heat-layer');
+      }
+    }
+
+    function closeCollectionLabels(group){
+      if(!group) return;
+      group.eachLayer(function(layer){
+        if(layer && typeof layer.closeTooltip === 'function'){
+          layer.closeTooltip();
+        }
+      });
+    }
+
+    function showVisibleCollectionLabels(group){
+      if(!group) return;
+      group.eachLayer(function(layer){
+        if(layer && typeof layer.openTooltip === 'function' && map.hasLayer(layer)){
+          layer.openTooltip();
+        }
+      });
+    }
+
+    function syncZoomMode(){
+      var z = map.getZoom();
+
+      container.classList.remove('zoom-heat', 'zoom-points', 'zoom-counts');
+
+      if(z <= 6){
+        container.classList.add('zoom-heat');
+      } else if(z <= 10){
+        container.classList.add('zoom-points');
+      } else {
+        container.classList.add('zoom-counts');
+      }
+
+      if(heat){
+        if(z <= 9){
+          if(!map.hasLayer(heat)) heat.addTo(map);
+          if(heat._canvas){
+            heat._canvas.classList.add('tsiino-heat-layer');
+            heat._canvas.style.opacity =
+              z <= 6 ? '0.62' :
+              z === 7 ? '0.40' :
+              z === 8 ? '0.22' : '0.10';
+          }
+        } else if(map.hasLayer(heat)){
+          map.removeLayer(heat);
+        }
+      }
+
+      var group = findClusterGroup();
+      if(group){
+        if(typeof group.refreshClusters === 'function'){
+          group.refreshClusters();
+        }
+
+        closeCollectionLabels(group);
+
+        // Nas escalas mais próximas, os pontos individuais exibem o
+        // identificador da coleta. Registros ainda sobrepostos continuam
+        // como agrupamento e podem ser abertos com clique.
+        if(z >= 15){
+          window.setTimeout(function(){
+            showVisibleCollectionLabels(group);
+          }, 80);
+        }
+      }
+    }
+
+    map.on('zoomend moveend', syncZoomMode);
+
+    var group = findClusterGroup();
+    if(group){
+      group.on('spiderfied', function(){
+        window.setTimeout(syncZoomMode, 120);
+      });
+      group.on('unspiderfied', function(){
+        window.setTimeout(syncZoomMode, 120);
+      });
+      group.on('animationend', function(){
+        window.setTimeout(syncZoomMode, 40);
+      });
+    }
+
+    // Controle de tela cheia usando a API nativa do navegador.
+    if(!container.querySelector('.tsiino-fullscreen-control')){
+      var FullscreenControl = L.Control.extend({
+        options: { position: 'topleft' },
+        onAdd: function(){
+          var wrap = L.DomUtil.create('div', 'leaflet-bar tsiino-fullscreen-control');
+          var button = L.DomUtil.create('a', '', wrap);
+          button.href = '#';
+          button.innerHTML = '&#x26F6;';
+          button.title = 'Abrir mapa em tela cheia';
+          button.setAttribute('aria-label', 'Abrir mapa em tela cheia');
+          button.setAttribute('role', 'button');
+
+          L.DomEvent.disableClickPropagation(wrap);
+          L.DomEvent.disableScrollPropagation(wrap);
+
+          L.DomEvent.on(button, 'click', function(ev){
+            L.DomEvent.stop(ev);
+
+            var isNativeFull =
+              document.fullscreenElement === container ||
+              document.webkitFullscreenElement === container;
+
+            if(isNativeFull){
+              if(document.exitFullscreen) document.exitFullscreen();
+              else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+              return;
+            }
+
+            if(container.classList.contains('tsiino-faux-fullscreen')){
+              container.classList.remove('tsiino-faux-fullscreen');
+              document.body.classList.remove('tsiino-map-fullscreen');
+              window.setTimeout(function(){ map.invalidateSize(); }, 80);
+              return;
+            }
+
+            if(container.requestFullscreen){
+              container.requestFullscreen();
+            } else if(container.webkitRequestFullscreen){
+              container.webkitRequestFullscreen();
+            } else {
+              container.classList.add('tsiino-faux-fullscreen');
+              document.body.classList.add('tsiino-map-fullscreen');
+              window.setTimeout(function(){ map.invalidateSize(); }, 80);
+            }
+          });
+
+          return wrap;
+        }
+      });
+
+      map.addControl(new FullscreenControl());
+    }
+
+    function afterFullscreenChange(){
+      window.setTimeout(function(){
+        map.invalidateSize();
+        syncZoomMode();
+      }, 100);
+    }
+
+    document.addEventListener('fullscreenchange', afterFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', afterFullscreenChange);
+
+    document.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape' && container.classList.contains('tsiino-faux-fullscreen')){
+        container.classList.remove('tsiino-faux-fullscreen');
+        document.body.classList.remove('tsiino-map-fullscreen');
+        window.setTimeout(function(){ map.invalidateSize(); }, 80);
+      }
+    });
+
+    window.setTimeout(function(){
+      map.invalidateSize();
+      syncZoomMode();
+    }, 180);
+  }
+  ",
+  data = list(heat = heat_payload)
+)
+
+map
+```
+
+```{=html}
+</section>
+
+<div class="bg-window"></div>
+
+<section id="lista-expedicoes" class="expeditions-shell">
+  <div class="expeditions-heading">
+    <div class="eyebrow" data-i18n="expeditions.list.eyebrow">Registros de campo</div>
+    <h2 data-i18n="expeditions.list.title">Expedições</h2>
+    <p data-i18n="expeditions.list.description">Fotografias e registros das expedições do projeto..</p>
+  </div>
+```
+
+```{r expedition-sections}
+library(htmltools)
+
+# =========================================================================
+# METADADOS DAS EXPEDIÇÕES — mantêm a lógica antiga das fotos/cards.
+# Este arquivo NÃO alimenta mais os pontos do mapa.
+# =========================================================================
+
+exp_meta_path <- find_up(file.path("_input_data", "expedicoes_tsiino.csv"))
+photo_root_abs <- find_up(file.path("_input_data", "expedicoes_fotos"))
+photo_root_html_rel <- file.path("..", "_input_data", "expedicoes_fotos")
+
+read_expedition_metadata <- function(path) {
+  if (is.na(path) || !file.exists(path)) return(data.frame())
+
+  raw <- tryCatch(read_delimited_auto(path), error = function(e) NULL)
+  if (is.null(raw) || nrow(raw) == 0) return(data.frame())
+
+  get_meta <- function(candidates) get_col_chr(raw, candidates)
+
+  out <- data.frame(
+    expedicao = first_nonempty(
+      get_meta(c("expedicao", "expedição", "expedition", "nome", "name"))
+    ),
+    input_id = first_nonempty(
+      get_meta(c("expedicao_id", "expedição_id", "id", "slug", "codigo", "código"))
+    ),
+    localidade = first_nonempty(
+      get_meta(c("localidade", "local", "site", "ponto", "locality"))
+    ),
+    data_exp = first_nonempty(
+      get_meta(c("data", "date", "periodo", "período"))
+    ),
+    comunidade = first_nonempty(
+      get_meta(c("comunidade", "community", "aldeia"))
+    ),
+    municipio = first_nonempty(
+      get_meta(c("municipio", "município", "city", "cidade"))
+    ),
+    equipe = first_nonempty(
+      get_meta(c("equipe", "team", "pesquisadores", "coletores", "collectors"))
+    ),
+    observacoes = first_nonempty(
+      get_meta(c("observacoes", "observações", "obs", "notes", "comentarios", "comentários"))
+    ),
+    resumo = first_nonempty(
+      get_meta(c("resumo", "descricao", "descrição", "description"))
+    ),
+    pasta_fotos = clean_photo_folder(first_nonempty(
+      get_meta(c("pasta_fotos", "fotos", "folder", "photo_folder", "pasta", "imagens"))
+    )),
+    stringsAsFactors = FALSE
+  )
+
+  out$expedicao[!nz(out$expedicao)] <- paste0("Expedição ", which(!nz(out$expedicao)))
+
+  ids <- out$input_id
+  ids[!nz(ids)] <- out$expedicao[!nz(ids)]
+  out$expedicao_id <- slugify(ids)
+  out$section_id <- paste0("exp-", out$expedicao_id)
+
+  out$pasta_fotos[!nz(out$pasta_fotos)] <- out$expedicao_id[!nz(out$pasta_fotos)]
+  out
+}
+
+expedicoes <- read_expedition_metadata(exp_meta_path)
+
+# Fallback: se o CSV ainda não existir, cada subpasta de expedicoes_fotos
+# vira uma expedição para que a galeria continue funcionando.
+if (nrow(expedicoes) == 0 && !is.na(photo_root_abs) && dir.exists(photo_root_abs)) {
+  folders <- list.dirs(photo_root_abs, recursive = FALSE, full.names = FALSE)
+  folders <- folders[nz(folders)]
+
+  if (length(folders) > 0) {
+    titles <- gsub("[-_]", " ", folders)
+    titles <- tools::toTitleCase(titles)
+
+    expedicoes <- data.frame(
+      expedicao = titles,
+      input_id = folders,
+      localidade = NA_character_,
+      data_exp = NA_character_,
+      comunidade = NA_character_,
+      municipio = NA_character_,
+      equipe = NA_character_,
+      observacoes = NA_character_,
+      resumo = NA_character_,
+      pasta_fotos = folders,
+      expedicao_id = slugify(folders),
+      stringsAsFactors = FALSE
+    )
+    expedicoes$section_id <- paste0("exp-", expedicoes$expedicao_id)
+  }
+}
+
+get_photos <- function(folder) {
+  folder <- clean_photo_folder(folder)[1]
+
+  if (is.na(photo_root_abs) || is.na(folder) || !nzchar(folder)) {
+    return(character())
+  }
+
+  d <- file.path(photo_root_abs, folder)
+  if (!dir.exists(d)) return(character())
+
+  f <- list.files(
+    d,
+    pattern = "\\.(jpg|jpeg|png|webp)$",
+    full.names = FALSE,
+    ignore.case = TRUE
+  )
+
+  f <- f[!grepl("^\\.", f)]
+  if (length(f) == 0) return(character())
+
+  f <- sort(f)
+  gsub("\\\\", "/", file.path(photo_root_html_rel, folder, f))
+}
+
+make_meta <- function(label, value, key = NULL) {
+  value <- as.character(value)[1]
+  if (!nz(value)) return(NULL)
+
+  if (!is.null(key) && nzchar(key)) {
+    tags$span(
+      class = "meta-pill",
+      tags$span(`data-i18n` = key, label),
+      ": ",
+      value
+    )
+  } else {
+    tags$span(class = "meta-pill", paste0(label, ": ", value))
+  }
+}
+
+make_gallery <- function(photos, title, section_id) {
+  if (length(photos) == 0) {
+    return(
+      tags$div(
+        class = "empty-gallery",
+        tags$span(`data-i18n` = "expeditions.card.noPhoto", "Nenhuma foto encontrada para esta expedição.")
+      )
+    )
+  }
+
+  slides <- lapply(seq_along(photos), function(j) {
+    tags$figure(
+      class = "exp-slide",
+      tags$img(
+        src = photos[j],
+        alt = paste(title, "foto", j),
+        loading = if (j == 1) "eager" else "lazy",
+        decoding = "async"
+      ),
+      tags$figcaption(
+        tagList(
+          tags$span(`data-i18n` = "common.photo", "Foto"),
+          " ", j, " · ", title
+        )
+      )
+    )
+  })
+
+  dots <- lapply(seq_along(photos), function(j) {
+    tags$button(
+      class = paste("exp-carousel-dot", if (j == 1) "is-current" else ""),
+      type = "button",
+      `aria-label` = paste("Ir para foto", j),
+      `aria-current` = if (j == 1) "true" else "false"
+    )
+  })
+
+  tags$div(
+    class = "exp-carousel",
+    id = paste0("carousel-", section_id),
+    `data-index` = "0",
+    `data-single` = if (length(photos) == 1) "true" else "false",
+    tags$div(class = "exp-carousel-track", do.call(tagList, slides)),
+    tags$button(
+      class = "exp-carousel-nav exp-carousel-prev",
+      type = "button",
+      `aria-label` = "Foto anterior",
+      "‹"
+    ),
+    tags$button(
+      class = "exp-carousel-nav exp-carousel-next",
+      type = "button",
+      `aria-label` = "Próxima foto",
+      "›"
+    ),
+    tags$div(class = "exp-carousel-dots", do.call(tagList, dots))
+  )
+}
+
+make_exp_card <- function(i) {
+  x <- expedicoes[i, , drop = FALSE]
+  photos <- get_photos(x$pasta_fotos)
+
+  title <- ifelse(
+    nz(x$expedicao),
+    x$expedicao,
+    paste0("Expedição ", i)
+  )
+
+  summary_txt <- ifelse(
+    nz(x$resumo),
+    x$resumo,
+    x$observacoes
+  )
+
+  tags$section(
+    class = "expedition-card",
+    id = x$section_id,
+    tags$div(
+      class = "expedition-eyebrow",
+      `data-i18n` = "expeditions.card.eyebrow",
+      "Expedição"
+    ),
+    tags$h3(title),
+    tags$div(
+      class = "expedition-meta",
+      make_meta("Data", x$data_exp, "common.date"),
+      make_meta("Localidade", x$localidade, "common.locality"),
+      make_meta("Comunidade", x$comunidade, "common.community"),
+      make_meta("Município", x$municipio, "common.municipality"),
+      make_meta("Equipe", x$equipe, "common.team")
+    ),
+    if (nz(summary_txt)) tags$p(class = "expedition-summary", summary_txt),
+    make_gallery(photos, title, x$section_id)
+  )
+}
+
+make_page_break <- function(position_index) {
+  n <- ((position_index - 1) %% 5) + 1
+  filename <- if (n == 1) "page_break.jpg" else paste0("page_break_", n, ".jpg")
+
+  tags$figure(
+    class = "expedition-break",
+    `aria-hidden` = "true",
+    tags$img(
+      src = file.path("..", "figures", filename),
+      alt = "",
+      loading = "lazy",
+      decoding = "async",
+      onerror = "this.closest('.expedition-break').style.display='none';"
+    )
+  )
+}
+
+if (nrow(expedicoes) > 0) {
+  items <- list()
+
+  for (i in seq_len(nrow(expedicoes))) {
+    items[[length(items) + 1]] <- make_exp_card(i)
+
+    if (i < nrow(expedicoes)) {
+      items[[length(items) + 1]] <- make_page_break(i)
+    }
+  }
+
+  tagList(
+    tags$div(
+      class = "expedition-grid",
+      do.call(tagList, items)
+    )
+  )
+} else {
+  tags$div(
+    class = "expedition-card",
+    tags$p(
+      `data-i18n` = "expeditions.list.empty",
+      "Nenhuma expedição foi cadastrada em _input_data/expedicoes_tsiino.csv e nenhuma subpasta foi encontrada em _input_data/expedicoes_fotos/."
+    )
+  )
+}
+```
+
+```{=html}
+</section>
+```

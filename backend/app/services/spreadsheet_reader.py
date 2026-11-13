@@ -1,208 +1,152 @@
+"""Leitura de planilhas .xlsx/.xlsm em uma única passada (modo streaming do openpyxl)."""
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
 from openpyxl import load_workbook
 
-from app.services.normalization import clean_cell, normalize_key, to_float
-from app.services.schema_detector import CANONICAL_COLUMNS, COLUMN_ALIASES, REQUIRED_MINIMUM, HeaderDetection
+from app.services.inpa_schema import HeaderDetection, detect_header, detect_standard_header
+from app.services.normalization import clean_cell, json_value, norm, parse_coordinate
+
+REPORT_SHEET = "Validação Tsiino"
+PREFERRED_SHEETS = ("Espécimes", "Especimes", "Specimens", "Sheet1", "Planilha1")
+EXAMPLE_MARKERS = ("linha de exemplo", "exemplo ->", "a. coletor", "b. auxiliar", "encholirium horridum")
 
 
+@dataclass
+class SheetData:
+    sheet_name: str
+    sheet_names: list[str]
+    rows: list[list[Any]]           # valores já limpos (clean_cell), linha 1 = índice 0
+    truncated: bool = False
+    max_rows: int = 0
+
+
+@dataclass
 class ParsedSpreadsheet:
-    def __init__(self, header: HeaderDetection, records: list[dict[str, Any]]):
-        self.header = header
-        self.records = records
+    header: HeaderDetection
+    records: list[dict[str, Any]]
+    sheet: SheetData
+    skipped_example_rows: list[int] = field(default_factory=list)
 
 
-def _map_header(value: Any) -> str | None:
-    raw = clean_cell(value)
-    if raw is None:
-        return None
-    if raw in CANONICAL_COLUMNS:
-        return raw
-    key = normalize_key(raw)
-    if key in CANONICAL_COLUMNS:
-        return key
-    return COLUMN_ALIASES.get(key)
-
-
-def _safe_cell(value: Any) -> Any:
-    return clean_cell(value)
-
-
-def _row_values(row: tuple[Any, ...]) -> list[Any]:
-    return [_safe_cell(value) for value in row]
-
-
-def _detect_header_from_rows(rows: list[list[Any]], max_scan_rows: int = 20) -> HeaderDetection:
-    best: HeaderDetection | None = None
-    best_score = -1
-
-    scan_limit = min(len(rows), max_scan_rows)
-    for row_idx0 in range(scan_limit):
-        values = rows[row_idx0]
-        raw_headers = [str(v).strip() if v is not None else '' for v in values]
-        mapped: dict[str, str] = {}
-        unknown: list[str] = []
-
-        for raw in raw_headers:
-            if not raw:
-                continue
-            canonical = _map_header(raw)
-            if canonical:
-                mapped[raw] = canonical
-            else:
-                # Text-heavy instruction rows in INPA templates should not dominate.
-                if len(raw) <= 80:
-                    unknown.append(raw)
-
-        mapped_values = set(mapped.values())
-        score = len(mapped_values & set(REQUIRED_MINIMUM)) * 3 + len(mapped_values & set(CANONICAL_COLUMNS))
-        if score > best_score:
-            missing = [col for col in REQUIRED_MINIMUM if col not in mapped_values]
-            best = HeaderDetection(
-                header_row=row_idx0 + 1,
-                mapping=mapped,
-                raw_headers=raw_headers,
-                missing_minimum=missing,
-                unknown_headers=unknown,
-            )
-            best_score = score
-
-    if best is None or best_score < 3:
-        raise ValueError('Não foi possível detectar a linha de cabeçalho da planilha.')
-    return best
-
-
-def _looks_like_template_example(row_idx: int, header_row: int, raw: dict[str, Any]) -> bool:
-    if row_idx != header_row + 1:
-        return False
-    joined = ' '.join(str(v).strip().lower() for v in raw.values() if v is not None)
-    example_markers = ['a. coletor', 'b. auxiliar', 'exemplo', 'encholirium horridum', 'bromeliaceae encholirium']
-    return any(marker in joined for marker in example_markers)
-
-
-def _open_workbook(path: Path):
-    # read_only=True avoids a class of openpyxl errors in files with odd worksheet dimensions.
-    # If a workbook cannot be streamed, fall back to normal mode.
-    try:
-        return load_workbook(path, data_only=True, read_only=True)
-    except Exception:
-        return load_workbook(path, data_only=True, read_only=False)
-
-
-def _select_sheet(wb, sheet_name: str | None):
+def _select_sheet(names: list[str], sheet_name: str | None) -> str:
     if sheet_name:
-        if sheet_name not in wb.sheetnames:
-            available = ', '.join(wb.sheetnames)
-            raise ValueError(f"A aba '{sheet_name}' não foi encontrada. Abas disponíveis: {available}")
-        return wb[sheet_name]
-    # Prefer the INPA/BRAHMS sheet when present, otherwise use the first sheet.
-    for preferred in ('Espécimes', 'Especimes', 'Specimens', 'Sheet1'):
-        if preferred in wb.sheetnames:
-            return wb[preferred]
-    return wb[wb.sheetnames[0]]
+        if sheet_name in names:
+            return sheet_name
+        wanted = norm(sheet_name)
+        for name in names:
+            if norm(name) == wanted:
+                return name
+        raise ValueError(f"A aba '{sheet_name}' não foi encontrada. Abas disponíveis: {', '.join(names)}")
+    for preferred in PREFERRED_SHEETS:
+        if preferred in names:
+            return preferred
+    for name in names:
+        if name != REPORT_SHEET:
+            return name
+    return names[0]
 
 
-def parse_xlsx(path: Path, sheet_name: str | None = None) -> ParsedSpreadsheet:
-    wb = _open_workbook(path)
+def read_sheet(source: bytes | Path, sheet_name: str | None = None, max_rows: int = 5000,
+               header_allowance: int = 30) -> SheetData:
+    """Lê a aba escolhida inteira para memória (até ``max_rows`` linhas de dados)."""
+    handle = BytesIO(source) if isinstance(source, (bytes, bytearray)) else source
     try:
-        ws = _select_sheet(wb, sheet_name)
-
+        wb = load_workbook(handle, read_only=True, data_only=True)
+    except Exception as exc:  # arquivo corrompido, senha, formato antigo .xls renomeado etc.
+        raise ValueError(f"Não foi possível abrir a planilha ({exc.__class__.__name__}). "
+                         "Confirme que é um arquivo .xlsx/.xlsm válido e sem senha.") from exc
+    try:
+        names = list(wb.sheetnames)
+        title = _select_sheet(names, sheet_name)
+        ws = wb[title]
+        limit = max_rows + header_allowance
         rows: list[list[Any]] = []
-        # Avoid ws.max_row/ws[1] because some browser-edited or legacy spreadsheets expose None-like dimensions.
-        # IMPORTANT on Windows: read all rows before returning and close the workbook in finally,
-        # otherwise TemporaryDirectory cleanup can fail with WinError 32 because openpyxl keeps
-        # the uploaded .xlsx file handle open.
+        truncated = False
         for row in ws.iter_rows(values_only=True):
-            values = _row_values(row)
-            # Keep instruction rows; header detection needs them for row indices, but trim trailing empty cells.
+            values = [clean_cell(v) for v in row]
             while values and values[-1] is None:
                 values.pop()
+            if len(rows) >= limit:
+                if values:
+                    truncated = True
+                    break
+                continue
             rows.append(values)
-            if len(rows) >= 5000:
-                break
     finally:
-        close = getattr(wb, 'close', None)
-        if callable(close):
-            close()
-
+        wb.close()
+    while rows and not rows[-1]:
+        rows.pop()
     if not rows:
-        raise ValueError('A planilha está vazia.')
+        raise ValueError("A planilha está vazia.")
+    return SheetData(sheet_name=title, sheet_names=names, rows=rows, truncated=truncated, max_rows=max_rows)
 
-    header = _detect_header_from_rows(rows)
-    header_idx0 = header.header_row - 1
-    header_values = header.raw_headers
-    raw_to_canonical = header.mapping
-    useful_header_count = max(1, len([h for h in header_values if h]))
 
+def _is_example_row(raw: dict[str, Any]) -> bool:
+    joined = " ".join(str(v).lower() for v in list(raw.values())[:6] if v is not None)
+    return any(marker in joined for marker in EXAMPLE_MARKERS)
+
+
+def records_from_sheet(sheet: SheetData, header: HeaderDetection, max_rows: int | None = None) -> ParsedSpreadsheet:
+    headers = header.raw_headers
+    mapping = header.mapping
     records: list[dict[str, Any]] = []
-    for row_idx0 in range(header_idx0 + 1, len(rows)):
-        row_idx = row_idx0 + 1
-        values = rows[row_idx0]
+    skipped: list[int] = []
+    limit = max_rows or sheet.max_rows or 5000
+    for idx0 in range(header.header_row, len(sheet.rows)):
+        values = sheet.rows[idx0]
+        if not any(v is not None for v in values):
+            continue
+        row_number = idx0 + 1
         raw: dict[str, Any] = {}
-        canonical: dict[str, Any] = {'_row_number': row_idx, '_raw': raw}
-        empty_count = 0
-
-        for pos, raw_header in enumerate(header_values):
-            if not raw_header:
+        record: dict[str, Any] = {"_row_number": row_number}
+        for pos, name in enumerate(headers):
+            if not name:
                 continue
             value = values[pos] if pos < len(values) else None
-            value = _safe_cell(value)
-            raw[raw_header] = value
-            if value is None:
-                empty_count += 1
-            canonical_name = raw_to_canonical.get(raw_header)
-            if canonical_name:
-                canonical[canonical_name] = value
-
-        if empty_count >= useful_header_count - 1:
+            raw[name] = json_value(value)
+            canon = mapping.get(name)
+            if canon and canon not in record:
+                record[canon] = value
+        if not any(v not in (None, "") for v in raw.values()):
             continue
-        if _looks_like_template_example(row_idx, header.header_row, raw):
+        if idx0 == header.header_row and _is_example_row(raw):
+            skipped.append(row_number)
             continue
+        lat = parse_coordinate(record.get("lat"))
+        lon = parse_coordinate(record.get("long"))
+        record["_lat"] = lat
+        record["_long"] = lon
+        record["lat"] = lat.value if lat.value is not None else record.get("lat")
+        record["long"] = lon.value if lon.value is not None else record.get("long")
+        record["_raw"] = raw
+        records.append(record)
+        if len(records) >= limit:
+            break
+    return ParsedSpreadsheet(header=header, records=records, sheet=sheet, skipped_example_rows=skipped)
 
-        canonical['lat'] = to_float(canonical.get('lat'))
-        canonical['long'] = to_float(canonical.get('long'))
-        records.append(canonical)
 
-    return ParsedSpreadsheet(header=header, records=records)
+def parse_xlsx(source: bytes | Path, sheet_name: str | None = None, *, max_rows: int = 5000,
+               strict: bool = False) -> ParsedSpreadsheet:
+    sheet = read_sheet(source, sheet_name=sheet_name, max_rows=max_rows)
+    if strict:
+        header = detect_standard_header(sheet.rows)
+        if header is None:
+            raise ValueError("Não foi possível detectar o cabeçalho técnico INPA/BRAHMS. Use o mapeador de colunas.")
+    else:
+        header = detect_standard_header(sheet.rows) or detect_header(sheet.rows)
+    return records_from_sheet(sheet, header, max_rows=max_rows)
 
-# TSIINO_SPREADSHEET_READER_DETECTOR_V34
-def _detect_header_from_rows(rows, max_scan_rows: int = 20):
-    try:
-        from app.services.schema_detector import _tsiino_detect_header_from_values_v34
-        return _tsiino_detect_header_from_values_v34(rows, max_scan_rows=max_scan_rows)
-    except Exception:
-        best = None
-        best_score = -1
-        for row_idx, row in enumerate(rows[:max_scan_rows], start=1):
-            raw_headers = [clean_cell(v) or '' for v in row]
-            mapped = {}
-            unknown = []
-            for raw in raw_headers:
-                if not raw:
-                    continue
-                canonical = _map_header(raw)
-                if canonical:
-                    mapped.setdefault(raw, canonical)
-                else:
-                    unknown.append(raw)
-            score = len(set(mapped.values()) & set(REQUIRED_MINIMUM)) + len(set(mapped.values()) & set(CANONICAL_COLUMNS))
-            if score > best_score:
-                missing = [col for col in REQUIRED_MINIMUM if col not in set(mapped.values())]
-                best = HeaderDetection(row_idx, mapped, raw_headers, missing, unknown)
-                best_score = score
-        if best is None or best_score < 3:
-            raise ValueError('Não foi possível detectar a linha de cabeçalho da planilha.')
-        return best
 
-# TSIINO_STANDARD_READER_DETECTOR_V36
-def _detect_header_from_rows(rows, max_scan_rows: int = 25):
-    try:
-        from app.services.schema_detector import _tsiino_v36_detect_header_from_values
-        return _tsiino_v36_detect_header_from_values(rows, max_scan_rows=max_scan_rows)
-    except Exception as exc:
-        # Propaga a falha para o fluxo de mapeamento, sem aceitar cabeçalhos descritivos como padrão.
-        raise ValueError(str(exc))
-
+def public_record(record: dict[str, Any]) -> dict[str, Any]:
+    """Versão do registro para JSON (sem objetos internos)."""
+    out: dict[str, Any] = {}
+    for key, value in record.items():
+        if key in ("_lat", "_long"):
+            continue
+        out[key] = value if key == "_raw" else json_value(value)
+    return out

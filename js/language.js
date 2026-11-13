@@ -1,4 +1,4 @@
-/* Tsiino Hiiwiida language switcher — full-site runtime v3
+/* Tsiino Hiiwiida language switcher — full-site runtime v4
  * Source language: Portuguese (pt-BR). Target: English.
  * Designed for Quarto static pages, R-generated HTML widgets, Leaflet popups,
  * Plotly/SVG labels, and dynamically inserted content.
@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  window.TSIINO_TRANSLATION_RUNTIME_VERSION = "full-site-v3-2026-09-21";
+  window.TSIINO_TRANSLATION_RUNTIME_VERSION = "full-site-v4-2026-10-27";
   if (window.TSIINO_TRANSLATION_RUNTIME_ACTIVE) return;
   window.TSIINO_TRANSLATION_RUNTIME_ACTIVE = true;
 
@@ -24,7 +24,7 @@
     "script", "style", "code", "pre", "kbd", "samp", "textarea", "noscript",
     "template", ".tsiino-language-control", ".MathJax", ".sourceCode",
     "[translate=\"no\"]", ".notranslate", ".team-name", ".popup-taxon",
-    ".species-taxon-trigger em", ".taxon-record-popup > strong"
+    ".species-name em"
   ].join(",");
 
   const attrsToTranslate = ["placeholder", "title", "aria-label", "alt", "data-label", "value"];

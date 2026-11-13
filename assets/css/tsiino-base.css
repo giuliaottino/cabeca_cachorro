@@ -1,0 +1,991 @@
+/* =========================================================================
+   tsiino-base.css — sistema visual comum do site Tsiino Hiiwiida
+   -------------------------------------------------------------------------
+   Ordem de carregamento em cada página:
+     1. Bootstrap/Quarto (spacelab + theme.scss) e styles.css   → <head>
+     2. assets/css/pages/<pagina>.css   (estilos legados da página)
+     3. assets/css/tsiino-base.css      (este arquivo — vem por último)
+
+   Este arquivo define os tokens (cor, espaço, tipo, raio) e uma camada de
+   refinamento: menos caixas, sombras e ornamentos; tipografia em escala;
+   uma única cor de destaque. Ele NÃO cria breakpoints novos: os media
+   queries aqui reutilizam os breakpoints já existentes no site
+   (991.98px = colapso da navbar/hero; 767.98px = mobile).
+
+   Sobre o !important: o CSS legado das páginas usa !important em ~2.800
+   declarações. Para que esta camada prevaleça sem reescrever o legado,
+   as regras abaixo usam !important e prefixo "html body". Ao limpar o
+   legado de uma página, os !important daqui podem ser retirados.
+   ========================================================================= */
+
+
+/* -------------------------------------------------------------------------
+   1. Tokens
+   ------------------------------------------------------------------------- */
+:root {
+  /* Cores — base neutra + um destaque (verde da marca) */
+  --tsi-ink: #171717;            /* títulos e texto forte            */
+  --tsi-text: #2a2a28;           /* texto corrido                    */
+  --tsi-muted: #5f5e5a;          /* legendas, rótulos                */
+  --tsi-faint: #8a8984;          /* metadados                        */
+  --tsi-line: rgba(23, 23, 23, 0.12);
+  --tsi-line-strong: rgba(23, 23, 23, 0.22);
+  --tsi-bg: #ffffff;
+  --tsi-bg-subtle: #f5f5f3;      /* variação sutil para blocos       */
+  --tsi-bg-dark: #1c1f19;        /* faixas escuras (fotos, rodapé)   */
+  --tsi-on-dark: #f4f3ef;
+  --tsi-on-dark-muted: rgba(244, 243, 239, 0.74);
+
+  --tsi-accent: #626A38;         /* único destaque: verde da marca   */
+  --tsi-accent-strong: #4b5229;  /* hover/links sobre fundo claro    */
+  --tsi-accent-soft: rgba(98, 106, 56, 0.10);
+  --tsi-danger: #A93632;         /* só para erro/alerta              */
+
+  /* Espaçamento — múltiplos de 4px */
+  --tsi-space-1: 4px;
+  --tsi-space-2: 8px;
+  --tsi-space-3: 12px;
+  --tsi-space-4: 16px;
+  --tsi-space-5: 24px;
+  --tsi-space-6: 32px;
+  --tsi-space-7: 48px;
+  --tsi-space-8: 64px;
+  --tsi-space-9: 96px;
+
+  /* Tipografia — escala ~1.25, com clamp só nos tamanhos de exibição */
+  --tsi-font-sans: "Montserrat", Arial, sans-serif;
+  --tsi-font-serif: "Source Serif 4", Georgia, serif;
+  --tsi-font-mono: "Space Mono", ui-monospace, monospace;
+  --tsi-fs-xs: 0.75rem;     /* 12.75px com base 17px */
+  --tsi-fs-sm: 0.875rem;
+  --tsi-fs-base: 1rem;
+  --tsi-fs-md: 1.125rem;
+  --tsi-fs-lg: 1.25rem;
+  --tsi-fs-xl: 1.5rem;
+  --tsi-fs-2xl: clamp(1.5rem, 1.2rem + 1vw, 1.875rem);   /* h2 de seção   */
+  --tsi-fs-3xl: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);  /* títulos fortes */
+  --tsi-fs-display: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);/* h1 dos heroes */
+  --tsi-lh-body: 1.6;
+  --tsi-lh-snug: 1.3;
+  --tsi-lh-tight: 1.1;
+  --tsi-tracking-tight: -0.015em;
+
+  /* Forma */
+  --tsi-radius: 6px;
+  --tsi-radius-lg: 10px;
+}
+
+
+/* -------------------------------------------------------------------------
+   2. Base global
+   ------------------------------------------------------------------------- */
+html body {
+  line-height: var(--tsi-lh-body);
+}
+
+/* Navegação e dropdowns: sem caixa-alta, espaçamento normal */
+html body #quarto-header .navbar .nav-link,
+html body #quarto-header .dropdown-menu .dropdown-item {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+html body #quarto-header .dropdown-menu {
+  border: 1px solid var(--tsi-line) !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  padding: var(--tsi-space-1) 0 !important;
+}
+
+/* Cabeçalho de seção: remove o traço decorativo antes do título
+   e a linha sob o h2; o título passa a ser neutro (não vermelho). */
+html body .section-title {
+  display: block !important;
+  margin-bottom: var(--tsi-space-5) !important;
+}
+html body .section-title::before {
+  display: none !important;
+  content: none !important;
+}
+html body .section-title h2,
+html body .content-card > h2 {
+  font-size: var(--tsi-fs-2xl) !important;
+  font-weight: 700 !important;
+  line-height: var(--tsi-lh-snug) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+  color: var(--tsi-ink) !important;
+  border-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+}
+
+/* Fundo da página: branco neutro no lugar do creme.
+   Expedições mantém o fundo escuro próprio (a página é toda fotográfica). */
+html body:not(:has(.page-hero-expeditions)) {
+  background: var(--tsi-bg) !important;
+  background-image: none !important;
+}
+
+/* Seções principais: sem sombra, sem faixa grossa no topo, sem cantos.
+   A separação entre seções vira espaço + uma linha fina.
+
+   Reforço de especificidade: várias seções têm regras legadas do tipo
+   "#id.classe.classe.classe !important". O :is() com os IDs dá peso de
+   ID, e ".content-card" repetido soma 4 classes — o suficiente para
+   prevalecer sem tocar no legado. */
+html body .content-card,
+html body :is(#o-projeto, #videos-projeto, #metodo-integrado, #salvaguardas-cta,
+  #divulgacao, #pesquisadores-responsaveis, #mapa-expedicoes, #introducao,
+  #resultados-indicadores, #paineis-especificos, #infraestrutura-dados,
+  #conservacao-catalogo, #visao-geral-equipe, #bolsistas-indigenas,
+  #bolsistas-instituicoes, #equipe-ampliada).content-card.content-card.content-card.content-card {
+  background: var(--tsi-bg) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--tsi-line) !important;
+  border-radius: 0 !important;
+}
+html body :is(#o-projeto, #videos-projeto, #metodo-integrado, #salvaguardas-cta,
+  #divulgacao, #pesquisadores-responsaveis, #mapa-expedicoes, #introducao,
+  #resultados-indicadores, #paineis-especificos, #infraestrutura-dados,
+  #conservacao-catalogo, #visao-geral-equipe, #bolsistas-indigenas,
+  #bolsistas-instituicoes, #equipe-ampliada).content-card.content-card.content-card.content-card::before,
+html body :is(#o-projeto, #videos-projeto, #metodo-integrado, #salvaguardas-cta,
+  #divulgacao, #pesquisadores-responsaveis, #mapa-expedicoes, #introducao,
+  #resultados-indicadores, #paineis-especificos, #infraestrutura-dados,
+  #conservacao-catalogo, #visao-geral-equipe, #bolsistas-indigenas,
+  #bolsistas-instituicoes, #equipe-ampliada) .section-title.section-title::before {
+  display: none !important;
+}
+html body :is(#o-projeto, #videos-projeto, #metodo-integrado, #salvaguardas-cta,
+  #divulgacao, #pesquisadores-responsaveis, #mapa-expedicoes, #introducao,
+  #resultados-indicadores, #paineis-especificos, #infraestrutura-dados,
+  #conservacao-catalogo, #visao-geral-equipe, #bolsistas-indigenas,
+  #bolsistas-instituicoes, #equipe-ampliada) .section-title.section-title {
+  display: block !important;
+}
+html body :is(#o-projeto, #videos-projeto, #metodo-integrado, #salvaguardas-cta,
+  #divulgacao, #pesquisadores-responsaveis, #mapa-expedicoes, #introducao,
+  #resultados-indicadores, #paineis-especificos, #infraestrutura-dados,
+  #conservacao-catalogo, #visao-geral-equipe, #bolsistas-indigenas,
+  #bolsistas-instituicoes, #equipe-ampliada) .section-title.section-title h2 {
+  font-size: var(--tsi-fs-2xl) !important;
+  font-weight: 700 !important;
+  line-height: var(--tsi-lh-snug) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+  color: var(--tsi-ink) !important;
+  border-bottom: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Botões principais: sem sombra, sem pílula, sem caixa-alta */
+html body .btn-main {
+  background: var(--tsi-accent) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+  font-family: var(--tsi-font-sans) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  padding: var(--tsi-space-2) var(--tsi-space-4) !important;
+  transform: none !important;
+}
+html body .btn-main:hover,
+html body .btn-main:focus-visible {
+  background: var(--tsi-accent-strong) !important;
+}
+
+/* Hero (títulos das páginas): tamanho e espaçamento de letra contidos */
+html body .hero-strip h1,
+html body .page-hero h1,
+html body .conservation-hero h1,
+html body .hv-site-title {
+  font-size: var(--tsi-fs-display) !important;
+  letter-spacing: -0.02em !important;
+  line-height: var(--tsi-lh-tight) !important;
+}
+
+/* Subtítulos do hero: texto normal em vez de monoespaçado em caixa-alta */
+html body .hero-subtitle {
+  font-family: var(--tsi-font-sans) !important;
+  font-size: var(--tsi-fs-md) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   3. Sobre (index)
+   ------------------------------------------------------------------------- */
+
+/* O projeto: o título ocupa a largura toda da grade (antes ficava na
+   coluna central do Quarto, desalinhado do conteúdo abaixo). */
+html body #o-projeto .section-title {
+  grid-column: 1 / -1 !important;
+}
+
+/* Citações de abertura (.lead): fio neutro no lugar da barra ocre */
+html body .lead {
+  border-left: 2px solid var(--tsi-line-strong) !important;
+}
+
+/* Números-chave: menores, na cor do texto */
+html body #o-projeto .about-stat strong,
+html body #o-projeto.content-card.about-section.projeto-editorial .about-stat strong {
+  font-size: var(--tsi-fs-xl) !important;
+  line-height: var(--tsi-lh-tight) !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+  color: var(--tsi-ink) !important;
+}
+
+/* Título "Três eixos do projeto": sem caixa escura, sombra e caixa-alta */
+html body #frentes-integradas .feature-title {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: var(--tsi-ink) !important;
+  text-transform: none !important;
+  font-size: var(--tsi-fs-3xl) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+  line-height: var(--tsi-lh-tight) !important;
+}
+html body #frentes-integradas .feature-title::before,
+html body #frentes-integradas .feature-eyebrow:empty {
+  display: none !important;
+}
+
+html body #frentes-integradas.full-bleed-feature,
+html body #frentes-integradas .feature-title-wrap {
+  background: var(--tsi-bg) !important;
+  background-image: none !important;
+}
+
+/* Painéis dos eixos: cor sólida no lugar dos degradês */
+html body #frentes-integradas .feature-panel {
+  background: var(--tsi-bg-dark) !important;
+  background-image: none !important;
+}
+html body #frentes-integradas .feature-panel::after {
+  display: none !important;
+}
+/* Rótulo "Eixo N": texto simples em vez de selo com sombra */
+html body #frentes-integradas .feature-panel h3 {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: var(--tsi-on-dark-muted) !important;
+}
+
+/* Como o projeto atua: passos sem degradê; número sem círculo */
+html body #metodo-integrado .method-river {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+  gap: var(--tsi-space-2) !important;
+}
+html body #metodo-integrado .method-step {
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  background: var(--tsi-bg-subtle) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body #metodo-integrado .method-number {
+  width: auto !important;
+  height: auto !important;
+  background: none !important;
+  border-radius: 0 !important;
+  color: var(--tsi-muted) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  justify-content: flex-start !important;
+  margin-bottom: var(--tsi-space-3) !important;
+}
+html body #metodo-integrado .method-step h3 {
+  font-size: var(--tsi-fs-lg) !important;
+  letter-spacing: normal !important;
+  color: var(--tsi-ink) !important;
+}
+html body #metodo-integrado .method-step p {
+  color: var(--tsi-text) !important;
+}
+html body #metodo-integrado .impact-card {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--tsi-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: var(--tsi-space-4) 0 0 !important;
+}
+html body #metodo-integrado .impact-card.impact-card {
+  min-height: 0 !important;
+  justify-content: flex-start !important;
+}
+html body #metodo-integrado .impact-card p {
+  margin-top: var(--tsi-space-2) !important;
+}
+html body #metodo-integrado .impact-card h3 {
+  color: var(--tsi-muted) !important;
+}
+html body .method-eyebrow {
+  background: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* Vídeos */
+html body .video-card {
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+html body .video-card .video-caption {
+  background: var(--tsi-bg) !important;
+  background-image: none !important;
+  color: var(--tsi-muted) !important;
+  padding-inline: 0 !important;
+}
+
+/* Salvaguardas: selos de siglas viram texto simples */
+html body #salvaguardas-cta .safeguards-editorial-tags span {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Rede de coordenação: números e painel sem caixa */
+html body #pesquisadores-responsaveis :is(.researchers-panel, .researchers-summary > *) {
+  background: none !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html body #pesquisadores-responsaveis .researchers-panel {
+  padding: 0 !important;
+}
+html body #pesquisadores-responsaveis .researchers-summary > * {
+  border-top: 1px solid var(--tsi-line) !important;
+  padding: var(--tsi-space-3) 0 0 !important;
+}
+html body #pesquisadores-responsaveis .researchers-number {
+  color: var(--tsi-ink) !important;
+  font-size: var(--tsi-fs-xl) !important;
+}
+html body #pesquisadores-responsaveis .researchers-kicker {
+  background: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* Logos institucionais: faixa em cinza sutil (separa do conteúdo sem caixa) */
+html body #logos-institucionais.logos-strip {
+  background: var(--tsi-bg-subtle) !important;
+  border-top: 0 !important;
+}
+
+/* Logos institucionais: sem animação de escala no hover */
+html body .logo-item:hover img {
+  transform: none !important;
+}
+
+/* Objetivos: título em escala de seção, sem sublinhado ornamental */
+html body #objetivos .core-objectives-title {
+  font-size: var(--tsi-fs-3xl) !important;
+  line-height: var(--tsi-lh-tight) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+}
+html body #objetivos .core-objectives-title * {
+  font-size: inherit !important;
+  letter-spacing: inherit !important;
+  margin-left: 0 !important;
+}
+html body #objetivos .core-title-line-b {
+  color: var(--tsi-ink) !important;
+}
+html body #objetivos .core-title-line-b::after,
+html body #objetivos.core-objectives-section::before,
+html body #objetivos.core-objectives-section::after {
+  display: none !important;
+}
+html body #objetivos .core-objectives-title {
+  border-bottom: 0 !important;
+}
+html body #objetivos .core-title-line {
+  text-shadow: none !important;
+}
+html body #objetivos .core-objective-card.core-objective-card {
+  background: var(--tsi-bg) !important;
+  box-shadow: none !important;
+  border: 1px solid var(--tsi-line) !important;
+  border-radius: var(--tsi-radius-lg) !important;
+}
+
+/* Salvaguardas */
+html body #salvaguardas-cta .safeguards-editorial-card {
+  background: var(--tsi-bg-subtle) !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius-lg) !important;
+  box-shadow: none !important;
+}
+
+/* Expedições recentes: título contido sobre as fotos */
+html body #expedicoes-recentes .exp-collage-heading {
+  font-size: var(--tsi-fs-3xl) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+}
+
+/* Divulgação: cartões sem sombra; link e selo sem caixa-alta */
+html body #divulgacao .carousel-slide {
+  box-shadow: none !important;
+  border-radius: var(--tsi-radius-lg) !important;
+}
+html body #divulgacao .carousel-link,
+html body #divulgacao .media-link {
+  font-family: var(--tsi-font-sans) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  text-underline-offset: 3px;
+}
+html body #divulgacao .carousel-type-pill {
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  color: inherit !important;
+  opacity: 0.8;
+}
+html body #divulgacao .media-panel-header::after {
+  display: none !important;
+}
+
+/* Rede de coordenação científica */
+html body .researcher-card {
+  background: var(--tsi-bg-subtle) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+html body .agency-pill {
+  background: none !important;
+  color: var(--tsi-muted) !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   4. Expedições
+   ------------------------------------------------------------------------- */
+html body .expedition-card {
+  box-shadow: none !important;
+  border-radius: var(--tsi-radius-lg) !important;
+}
+html body .meta-pill {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+html body .expedition-break {
+  box-shadow: none !important;
+}
+html body .map-legend {
+  box-shadow: none !important;
+  border-radius: var(--tsi-radius) !important;
+}
+html body .map-legend-details > summary {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   4b. Acesso aos dados
+   ------------------------------------------------------------------------- */
+
+/* Citações e destaques de texto: sem caixa, só o fio lateral */
+html body main p.lead {
+  background: none !important;
+  border: 0 !important;
+  border-left: 2px solid var(--tsi-line-strong) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 0 0 var(--tsi-space-4) !important;
+}
+html body .big-statement {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  font-size: var(--tsi-fs-xl) !important;
+  line-height: var(--tsi-lh-snug) !important;
+  color: var(--tsi-ink) !important;
+}
+
+/* Números de apoio (170+, 2, 4): sem caixa, separados por fio */
+html body .mini-facts .mini-fact {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--tsi-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: var(--tsi-space-3) 0 0 !important;
+}
+html body .mini-facts .mini-fact strong {
+  color: var(--tsi-ink) !important;
+  font-size: var(--tsi-fs-xl) !important;
+}
+
+/* Exsicatas: cartão leve, legenda neutra em vez de faixa verde */
+html body .specimen-panel :is(.specimen-card, .herbarium-mini-card) {
+  background: var(--tsi-bg-subtle) !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+html body .specimen-panel :is(.specimen-card, .herbarium-mini-card) figcaption {
+  background: none !important;
+  color: var(--tsi-muted) !important;
+}
+html body .specimen-panel :is(.specimen-card, .herbarium-mini-card) figcaption b {
+  color: var(--tsi-ink) !important;
+}
+html body .specimen-panel :is(.specimen-card, .herbarium-mini-card) figcaption span {
+  color: var(--tsi-muted) !important;
+}
+
+/* Galeria "Viajantes, coleções…": título simples; selos viram texto */
+html body .full-bleed-gallery {
+  background: var(--tsi-bg) !important;
+}
+html body .full-bleed-gallery .gallery-title-wrap {
+  background: none !important;
+  box-shadow: none !important;
+}
+html body .full-bleed-gallery .gallery-title {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: var(--tsi-ink) !important;
+  text-transform: none !important;
+  font-size: var(--tsi-fs-3xl) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+  line-height: var(--tsi-lh-tight) !important;
+}
+/* Rótulos sobre foto: fundo escuro translúcido discreto, só para legibilidade */
+html body .image-card .chip,
+html body .indicator-photo-card > span {
+  background: rgba(0, 0, 0, 0.5) !important;
+  border-radius: var(--tsi-radius) !important;
+  padding: 2px var(--tsi-space-2) !important;
+  color: #fff !important;
+}
+html body .indicator-photo-card {
+  border-radius: var(--tsi-radius-lg) !important;
+  box-shadow: none !important;
+}
+html body .data-photo-main {
+  border-radius: var(--tsi-radius-lg) !important;
+  box-shadow: none !important;
+}
+html body .data-photo-main .caption {
+  border-radius: var(--tsi-radius) !important;
+}
+
+/* Arquivos de entrada do painel */
+html body .input-status-grid .input-file {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--tsi-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: var(--tsi-space-3) 0 0 !important;
+}
+html body .input-status-grid .input-file > span {
+  background: none !important;
+  color: var(--tsi-accent-strong) !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Painéis: sem caixa externa; o título do painel em escala de seção */
+html body .dashboard-block {
+  background: none !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+html body .dashboard-heading .eyebrow {
+  background: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+html body .dashboard-heading h3 {
+  font-size: var(--tsi-fs-3xl) !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+  line-height: var(--tsi-lh-tight) !important;
+  color: var(--tsi-ink) !important;
+}
+
+/* KPIs: fundo claro, número na cor do texto e em tamanho contido
+   (styles.css força fundo verde-escuro; o seletor .kpi-grid prevalece) */
+html body .kpi-grid .kpi-card {
+  background: var(--tsi-bg-subtle) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+  color: var(--tsi-text) !important;
+}
+html body .kpi-grid .kpi-card .kpi-number {
+  color: var(--tsi-ink) !important;
+  font-size: var(--tsi-fs-xl) !important;
+  line-height: var(--tsi-lh-tight) !important;
+  letter-spacing: normal !important;
+}
+html body .kpi-grid .kpi-card > span {
+  color: var(--tsi-ink) !important;
+}
+html body .kpi-grid .kpi-card > p {
+  color: var(--tsi-muted) !important;
+}
+
+/* Gráficos e rankings: moldura fina, sem sombra; linhas do ranking sem caixas */
+html body .chart-card {
+  background: var(--tsi-bg) !important;
+  background-image: none !important;
+  border: 1px solid var(--tsi-line) !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+html body .rank-card h4 {
+  color: var(--tsi-muted) !important;
+}
+html body .rank-list li {
+  background: none !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--tsi-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Lista de espécies (details/summary): barra clara em vez de faixa escura */
+html body .species-drawer > summary {
+  background: var(--tsi-bg-subtle) !important;
+  background-image: none !important;
+  color: var(--tsi-ink) !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+html body .species-drawer > summary .species-summary-label {
+  color: var(--tsi-ink) !important;
+  font-size: var(--tsi-fs-md) !important;
+}
+html body .species-drawer > summary .species-summary-count {
+  background: none !important;
+  border: 0 !important;
+  color: var(--tsi-muted) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+html body .species-drawer > summary::after {
+  background: none !important;
+  border: 1px solid var(--tsi-line-strong) !important;
+  color: var(--tsi-ink) !important;
+  box-shadow: none !important;
+}
+html body .species-drawer {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+/* Infraestrutura dos dados */
+html body .data-principles article {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--tsi-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: var(--tsi-space-3) 0 0 !important;
+}
+html body .data-principles article b {
+  color: var(--tsi-ink) !important;
+}
+html body .data-infra-visual .data-flow-card {
+  background: var(--tsi-bg-subtle) !important;
+  background-image: none !important;
+  color: var(--tsi-text) !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+html body .data-infra-visual .data-flow-card > span {
+  color: var(--tsi-muted) !important;
+}
+html body .data-infra-visual .data-flow-card li {
+  color: var(--tsi-text) !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   5. Equipe
+   ------------------------------------------------------------------------- */
+html body .team-card {
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  background: var(--tsi-bg-subtle) !important;
+}
+html body .team-card::before {
+  display: none !important;
+}
+html body .team-card:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+/* [data-role] repetido: vence as regras legadas que coloriam nome e cargo
+   por categoria (vermelho/ocre) */
+html body .team-card[data-role] .team-name {
+  color: var(--tsi-ink) !important;
+}
+html body .team-card[data-role] .team-project-role {
+  color: var(--tsi-text) !important;
+  border-left: 2px solid var(--tsi-line-strong) !important;
+  background: none !important;
+}
+
+/* Hero da equipe: botão secundário no mesmo padrão do principal */
+html body .hero-actions .btn-ghost {
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+  font-family: var(--tsi-font-sans) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  padding: var(--tsi-space-2) var(--tsi-space-4) !important;
+}
+
+/* Painel interativo da rede: nós sem sombra; total em destaque sólido */
+html body .team-network-panel {
+  background: none !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html body .team-network-panel::before {
+  display: none !important;
+}
+html body .team-network-node .team-node-inner {
+  background: var(--tsi-bg-subtle) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+html body .team-network-node .team-node-halo {
+  display: none !important;
+}
+html body .team-network-node .team-number {
+  color: var(--tsi-ink) !important;
+}
+html body .team-network-node-total .team-node-inner {
+  background: var(--tsi-accent) !important;
+}
+html body .team-network-node-total :is(.team-number, .team-label, .team-node-helper) {
+  color: #fff !important;
+}
+
+/* Busca e filtros */
+html body .team-controls {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html body .team-search {
+  border: 1px solid var(--tsi-line-strong) !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+  background: var(--tsi-bg) !important;
+}
+html body .team-filter-buttons .team-filter {
+  font-family: var(--tsi-font-sans) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  box-shadow: none !important;
+  background: var(--tsi-bg) !important;
+  color: var(--tsi-text) !important;
+  border: 1px solid var(--tsi-line-strong) !important;
+  border-radius: var(--tsi-radius) !important;
+}
+html body .team-filter-buttons .team-filter.active {
+  background: var(--tsi-accent) !important;
+  border-color: var(--tsi-accent) !important;
+  color: #fff !important;
+}
+html body .team-network-kicker {
+  color: var(--tsi-muted) !important;
+}
+html body .team-index a {
+  color: var(--tsi-accent-strong) !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   5b. Validador de planilha
+   ------------------------------------------------------------------------- */
+html body :is(.hv-clean-overview, .tsiino-validator-intro-card) {
+  background: var(--tsi-bg-subtle) !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius-lg) !important;
+  box-shadow: none !important;
+}
+html body :is(.hv-clean-overview, .tsiino-validator-intro-card) h2 {
+  color: var(--tsi-ink) !important;
+  font-size: var(--tsi-fs-2xl) !important;
+}
+html body .hv-panel {
+  background: var(--tsi-bg) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--tsi-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html body .hv-section-title {
+  display: block !important;
+}
+html body .hv-section-title > span {
+  display: none !important;   /* traço decorativo antes do título */
+}
+html body :is(.hv-clean-overview, .tsiino-validator-intro-card) h2,
+html body .hv-section-title h2 {
+  border-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+html body .hv-section-title h2 {
+  color: var(--tsi-ink) !important;
+  text-transform: none !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+  font-size: var(--tsi-fs-2xl) !important;
+}
+html body .hv-panel :is(input[type="text"], input[type="file"], select) {
+  border: 1px solid var(--tsi-line-strong) !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+  background: var(--tsi-bg) !important;
+}
+html body :is(.hv-primary, .hv-secondary) {
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-family: var(--tsi-font-sans) !important;
+  font-weight: 600 !important;
+}
+html body .hv-primary {
+  background: var(--tsi-accent) !important;
+  border: 1px solid var(--tsi-accent) !important;
+  color: #fff !important;
+}
+html body .hv-primary:hover {
+  background: var(--tsi-accent-strong) !important;
+}
+html body .hv-secondary {
+  background: var(--tsi-bg) !important;
+  border: 1px solid var(--tsi-line-strong) !important;
+  color: var(--tsi-ink) !important;
+}
+html body .hv-status {
+  background: var(--tsi-bg-subtle) !important;
+  border: 0 !important;
+  border-radius: var(--tsi-radius) !important;
+  box-shadow: none !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   6. Heroes das páginas internas: menos vão entre navegação e conteúdo.
+      Reaproveita o breakpoint existente de 991.98px (onde antes 100vh).
+   ------------------------------------------------------------------------- */
+html body .page-hero.page-hero-expeditions,
+html body .page-hero.page-hero-team {
+  min-height: clamp(420px, 62vh, 600px) !important;
+}
+html body .conservation-hero {
+  min-height: clamp(460px, 70vh, 640px) !important;
+}
+html body .hv-site-hero {
+  min-height: clamp(420px, 62vh, 600px) !important;
+}
+@media (max-width: 991.98px) {
+  html body .page-hero.page-hero-expeditions,
+  html body .page-hero.page-hero-team,
+  html body .hv-site-hero {
+    min-height: 72svh !important;
+  }
+}
+
+
+/* -------------------------------------------------------------------------
+   7. Correção de transbordo (bug anterior): entre ~700px e 991.98px, a grade
+      de colunas do Quarto (page-layout: full) soma mais que a viewport, e a
+      home cortava a coluna do mapa em "O projeto" e deslocava o hero e os
+      eixos em 26px. Usa o breakpoint já existente de 991.98px.
+   ------------------------------------------------------------------------- */
+@media (max-width: 991.98px) {
+  html body:has(.hero-strip) main.content {
+    display: block !important;
+  }
+  html body #o-projeto.content-card.about-section.projeto-editorial {
+    display: block !important;
+  }
+  html body #o-projeto.content-card.about-section.projeto-editorial :is(.about-intro-grid, .about-visual-module, .pe-image, .pe-image img) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* -------------------------------------------------------------------------
+   8. Menu colapsado em Acesso e Validador (bug anterior): essas páginas não
+      tinham painel para o menu aberto, e os itens ficavam soltos sobre o
+      hero. Reproduz o painel da home. Breakpoint existente: 991.98px.
+   ------------------------------------------------------------------------- */
+@media (max-width: 991.98px) {
+  html body:is(:has(.conservation-hero), :has(.hv-site-hero)) #quarto-header .navbar-collapse:is(.show, .collapsing) {
+    margin-top: var(--tsi-space-2) !important;
+    padding: var(--tsi-space-3) var(--tsi-space-4) !important;
+    width: min(280px, calc(100vw - 2rem)) !important;
+    background: rgba(23, 23, 23, 0.86) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-radius: var(--tsi-radius-lg) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  html body:is(:has(.conservation-hero), :has(.hv-site-hero)) #quarto-header .navbar-collapse:is(.show, .collapsing) .nav-link {
+    color: #fff !important;
+  }
+}

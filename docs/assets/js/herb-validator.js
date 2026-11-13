@@ -1,650 +1,725 @@
+/* Validador de planilha de herbário — Tsiino Hiiwiida
+ *
+ * Módulo único (substitui herb-converter, herb-mapper-loader, herb-results-table, herb-standard-first-flow,
+ * herb-upload-formdata, herb-issue-geography, herb-mapper-result-flow e herb-validator-flow).
+ *
+ * Fluxo: acorda a API -> /converter/preview -> (padrão INPA? /upload : mapeador -> /validate_mapped)
+ *        -> renderiza o resultado direto da resposta (sem requisições extras).
+ *
+ * API: produção em https://api.tsiinohiiwiida.net (Cloudflare Worker -> Hugging Face Space);
+ *      em localhost usa http://127.0.0.1:8000. Para forçar outra base: ?api=https://... na URL.
+ */
 (function () {
-const LOCAL_API = 'http://127.0.0.1:8000/api/validator';
-const PROD_API = 'https://api.tsiinohiiwiida.net/api/validator';
+  'use strict';
 
-const host = window.location.hostname;
-const isLocal = !host || host === '127.0.0.1' || host === 'localhost';
+  // ---------------------------------------------------------------- configuração
+  const PROD_API = 'https://api.tsiinohiiwiida.net';
+  const LOCAL_API = 'http://127.0.0.1:8000';
+  const host = window.location.hostname;
+  const isLocal = !host || host === 'localhost' || host === '127.0.0.1';
+  const apiOverride = new URLSearchParams(window.location.search).get('api') || window.TSIINO_VALIDATOR_API;
+  const API_ROOT = String(apiOverride || (isLocal ? LOCAL_API : PROD_API)).replace(/\/+$/, '');
+  const API = API_ROOT + '/api/validator';
+  const PAGE_SIZE = 200;
+  const WAKE_TIMEOUT_MS = 150000;
 
-const API_BASE = isLocal ? LOCAL_API : PROD_API;
+  const SEV_LABEL = { error: 'Erro', warning: 'Alerta', info: 'Nota' };
+  const SEV_RANK = { error: 0, warning: 1, info: 2 };
 
-  const COLUMN_ALIASES = {
-    numtombo: 'accession', tombo: 'accession', coletor: 'collector', coletores: 'collector', numero: 'number',
-    numcoleta: 'number', numero_coleta: 'number', sufixo: 'suffix', dia: 'colldd', dia_coleta: 'colldd', mes: 'collmm',
-    mes_coleta: 'collmm', ano: 'collyy', ano_coleta: 'collyy', familia: 'family', genero: 'genus', especie: 'sp1',
-    epiteto: 'sp1', autor: 'author1', pais: 'country', estado: 'majorarea', uf: 'majorarea', municipio: 'minorarea',
-    localidade: 'gazetteer', notas_localidade: 'locnotes', habitat: 'habitattxt', latitude: 'lat', longitude: 'long',
-    altitude: 'alt', descricao: 'plantdesc', descricao_planta: 'plantdesc', nome_popular: 'vernacular', duplicatas: 'dups',
-    herbario: 'dups', herbarios: 'dups', projeto: 'project'
+  const state = {
+    busy: false,
+    file: null,
+    result: null,        // resposta de /upload ou /validate_mapped
+    filter: 'all',
+    code: '',
+    showInfo: true,
+    page: 1,
+    mapper: null,        // { preview, mapping, undo: [] }
+    map: null
   };
 
-  const CANONICAL = new Set([
-    'accession','collector','prefix','number','suffix','addcoll','colldd','collmm','collyy','initial',
-    'family','genus','detstatus','sp1','rank1','sp2','detby','detdd','detmm','detyy','country','majorarea',
-    'minorarea','gazetteer','locnotes','habitattxt','lat','NS','long','EW','llunit','alt','alt1','plantdesc',
-    'vernacular','dups','project','genbank','author1','cf'
-  ]);
+  // ---------------------------------------------------------------- utilidades
+  const $ = (id) => document.getElementById(id);
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
-  let records = [];
-  let issues = [];
-  let currentFilter = 'all';
-  let headers = [];
-  let canonicalToRaw = new Map();
-  let currentJobId = null;
-  let currentGeojson = null;
-
-  function $(id) { return document.getElementById(id); }
-
-  function fixMojibake(value) {
-    let text = String(value ?? '');
-    for (let i = 0; i < 3 && /(?:Ã|Â|â|�)/.test(text); i += 1) {
-      try {
-        const bytes = new Uint8Array(Array.from(text, (ch) => ch.charCodeAt(0) & 255));
-        const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-        if (!decoded || decoded === text) break;
-        text = decoded;
-      } catch (_) {
-        break;
-      }
-    }
-    return text
-      .replaceAll('Ã‡', 'Ç')
-      .replaceAll('Ã§', 'ç')
-      .replaceAll('Ã£', 'ã')
-      .replaceAll('Ã¡', 'á')
-      .replaceAll('Ã©', 'é')
-      .replaceAll('Ã­', 'í')
-      .replaceAll('Ã³', 'ó')
-      .replaceAll('Ãº', 'ú')
-      .replaceAll('Ãª', 'ê')
-      .replaceAll('Ã‰', 'É')
-      .replaceAll('Ã�', 'Í')
-      .replaceAll('Âº', 'º')
-      .replaceAll('Âª', 'ª')
-      .replaceAll('Â·', '·')
-      .replaceAll('â€“', '–')
-      .replaceAll('â€”', '—')
-      .replaceAll('â€œ', '“')
-      .replaceAll('â€', '”')
-      .replaceAll('â€˜', '‘')
-      .replaceAll('â€™', '’')
-      .replaceAll('â€¢', '•')
-      .replaceAll('âš ï¸', 'Aviso:')
-      .replaceAll('⚠️', 'Aviso:');
+  function setStatus(html, kind) {
+    const el = $('validator-status');
+    if (!el) return;
+    el.innerHTML = html;
+    el.className = 'hv-status' + (kind ? ' is-' + kind : '');
   }
 
-
-  function escapeHtml(value) {
-    return String(fixMojibake(value) ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-  }
-
-  function normalizeKey(value) {
-    return String(fixMojibake(value) ?? '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_+|_+$/g, '');
-  }
-
-  function canonicalizeHeader(rawHeader) {
-    const raw = String(rawHeader ?? '').trim();
-    if (CANONICAL.has(raw)) return raw;
-    const key = normalizeKey(raw);
-    if (CANONICAL.has(key)) return key;
-    return COLUMN_ALIASES[key] || key;
-  }
-
-  function setStatus(message, type = '') {
-    const node = $('validator-status');
-    if (!node) return;
-    node.innerHTML = fixMojibake(message);
-    node.className = 'hv-status' + (type ? ' is-' + type : '');
-  }
-
-  function setBusy(isBusy) {
+  function setBusy(flag, label) {
+    state.busy = flag;
     const btn = $('validate-button');
-    if (!btn) return;
-    btn.disabled = isBusy;
-    btn.textContent = isBusy ? 'Validando...' : 'Validar planilha';
-  }
-
-  function configureDownload(jobId) {
-    const link = $('download-annotated');
-    if (!link) return;
-    if (!jobId) {
-      link.href = '#';
-      link.classList.add('is-disabled');
-      link.setAttribute('aria-disabled', 'true');
-      return;
+    if (btn) {
+      btn.disabled = flag;
+      btn.textContent = flag ? (label || 'Processando...') : 'Validar planilha';
     }
-    link.href = `${API_BASE}/jobs/${jobId}/download.xlsx`;
-    link.download = `tsiino_planilha_anotada_${jobId}.xlsx`;
-    link.classList.remove('is-disabled');
-    link.setAttribute('aria-disabled', 'false');
+    document.querySelectorAll('[data-mapper-action]').forEach((b) => { b.disabled = flag; });
   }
 
-  function configureMap(jobId) {
-    const btn = $('map-button');
-    if (!btn) return;
-    if (!jobId) {
-      btn.classList.add('is-disabled');
-      btn.setAttribute('aria-disabled', 'true');
-      btn.disabled = true;
-      currentGeojson = null;
-      const panel = $('validator-map-panel');
-      if (panel) panel.hidden = true;
-      return;
+  function selectedFile() {
+    const input = $('spreadsheet-file');
+    return input && input.files && input.files[0] ? input.files[0] : null;
+  }
+
+  function options() {
+    return {
+      sheet: ($('sheet-name')?.value || '').trim(),
+      taxonomy: $('validate-taxonomy') ? $('validate-taxonomy').checked : true,
+      geography: $('validate-geography') ? $('validate-geography').checked : true,
+      collection: $('collection')?.value || 'INPA'
+    };
+  }
+
+  function formFor(file, extra = {}) {
+    const fd = new FormData();
+    fd.append('file', file, file.name || 'planilha.xlsx');
+    const o = options();
+    if (o.sheet) fd.append('sheet_name', o.sheet);
+    fd.append('validate_taxonomy', o.taxonomy ? 'true' : 'false');
+    fd.append('validate_geography', o.geography ? 'true' : 'false');
+    Object.entries(extra).forEach(([k, v]) => fd.append(k, v));
+    return fd;
+  }
+
+  class ApiError extends Error {
+    constructor(message, status, data) { super(message); this.status = status; this.data = data; }
+  }
+
+  async function request(path, init = {}, { asBlob = false } = {}) {
+    let res;
+    try {
+      res = await fetch(API + path, init);
+    } catch (err) {
+      throw new ApiError('Sem conexão com o servidor de validação. Verifique a internet e tente de novo.', 0);
     }
-    btn.classList.remove('is-disabled');
-    btn.setAttribute('aria-disabled', 'false');
-    btn.disabled = false;
-  }
-
-  function getRaw(record) {
-    return record && typeof record._raw === 'object' && record._raw !== null ? record._raw : record;
-  }
-
-  function buildHeaders() {
-    const seen = new Set();
-    headers = [];
-    canonicalToRaw = new Map();
-
-    records.forEach((record) => {
-      const raw = getRaw(record);
-      Object.keys(raw || {}).forEach((h) => {
-        if (!h || h.startsWith('_')) return;
-        if (!seen.has(h)) {
-          seen.add(h);
-          headers.push(h);
-        }
-        const canonical = canonicalizeHeader(h);
-        if (!canonicalToRaw.has(canonical)) canonicalToRaw.set(canonical, h);
-      });
-    });
-
-    if (!headers.length) {
-      const fallback = new Set();
-      records.forEach((record) => {
-        Object.keys(record || {}).forEach((h) => {
-          if (!h.startsWith('_') && !fallback.has(h)) {
-            fallback.add(h);
-            headers.push(h);
-            if (!canonicalToRaw.has(h)) canonicalToRaw.set(h, h);
-          }
-        });
-      });
+    if (!res.ok) {
+      let data = null;
+      try { data = await res.json(); } catch (_) { /* resposta não JSON */ }
+      const detail = data && (typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail || data));
+      throw new ApiError(detail || `Erro ${res.status} no servidor.`, res.status, data);
     }
+    return asBlob ? res.blob() : res.json();
   }
 
-  function issueRawColumn(item) {
-    const col = item.column_name || '';
-    if (!col) return '_row';
-    return canonicalToRaw.get(col) || col;
-  }
-
-  function groupIssuesByCell() {
-    const grouped = new Map();
-    issues.forEach((item) => {
-      const row = item.row_number == null ? '_global' : String(item.row_number);
-      const col = issueRawColumn(item);
-      const key = row + '||' + col;
-      if (!grouped.has(key)) grouped.set(key, []);
-      grouped.get(key).push(item);
-    });
-    return grouped;
-  }
-
-  function rowIssueSeverity(rowNumber, grouped) {
-    let hasWarning = false;
-    let hasInfo = false;
-    for (const h of headers) {
-      const cellIssues = grouped.get(String(rowNumber) + '||' + h) || [];
-      if (cellIssues.some((i) => i.severity === 'error')) return 'error';
-      if (cellIssues.some((i) => i.severity === 'warning')) hasWarning = true;
-      if (cellIssues.some((i) => i.severity === 'info')) hasInfo = true;
-    }
-    const rowIssues = grouped.get(String(rowNumber) + '||_row') || [];
-    if (rowIssues.some((i) => i.severity === 'error')) return 'error';
-    if (hasWarning || rowIssues.some((i) => i.severity === 'warning')) return 'warning';
-    if (hasInfo || rowIssues.some((i) => i.severity === 'info')) return 'info';
-    return 'clear';
-  }
-
-  function cellClass(cellIssues) {
-    if (!cellIssues || !cellIssues.length) return '';
-    if (cellIssues.some((i) => i.severity === 'error')) return 'hv-cell-error';
-    if (cellIssues.some((i) => i.severity === 'warning')) return 'hv-cell-warning';
-    return 'hv-cell-info';
-  }
-
-  function renderSummary(summary) {
-    const node = $('validator-summary');
-    if (!node) return;
-    node.innerHTML = `
-      <div class="hv-card-number"><span>Linhas</span><strong>${summary.total_rows ?? records.length}</strong><small>Registros detectados apÃƒÂ³s o cabeÃƒÂ§alho</small></div>
-      <div class="hv-card-number"><span>Erros</span><strong>${summary.error_count ?? 0}</strong><small>Problemas que devem ser corrigidos</small></div>
-      <div class="hv-card-number"><span>Alertas</span><strong>${summary.warning_count ?? 0}</strong><small>Casos que exigem revisÃƒÂ£o curatorial</small></div>
-    `;
-  }
-
-  function renderGlobalIssues(grouped) {
-    const global = grouped.get('_global||_row') || [];
-    const extra = issues.filter((item) => item.row_number == null && issueRawColumn(item) !== '_row');
-    const all = [...global, ...extra];
-    if (!all.length) return '';
-    return `<tbody>${all.map((item) => `
-      <tr class="hv-global-issue"><td class="hv-rownum">Ã¢â‚¬â€</td><td colspan="${Math.max(headers.length, 1)}">
-        <span class="hv-cell-msg ${escapeHtml(item.severity)}">${item.severity === 'error' ? 'Ã¢Å“â€“' : item.severity === 'warning' ? 'Ã¢Å¡Â ' : 'Ã¢â€œËœ'} ${escapeHtml(item.message)}</span>
-      </td></tr>`).join('')}</tbody>`;
-  }
-
-  function renderSheet() {
-    const table = $('validator-sheet');
-    if (!table) return;
-    buildHeaders();
-    const grouped = groupIssuesByCell();
-
-    const thead = `<thead><tr><th class="hv-rownum">Linha</th>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>`;
-    const globals = renderGlobalIssues(grouped);
-
-    const rowsHtml = records.map((record, idx) => {
-      const rowNumber = record._row_number ?? idx + 1;
-      const severity = rowIssueSeverity(rowNumber, grouped);
-      const hidden = currentFilter !== 'all' && currentFilter !== severity;
-      const raw = getRaw(record);
-      const cells = headers.map((h) => {
-        const value = raw[h] ?? record[canonicalizeHeader(h)] ?? '';
-        const cellIssues = grouped.get(String(rowNumber) + '||' + h) || [];
-        const messages = cellIssues.map((item) => `
-          <span class="hv-cell-msg ${escapeHtml(item.severity)}">
-            ${item.severity === 'error' ? 'Ã¢Å“â€“' : item.severity === 'warning' ? 'Ã¢Å¡Â ' : 'Ã¢â€œËœ'} ${escapeHtml(item.message)}${item.suggestion ? `<br><em>SugestÃƒÂ£o: ${escapeHtml(item.suggestion)}</em>` : ''}
-          </span>`).join('');
-        return `<td class="${cellClass(cellIssues)}"><div class="hv-cell-value">${escapeHtml(value)}</div>${messages ? `<div class="hv-cell-issues">${messages}</div>` : ''}</td>`;
-      }).join('');
-      return `<tr class="${hidden ? 'hv-row-muted' : ''}" ${hidden ? 'style="display:none"' : ''}><td class="hv-rownum">${escapeHtml(rowNumber)}</td>${cells}</tr>`;
-    }).join('');
-
-    table.innerHTML = thead + globals + `<tbody>${rowsHtml}</tbody>`;
-  }
-
-  function renderIssues() {
-    const table = $('validator-issues');
-    if (!table) return;
-    const filtered = issues.filter((item) => item.severity !== 'info' || currentFilter === 'all');
-    if (!filtered.length) {
-      table.innerHTML = '<tbody><tr><td>Nenhum erro ou alerta encontrado.</td></tr></tbody>';
-      return;
-    }
-    table.innerHTML = `
-      <thead><tr><th>Linha</th><th>Campo</th><th>Tipo</th><th>CÃƒÂ³digo</th><th>Mensagem</th><th>Valor</th><th>SugestÃƒÂ£o</th></tr></thead>
-      <tbody>
-        ${filtered.map((item) => `
-          <tr>
-            <td>${escapeHtml(item.row_number ?? '')}</td>
-            <td>${escapeHtml(item.column_name ?? '')}</td>
-            <td><span class="hv-pill ${escapeHtml(item.severity)}">${escapeHtml(item.severity)}</span></td>
-            <td>${escapeHtml(item.code)}</td>
-            <td>${escapeHtml(item.message)}</td>
-            <td>${escapeHtml(item.value ?? '')}</td>
-            <td>${escapeHtml(item.suggestion ?? '')}</td>
-          </tr>`).join('')}
-      </tbody>`;
-  }
-
-  function renderResults(summary) {
-    const result = $('validator-results');
-    if (result) result.hidden = false;
-    renderSummary(summary || {});
-    renderSheet();
-    renderIssues();
-    if (result) result.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  async function safeFetch(url, options) {
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      let message = response.status + ' ' + response.statusText;
+  // Free Spaces hibernam: espera o /health responder antes de enviar a planilha.
+  async function ensureAwake() {
+    const started = Date.now();
+    let attempt = 0;
+    while (Date.now() - started < WAKE_TIMEOUT_MS) {
+      attempt += 1;
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 10000);
       try {
-        const data = await response.json();
-        message = data.detail || data.message || message;
-      } catch (_) {}
-      throw new Error(message);
-    }
-    return response;
-  }
-
-  function renderMap(geojson) {
-    const container = $('validator-map');
-    if (!container) return;
-    const features = (geojson && geojson.features) || [];
-    if (!features.length) {
-      container.innerHTML = '<div class="hv-map-empty">Nenhum ponto com latitude e longitude foi encontrado na planilha validada.</div>';
-      return;
-    }
-
-    const coords = features.map((f) => f.geometry && f.geometry.coordinates).filter((c) => Array.isArray(c) && c.length >= 2);
-    const lons = coords.map((c) => Number(c[0])).filter(Number.isFinite);
-    const lats = coords.map((c) => Number(c[1])).filter(Number.isFinite);
-    let minLon = Math.min(...lons), maxLon = Math.max(...lons), minLat = Math.min(...lats), maxLat = Math.max(...lats);
-    if (minLon === maxLon) { minLon -= 0.01; maxLon += 0.01; }
-    if (minLat === maxLat) { minLat -= 0.01; maxLat += 0.01; }
-    const padLon = (maxLon - minLon) * 0.12;
-    const padLat = (maxLat - minLat) * 0.12;
-    minLon -= padLon; maxLon += padLon; minLat -= padLat; maxLat += padLat;
-    const x = (lon) => 60 + ((lon - minLon) / (maxLon - minLon)) * 880;
-    const y = (lat) => 500 - ((lat - minLat) / (maxLat - minLat)) * 440;
-
-    const points = features.map((f, idx) => {
-      const c = f.geometry.coordinates;
-      const props = f.properties || {};
-      const cls = props.has_error ? 'hv-map-point-error' : 'hv-map-point-ok';
-      const label = props.row_number ?? idx + 1;
-      return `<g><circle class="${cls}" cx="${x(Number(c[0]))}" cy="${y(Number(c[1]))}" r="8"><title>Linha ${escapeHtml(label)} Ã‚Â· ${escapeHtml(props.genus || '')} ${escapeHtml(props.sp1 || '')}</title></circle><text x="${x(Number(c[0])) + 11}" y="${y(Number(c[1])) + 4}" font-size="12" font-weight="800" fill="#2E3B24">${escapeHtml(label)}</text></g>`;
-    }).join('');
-
-    const list = features.map((f) => {
-      const c = f.geometry.coordinates;
-      const p = f.properties || {};
-      return `<li><b>Linha ${escapeHtml(p.row_number ?? '')}</b> Ã¢â‚¬â€ ${escapeHtml(p.genus ?? '')} ${escapeHtml(p.sp1 ?? '')}<small>${escapeHtml(c[1])}, ${escapeHtml(c[0])}${p.has_error ? ' Ã‚Â· com erro na linha' : ''}</small></li>`;
-    }).join('');
-
-    container.innerHTML = `
-      <div class="hv-map-layout">
-        <svg class="hv-map-svg" viewBox="0 0 1000 560" role="img" aria-label="Mapa simples dos pontos de coleta">
-          <rect x="0" y="0" width="1000" height="560" fill="rgba(255,253,247,.82)"></rect>
-          <g opacity=".34" stroke="#626A38" stroke-width="1">
-            <line x1="60" y1="60" x2="60" y2="500"></line><line x1="60" y1="500" x2="940" y2="500"></line>
-            <line x1="60" y1="280" x2="940" y2="280" stroke-dasharray="6 8"></line><line x1="500" y1="60" x2="500" y2="500" stroke-dasharray="6 8"></line>
-          </g>
-          <text x="60" y="36" fill="#6E1F1D" font-size="17" font-weight="900">Pontos de coleta</text>
-          <text x="60" y="535" fill="#675F55" font-size="12">Longitude ${minLon.toFixed(3)} a ${maxLon.toFixed(3)}</text>
-          <text x="770" y="535" fill="#675F55" font-size="12">Latitude ${minLat.toFixed(3)} a ${maxLat.toFixed(3)}</text>
-          ${points}
-        </svg>
-        <div class="hv-map-list"><h4>Registros mapeados</h4><ol>${list}</ol></div>
-      </div>`;
-  }
-
-  async function openMap() {
-    if (!currentJobId) return;
-    const panel = $('validator-map-panel');
-    if (panel) panel.hidden = false;
-    try {
-      if (!currentGeojson) {
-        const response = await safeFetch(`${API_BASE}/jobs/${currentJobId}/map.geojson`);
-        currentGeojson = await response.json();
+        const res = await fetch(API_ROOT + '/health', { signal: ctrl.signal, cache: 'no-store' });
+        clearTimeout(timer);
+        if (res.ok) return true;
+      } catch (_) {
+        clearTimeout(timer);
       }
-      renderMap(currentGeojson);
-      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (error) {
-      const container = $('validator-map');
-      if (container) container.innerHTML = `<div class="hv-map-empty">NÃƒÂ£o foi possÃƒÂ­vel carregar o mapa: ${escapeHtml(error.message)}</div>`;
+      const secs = Math.round((Date.now() - started) / 1000);
+      setStatus(`Acordando o servidor de validação (${secs}s)… Após um período sem uso, ele leva até 1–2 minutos para iniciar.`, 'warning');
+      await sleep(Math.min(3000 + attempt * 1000, 8000));
     }
+    throw new ApiError('O servidor de validação não respondeu. Tente novamente em alguns minutos.', 503);
   }
 
-  // TSIINO_COLUMN_PREFLIGHT
-  function normalizeColumnForPreflight(value) {
-    return String(fixMojibake(value) ?? '')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  function downloadBlob(blob, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
 
-  function arrayFromPreviewValue(value) {
-    if (Array.isArray(value)) return value;
-    if (value && typeof value === 'object') {
-      return Object.entries(value).map(([key, val]) => {
-        if (val && typeof val === 'object') return { key, name: key, ...val };
-        return { key, name: key, label: String(val ?? key) };
-      });
-    }
-    return [];
-  }
-
-  function targetNameForPreflight(col) {
-    return String(col?.field ?? col?.name ?? col?.key ?? col?.header ?? col?.label ?? '').trim();
-  }
-
-  function sourceHeaderForPreflight(col) {
-    return String(col?.header ?? col?.name ?? col?.field ?? col?.key ?? col?.label ?? '').trim();
-  }
-
-  function mappingHasTargetForPreflight(mapping, targetName) {
-    if (!mapping || typeof mapping !== 'object') return false;
-    const direct = mapping[targetName];
-    if (direct !== undefined && direct !== null && direct !== '') return true;
-    const wanted = normalizeColumnForPreflight(targetName);
-    for (const [key, value] of Object.entries(mapping)) {
-      if (normalizeColumnForPreflight(key) !== wanted) continue;
-      if (value === undefined || value === null || value === '') return false;
-      if (typeof value === 'object') {
-        return Boolean(value.source_index || value.index || value.source || value.header || value.name || value.key);
-      }
-      return String(value).trim() !== '';
-    }
-    return false;
-  }
-
-  function previewNeedsColumnMapper(data) {
-    const sourceColumns = arrayFromPreviewValue(data?.source_columns || data?.columns || data?.input_columns || data?.headers);
-    const targetColumns = arrayFromPreviewValue(data?.target_columns || data?.standard_columns || data?.inpa_columns || data?.template_columns);
-    if (!sourceColumns.length || !targetColumns.length) return false;
-
-    const sourceNames = new Set(sourceColumns.map((col) => normalizeColumnForPreflight(sourceHeaderForPreflight(col))).filter(Boolean));
-    const targetNames = targetColumns.map(targetNameForPreflight).filter(Boolean);
-    const requiredNames = targetColumns.filter((col) => Boolean(col.required)).map(targetNameForPreflight).filter(Boolean);
-    const mapping = data?.suggested_mapping || data?.mapping || data?.auto_mapping || {};
-
-    const exactTargetCount = targetNames.filter((name) => sourceNames.has(normalizeColumnForPreflight(name))).length;
-    const exactRequiredCount = requiredNames.filter((name) => sourceNames.has(normalizeColumnForPreflight(name))).length;
-    const mappedRequiredCount = requiredNames.filter((name) => mappingHasTargetForPreflight(mapping, name)).length;
-
-    const enoughRequired = requiredNames.length ? exactRequiredCount >= Math.max(1, requiredNames.length - 1) : false;
-    const enoughTemplateShape = exactTargetCount >= Math.min(targetNames.length, 10);
-    const looksAlreadyInpa = enoughRequired && enoughTemplateShape;
-
-    // If it is not already a BRAHMS/INPA header, open the mapper even when aliases were recognized.
-    // That gives the user a converted file and then an annotated converted file after validation.
-    return !looksAlreadyInpa && (mappedRequiredCount > 0 || exactTargetCount > 0 || sourceColumns.length > 0);
-  }
-
-  async function maybeOpenColumnMapperBeforeValidation(file) {
-    const mapper = window.TsiinoConverterIntegration;
-    if (!mapper || typeof mapper.openMapper !== 'function' || !file) return false;
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const sheetName = $('sheet-name')?.value?.trim();
-      if (sheetName) formData.append('sheet_name', sheetName);
-      const response = await fetch(`${API_BASE}/converter/preview`, { method: 'POST', body: formData });
-      if (!response.ok) return false;
-      const data = await response.json();
-      if (!previewNeedsColumnMapper(data)) return false;
-      setStatus('Detectei colunas fora do padrao INPA/BRAHMS. Confira o mapeamento sugerido; depois baixe a convertida ou valide a convertida para gerar a anotada.', 'warning');
-      await mapper.openMapper(file, 'Colunas fora do padrao INPA/BRAHMS detectadas automaticamente. Confira as sugestoes e escolha: baixar convertida sem anotacao ou aplicar mapeamento e validar.');
-      return true;
-    } catch (error) {
-      console.warn('[Tsiino] Preflight do mapeador falhou; seguindo para validacao direta.', error);
-      return false;
-    }
-  }
-
-  function issuesIndicateSchemaProblem(items) {
-    return Array.isArray(items) && items.some((item) => {
-      const code = String(item?.code || item?.type || '').toUpperCase();
-      const text = String(item?.message || item?.detail || item?.field || '');
-      return /SCHEMA|HEADER|COLUMN|COLUNA|REQUIRED|OBRIGAT|PADRAO|PADRÃO/.test(code) || /coluna obrigat|coluna ausente|required column|missing column|cabec|cabeç|padrao|padrão/i.test(text);
-    });
-  }
-
-  async function maybeOpenMapperFromIssues(items) {
-    const mapper = window.TsiinoConverterIntegration;
-    const file = $('spreadsheet-file')?.files?.[0];
-    if (!mapper || typeof mapper.openMapper !== 'function' || !file || !issuesIndicateSchemaProblem(items)) return false;
-    setStatus('A planilha tem colunas obrigatorias ausentes no padrao INPA/BRAHMS. Abrindo o mapeador para converter antes de validar.', 'warning');
-    await mapper.openMapper(file, 'A validacao encontrou colunas obrigatorias ausentes. Mapeie as colunas da sua planilha para o padrao INPA e valide a versao convertida.');
-    return true;
-  }
-
-
-  async function validateSpreadsheet(event) {
+  // ---------------------------------------------------------------- fluxo principal
+  async function onSubmit(event) {
     event.preventDefault();
-    const fileInput = $('spreadsheet-file');
-    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
-    if (!file) {
-      setStatus('Selecione uma planilha .xlsx ou .xlsm.', 'error');
+    if (state.busy) return;
+    const file = selectedFile();
+    if (!file) { setStatus('Selecione uma planilha .xlsx ou .xlsm.', 'error'); return; }
+    if (!/\.(xlsx|xlsm)$/i.test(file.name)) {
+      setStatus('Formato não suportado. Salve a planilha como .xlsx (Excel) e envie de novo.', 'error');
       return;
     }
-
-    
-    if (await maybeOpenColumnMapperBeforeValidation(file)) return;
-
-    setBusy(true);
-    configureDownload(null);
-    configureMap(null);
-    setStatus('Enviando e validando a planilha...', '');
-
+    state.file = file;
+    resetResults();
+    setBusy(true, 'Processando...');
     try {
-      const form = new FormData();
-      form.append('file', file);
-      form.append('validate_taxonomy', $('validate-taxonomy')?.checked ? 'true' : 'false');
-      form.append('validate_geography', $('validate-geography')?.checked ? 'true' : 'false');
-      const sheetName = ($('sheet-name')?.value || '').trim();
-      if (sheetName) form.append('sheet_name', sheetName);
-
-      const upload = await safeFetch(`${API_BASE}/upload`, { method: 'POST', body: form });
-      const uploadData = await upload.json();
-      currentJobId = uploadData.job_id;
-      if (!currentJobId) throw new Error('A API nÃƒÂ£o retornou job_id.');
-
-      const [summaryResponse, issuesResponse, tableResponse] = await Promise.all([
-        safeFetch(`${API_BASE}/jobs/${currentJobId}`),
-        safeFetch(`${API_BASE}/jobs/${currentJobId}/issues`),
-        safeFetch(`${API_BASE}/jobs/${currentJobId}/table`)
-      ]);
-
-      const summary = await summaryResponse.json();
-      issues = (await issuesResponse.json()).filter((item) => !["TAXONOMY_LOCAL_FIXTURE", "GEOGRAPHY_LOCAL_FIXTURE"].includes(item.code));
-      records = await tableResponse.json();
-      if (await maybeOpenMapperFromIssues(issues)) return;
-      currentGeojson = null;
-      currentFilter = 'all';
-      document.querySelectorAll('.hv-filter').forEach((b) => b.classList.toggle('is-active', b.dataset.filter === 'all'));
-      renderResults(summary);
-      configureDownload(currentJobId);
-const annotatedLink = $('download-annotated');
-
-if (annotatedLink) {
-  annotatedLink.textContent = 'Baixar planilha anotada';
-}
-
-configureMap(currentJobId);
-      setStatus('ValidaÃƒÂ§ÃƒÂ£o concluÃƒÂ­da. Corrija as cÃƒÂ©lulas destacadas ou baixe a cÃƒÂ³pia .xlsx anotada.', 'ok');
-    } catch (error) {
-      const mappingFile = document.getElementById('spreadsheet-file')?.files?.[0];
-      const message = String(error?.message || error || 'Erro desconhecido');
-      const hasInternalMapper = Boolean(window.TsiinoConverterIntegration?.openAfterValidationFailure);
-
-      // Se a API rejeitar a planilha por cabeÃ§alho/estrutura, nÃ£o recarregue a pÃ¡gina:
-      // abra o mapeador interno e deixe a usuÃ¡ria converter + validar no mesmo fluxo.
-      if (mappingFile && hasInternalMapper) {
-        try {
-          setStatus('A planilha nÃ£o foi reconhecida no padrÃ£o INPA/BRAHMS. Abrindo o mapeador de colunas.', 'warning');
-          await window.TsiinoConverterIntegration.openAfterValidationFailure(error);
-          return;
-        } catch (mapperError) {
-          console.warn('[Tsiino] O mapeador interno nÃ£o conseguiu abrir.', mapperError);
-        }
+      await ensureAwake();
+      setStatus('Lendo a estrutura da planilha...', '');
+      const preview = await request('/converter/preview', { method: 'POST', body: formFor(file) });
+      if (options().collection === 'CUSTOM' || !preview.detected_standard) {
+        openMapper(preview);
+        setStatus(
+          options().collection === 'CUSTOM'
+            ? 'Confira o mapeamento das colunas para o padrão INPA/BRAHMS.'
+            : 'A planilha não está no padrão técnico INPA/BRAHMS. Confira as correspondências sugeridas abaixo e clique em <strong>Aplicar mapeamento e validar</strong>.',
+          'warning'
+        );
+        return;
       }
-
-      setStatus(`NÃ£o foi possÃ­vel validar: ${escapeHtml(message)}. Em teste local, confirme se a API estÃ¡ rodando em http://127.0.0.1:8000. No site publicado, a API deve responder em https://api.tsiinohiiwiida.net/health.`, 'error');
+      closeMapper();
+      setStatus(`Planilha no padrão INPA/BRAHMS (aba <strong>${esc(preview.sheet_name)}</strong>). Validando ${esc(file.name)}...`, '');
+      const result = await request('/upload', { method: 'POST', body: formFor(file) });
+      showResult(await hydrate(result));
+    } catch (err) {
+      fail(err);
     } finally {
       setBusy(false);
     }
   }
 
-  function setupFilters() {
-    document.querySelectorAll('.hv-filter').forEach((button) => {
-      button.addEventListener('click', () => {
-        currentFilter = button.dataset.filter || 'all';
-        document.querySelectorAll('.hv-filter').forEach((b) => b.classList.remove('is-active'));
-        button.classList.add('is-active');
-        renderSheet();
-      });
-    });
+  function fail(err) {
+    console.error('[Tsiino validador]', err);
+    const msg = err instanceof ApiError ? err.message : String(err && err.message || err);
+    setStatus(`Não foi possível concluir: ${esc(msg)}`, 'error');
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // ---------------------------------------------------------------- mapeador
+  function fieldDefs() {
+    return (state.mapper && state.mapper.preview.fields) || [];
+  }
 
-    setupFilters();
-    const mapButton = $('map-button');
-    if (mapButton) mapButton.addEventListener('click', openMap);
-    const mapClose = $('map-close');
-    if (mapClose) mapClose.addEventListener('click', () => { const panel = $('validator-map-panel'); if (panel) panel.hidden = true; });
-  });
+  function colLetter(n) { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
 
-window.TsiinoValidatorBridge = {
-  apiBase: API_BASE,
-  setStatus,
-  setBusy,
-
-  async applyJob(jobId, options = {}) {
-    currentJobId = jobId;
-
-    const [summaryResponse, issuesResponse, tableResponse] = await Promise.all([
-      safeFetch(`${API_BASE}/jobs/${currentJobId}`),
-      safeFetch(`${API_BASE}/jobs/${currentJobId}/issues`),
-      safeFetch(`${API_BASE}/jobs/${currentJobId}/table`)
-    ]);
-
-    const summary = await summaryResponse.json();
-
-    issues = (await issuesResponse.json()).filter(
-      (item) =>
-        ![
-          "TAXONOMY_LOCAL_FIXTURE",
-          "GEOGRAPHY_LOCAL_FIXTURE"
-        ].includes(item.code)
-    );
-
-    records = await tableResponse.json();
-
-    currentGeojson = null;
-    currentFilter = 'all';
-
-    document.querySelectorAll('.hv-filter').forEach((button) => {
-      button.classList.toggle(
-        'is-active',
-        button.dataset.filter === 'all'
-      );
-    });
-
-    // Renderiza e exibe efetivamente o resultado da validação.
-    renderResults(summary);
-
-    configureDownload(currentJobId);
-    configureMap(currentJobId);
-
-    const download = $('download-annotated');
-    if (download) {
-      download.textContent = options.converted
-        ? 'Baixar planilha convertida e anotada'
-        : 'Baixar planilha anotada';
+  function openMapper(preview) {
+    state.mapper = { preview, mapping: { ...(preview.suggested_mapping || {}) }, undo: [] };
+    let panel = $('tsiino-mapper');
+    if (!panel) {
+      panel = document.createElement('section');
+      panel.id = 'tsiino-mapper';
+      panel.className = 'hv-panel hv-mapper-v20';
+      panel.setAttribute('aria-label', 'Mapeamento de colunas');
+      const anchor = $('enviar-planilha');
+      anchor.parentNode.insertBefore(panel, anchor.nextSibling);
     }
-
-    setStatus(
-      options.statusMessage ||
-        'Validação concluída. Corrija as células destacadas ou baixe a cópia .xlsx anotada.',
-      'ok'
-    );
-
-    return summary;
+    panel.hidden = false;
+    renderMapper();
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-};
 
+  function closeMapper() {
+    const panel = $('tsiino-mapper');
+    if (panel) panel.hidden = true;
+    state.mapper = null;
+  }
+
+  function pushUndo() {
+    state.mapper.undo.push(JSON.stringify(state.mapper.mapping));
+    if (state.mapper.undo.length > 50) state.mapper.undo.shift();
+  }
+
+  function setMapping(field, column) {
+    const m = state.mapper.mapping;
+    pushUndo();
+    if (!column) { delete m[field]; renderMapper(); return; }
+    Object.keys(m).forEach((f) => { if (m[f] === column) delete m[f]; });  // uma coluna -> um campo
+    m[field] = column;
+    renderMapper();
+  }
+
+  function renderMapper() {
+    const panel = $('tsiino-mapper');
+    const mp = state.mapper;
+    if (!panel || !mp) return;
+    const { preview, mapping } = mp;
+    const columns = preview.source_columns || [];
+    const used = new Set(Object.values(mapping));
+    const missing = fieldDefs().filter((f) => f.required && !mapping[f.key]).map((f) => f.key);
+    const rows = (preview.rows || []).slice(0, 12);
+    const letterOf = Object.fromEntries(columns.map((c) => [c.name, c.letter]));
+
+    const optionsHtml = (current) => ['<option value="">— sem coluna —</option>']
+      .concat(columns.map((c) => `<option value="${esc(c.name)}"${c.name === current ? ' selected' : ''}>${esc(c.letter)} · ${esc(c.name)}</option>`))
+      .join('');
+
+    let head = '<tr><th scope="col">Padrão<br>INPA</th>';
+    let slots = '<tr class="hv-mapper-v20-source-row"><th scope="row">Sua<br>planilha</th>';
+    fieldDefs().forEach((f) => {
+      const req = f.required ? ' <abbr title="obrigatório" class="tsiino-req">*</abbr>' : '';
+      head += `<th scope="col" class="${missing.includes(f.key) ? 'tsiino-missing' : ''}"><span class="hv-mapper-v20-code">${esc(f.code)}</span>${req}` +
+        `<button type="button" class="hv-mapper-v20-help" data-help="${esc(f.key)}" aria-label="Ajuda: ${esc(f.label)}">?</button>` +
+        `<small class="tsiino-field-label">${esc(f.label)}</small></th>`;
+      slots += `<td><div class="hv-mapper-v20-slot" data-field="${esc(f.key)}">` +
+        `<select class="tsiino-map-select" data-field="${esc(f.key)}" aria-label="Coluna para ${esc(f.label)}">${optionsHtml(mapping[f.key])}</select></div></td>`;
+    });
+    head += '</tr>';
+    slots += '</tr>';
+    const body = rows.map((r) => '<tr><th scope="row">Linha ' + esc(r._row_number) + '</th>' +
+      fieldDefs().map((f) => `<td><div class="hv-mapper-v20-data">${esc(mapping[f.key] ? r[mapping[f.key]] : '')}</div></td>`).join('') + '</tr>').join('');
+
+    const unmapped = columns.filter((c) => !used.has(c.name));
+    panel.innerHTML = `
+      <div class="hv-mapper-v20-head">
+        <div>
+          <h3>Mapear colunas para o padrão INPA/BRAHMS</h3>
+          <p>Escolha, para cada campo INPA, a coluna correspondente da sua planilha (ou arraste uma coluna sem destino até o campo).
+             As linhas abaixo mostram os dados reais (aba <strong>${esc(preview.sheet_name)}</strong>, cabeçalho na linha ${esc(preview.header_row)}).</p>
+        </div>
+        <button type="button" class="hv-secondary" data-mapper-action="close">Fechar</button>
+      </div>
+      <div class="hv-mapper-v20-status" role="status">
+        ${missing.length ? `Campos obrigatórios sem coluna: <strong>${missing.map(esc).join(', ')}</strong>. Eles serão apontados como erro na validação.` : 'Todos os campos obrigatórios têm coluna correspondente.'}
+      </div>
+      <div class="hv-mapper-v20-tools">
+        <button type="button" class="hv-secondary" data-mapper-action="undo" ${mp.undo.length ? '' : 'disabled'}>Desfazer</button>
+        <button type="button" class="hv-secondary" data-mapper-action="reset">Restaurar sugestões</button>
+        <button type="button" class="hv-secondary" data-mapper-action="clear">Limpar tudo</button>
+      </div>
+      <div class="hv-mapper-v20-tablewrap"><table class="hv-mapper-v20-grid"><thead>${head}</thead><tbody>${slots}${body}</tbody></table></div>
+      ${unmapped.length ? `<div class="tsiino-unmapped"><strong>Colunas sem destino (${unmapped.length}):</strong> ${unmapped.map((c) =>
+        `<span class="hv-mapper-v20-chip" draggable="true" data-column="${esc(c.name)}" title="${esc((c.samples || []).join(' · '))}"><span class="hv-mapper-v20-letter">${esc(c.letter || letterOf[c.name] || '')}</span><span class="hv-mapper-v20-chip-text">${esc(c.name)}</span></span>`).join(' ')}</div>` : ''}
+      <div class="hv-mapper-v20-actions">
+        <button type="button" class="hv-primary" data-mapper-action="validate">Aplicar mapeamento e validar</button>
+        <button type="button" class="hv-secondary" data-mapper-action="download">Baixar convertida (sem anotação)</button>
+      </div>`;
+  }
+
+  function onMapperEvent(event) {
+    const panel = $('tsiino-mapper');
+    if (!panel || !panel.contains(event.target) || !state.mapper) return;
+    if (event.type === 'change' && event.target.matches('select.tsiino-map-select')) {
+      setMapping(event.target.dataset.field, event.target.value);
+      return;
+    }
+    if (event.type !== 'click') return;
+    const help = event.target.closest('[data-help]');
+    if (help) { showHelp(help); return; }
+    const btn = event.target.closest('[data-mapper-action]');
+    if (!btn || state.busy) return;
+    const action = btn.dataset.mapperAction;
+    const mp = state.mapper;
+    if (action === 'close') closeMapper();
+    else if (action === 'undo' && mp.undo.length) { mp.mapping = JSON.parse(mp.undo.pop()); renderMapper(); }
+    else if (action === 'reset') { pushUndo(); mp.mapping = { ...(mp.preview.suggested_mapping || {}) }; renderMapper(); }
+    else if (action === 'clear') { pushUndo(); mp.mapping = {}; renderMapper(); }
+    else if (action === 'validate') validateMapped();
+    else if (action === 'download') downloadConverted();
+  }
+
+  function showHelp(button) {
+    document.querySelectorAll('.hv-mapper-v20-popup').forEach((p) => p.remove());
+    const f = fieldDefs().find((x) => x.key === button.dataset.help);
+    if (!f) return;
+    const box = document.createElement('div');
+    box.className = 'hv-mapper-v20-popup';
+    box.setAttribute('role', 'tooltip');
+    box.innerHTML = `<div class="hv-mapper-v20-popup-code">${esc(f.code)}${f.required ? ' · obrigatório' : ''}</div><strong>${esc(f.label)}</strong><p>${esc(f.help)}</p>`;
+    document.body.appendChild(box);
+    const r = button.getBoundingClientRect();
+    box.style.position = 'fixed';
+    box.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 380)) + 'px';
+    box.style.top = Math.min(r.bottom + 8, window.innerHeight - 200) + 'px';
+  }
+
+  function onDrag(event) {
+    if (!state.mapper) return;
+    const chip = event.target.closest && event.target.closest('.hv-mapper-v20-chip[data-column]');
+    const slot = event.target.closest && event.target.closest('.hv-mapper-v20-slot[data-field]');
+    if (event.type === 'dragstart' && chip) event.dataTransfer.setData('text/plain', chip.dataset.column);
+    else if (event.type === 'dragover' && slot) { event.preventDefault(); slot.classList.add('is-drop'); }
+    else if (event.type === 'dragleave' && slot) slot.classList.remove('is-drop');
+    else if (event.type === 'drop' && slot) {
+      event.preventDefault();
+      const col = event.dataTransfer.getData('text/plain');
+      if (col) setMapping(slot.dataset.field, col);
+    }
+  }
+
+  async function validateMapped() {
+    const file = state.file || selectedFile();
+    if (!file || !state.mapper) return;
+    setBusy(true, 'Validando...');
+    setStatus('Convertendo para o padrão INPA/BRAHMS e validando...', '');
+    try {
+      await ensureAwake();
+      const fd = formFor(file, { mapping: JSON.stringify(state.mapper.mapping) });
+      const result = await request('/validate_mapped', { method: 'POST', body: fd });
+      closeMapper();
+      showResult(await hydrate(result));
+    } catch (err) {
+      fail(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function downloadConverted() {
+    const file = state.file || selectedFile();
+    if (!file || !state.mapper) return;
+    setBusy(true, 'Convertendo...');
+    try {
+      await ensureAwake();
+      const blob = await request('/converter/convert', { method: 'POST', body: formFor(file, { mapping: JSON.stringify(state.mapper.mapping) }) }, { asBlob: true });
+      downloadBlob(blob, file.name.replace(/\.[^.]+$/, '') + '_convertida_INPA.xlsx');
+      setStatus('Planilha convertida baixada. Você ainda pode validar com o botão <strong>Aplicar mapeamento e validar</strong>.', 'ok');
+    } catch (err) {
+      fail(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // ---------------------------------------------------------------- resultados
+  function resetResults() {
+    state.result = null;
+    state.map = null;
+    const results = $('validator-results');
+    if (results) results.hidden = true;
+    const panel = $('validator-map-panel');
+    if (panel) panel.hidden = true;
+    configureDownloads(null);
+  }
+
+  function configureDownloads(result) {
+    const link = $('download-annotated');
+    if (link) {
+      if (result) {
+        link.href = `${API}/jobs/${encodeURIComponent(result.job_id)}/download.xlsx`;
+        link.removeAttribute('download');
+        link.textContent = result.summary.converted_from ? 'Baixar planilha convertida e anotada' : 'Baixar planilha anotada';
+        link.classList.remove('is-disabled');
+        link.setAttribute('aria-disabled', 'false');
+      } else {
+        link.href = '#';
+        link.classList.add('is-disabled');
+        link.setAttribute('aria-disabled', 'true');
+      }
+    }
+    const map = $('map-button');
+    if (map) {
+      map.disabled = !result;
+      map.classList.toggle('is-disabled', !result);
+      map.setAttribute('aria-disabled', result ? 'false' : 'true');
+    }
+    const csv = $('download-issues-csv');
+    if (csv) csv.disabled = !result;
+  }
+
+  // Compatibilidade com a API anterior (que devolvia só job_id em /upload).
+  async function hydrate(result) {
+    if (result.summary && result.issues && result.table) return result;
+    const id = encodeURIComponent(result.job_id);
+    const [summary, issues, table] = await Promise.all([
+      request(`/jobs/${id}`), request(`/jobs/${id}/issues`), request(`/jobs/${id}/table`)
+    ]);
+    const columns = [];
+    table.forEach((r) => Object.keys(r._raw || {}).forEach((k) => { if (!columns.includes(k)) columns.push(k); }));
+    const fieldToHeader = {};
+    columns.forEach((c) => { const k = c.trim(); if (!fieldToHeader[k]) fieldToHeader[k] = c; });
+    summary.info_count = summary.info_count ?? issues.filter((i) => i.severity === 'info').length;
+    summary.rows_with_errors = summary.rows_with_errors ?? new Set(issues.filter((i) => i.severity === 'error').map((i) => i.row_number)).size;
+    return { ...result, summary, issues, table, header: { columns, field_to_header: fieldToHeader } };
+  }
+
+  function prepareResult(result) {
+    const fieldToHeader = (result.header && result.header.field_to_header) || {};
+    const columns = (result.header && result.header.columns) || [];
+    const headerToField = {};
+    Object.entries(fieldToHeader).forEach(([f, h]) => { headerToField[h] = f; });
+    const byCell = new Map();
+    const byRow = new Map();
+    const global = [];
+    result.issues.forEach((it) => {
+      if (it.row_number == null) { global.push(it); return; }
+      const header = fieldToHeader[it.column_name] || it.column_name || '';
+      const key = it.row_number + '|' + header;
+      if (!byCell.has(key)) byCell.set(key, []);
+      byCell.get(key).push(it);
+      if (!byRow.has(it.row_number)) byRow.set(it.row_number, []);
+      byRow.get(it.row_number).push(it);
+    });
+    // Ocorrências em campos sem coluna na planilha aparecem numa coluna extra.
+    const known = new Set(columns);
+    const orphanRows = new Set();
+    byCell.forEach((items, key) => { if (!known.has(key.slice(key.indexOf('|') + 1))) orphanRows.add(Number(key.split('|')[0])); });
+    result._view = { columns, headerToField, fieldToHeader, byCell, byRow, global, hasOrphans: orphanRows.size > 0 };
+    return result;
+  }
+
+  function rowSeverity(row) {
+    const items = state.result._view.byRow.get(row) || [];
+    let best = 'clear';
+    items.forEach((i) => { if (SEV_RANK[i.severity] < (SEV_RANK[best] ?? 9)) best = i.severity; });
+    return best;
+  }
+
+  function showResult(result) {
+    state.result = prepareResult(result);
+    state.filter = 'all';
+    state.code = '';
+    state.page = 1;
+    state.map = null;
+    const results = $('validator-results');
+    if (results) results.hidden = false;
+    renderSummary();
+    renderCodeFilter();
+    renderSheet();
+    renderIssueList();
+    configureDownloads(result);
+    const s = result.summary;
+    const verdict = s.error_count
+      ? `${plural(s.error_count, 'erro', 'erros')} em ${plural(s.rows_with_errors, 'linha', 'linhas')} precisam de correção antes do depósito.`
+      : 'Nenhum erro encontrado. Revise os alertas antes do depósito.';
+    setStatus(`Validação concluída em ${esc(s.elapsed_seconds)}s: ${esc(verdict)}`, s.error_count ? 'warning' : 'ok');
+    results && results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderSummary() {
+    const s = state.result.summary;
+    const node = $('validator-summary');
+    if (!node) return;
+    const card = (label, value, hint) => `<div class="hv-card-number"><span>${label}</span><strong>${value ?? 0}</strong><small>${hint}</small></div>`;
+    node.innerHTML =
+      card('Linhas', s.total_rows, `Aba “${esc(s.sheet_name)}”${s.converted_from ? ' (convertida)' : ''}`) +
+      card('Linhas com erro', s.rows_with_errors, 'Precisam de correção') +
+      card('Erros', s.error_count, 'Impedem o depósito') +
+      card('Alertas', s.warning_count, 'Exigem revisão curatorial') +
+      card('Notas', s.info_count, 'Sugestões de padronização');
+    const counts = { all: s.total_rows, error: 0, warning: 0, clear: 0 };
+    state.result.table.forEach((r) => {
+      const sev = rowSeverity(r._row_number);
+      if (sev === 'error') counts.error += 1;
+      else if (sev === 'warning') counts.warning += 1;
+      else counts.clear += 1;
+    });
+    document.querySelectorAll('.hv-filter[data-filter]').forEach((b) => {
+      const base = b.dataset.label || (b.dataset.label = b.textContent.trim());
+      b.textContent = `${base} (${counts[b.dataset.filter] ?? 0})`;
+      b.classList.toggle('is-active', b.dataset.filter === state.filter);
+    });
+  }
+
+  function renderCodeFilter() {
+    const sel = $('validator-code-filter');
+    if (!sel) return;
+    const counts = new Map();
+    state.result.issues.forEach((i) => {
+      const k = i.code;
+      if (!counts.has(k)) counts.set(k, { n: 0, severity: i.severity, message: i.message });
+      counts.get(k).n += 1;
+    });
+    const items = [...counts.entries()].sort((a, b) => (SEV_RANK[a[1].severity] - SEV_RANK[b[1].severity]) || b[1].n - a[1].n);
+    sel.innerHTML = '<option value="">Todas as ocorrências</option>' + items.map(([code, v]) =>
+      `<option value="${esc(code)}">${esc(SEV_LABEL[v.severity] || v.severity)} · ${esc(code)} (${v.n})</option>`).join('');
+    sel.value = '';
+  }
+
+  function visibleRows() {
+    const view = state.result._view;
+    return state.result.table.filter((r) => {
+      const row = r._row_number;
+      if (state.filter !== 'all') {
+        const sev = rowSeverity(row);
+        if (state.filter === 'clear' ? (sev === 'error' || sev === 'warning') : sev !== state.filter) return false;
+      }
+      if (state.code) return (view.byRow.get(row) || []).some((i) => i.code === state.code);
+      return true;
+    });
+  }
+
+  function cellIssues(row, header) {
+    const items = state.result._view.byCell.get(row + '|' + header) || [];
+    return state.showInfo ? items : items.filter((i) => i.severity !== 'info');
+  }
+
+  function messageHtml(it) {
+    return `<span class="hv-cell-msg ${esc(it.severity)}" title="${esc(it.code)}${it.source ? ' · ' + esc(it.source) : ''}">` +
+      `${esc(SEV_LABEL[it.severity] || '')}: ${esc(it.message)}${it.suggestion ? `<br><em>Sugestão: ${esc(it.suggestion)}</em>` : ''}</span>`;
+  }
+
+  function renderSheet() {
+    const table = $('validator-sheet');
+    if (!table) return;
+    const view = state.result._view;
+    const cols = view.columns;
+    const rows = visibleRows();
+    const shown = rows.slice(0, state.page * PAGE_SIZE);
+    const head = '<thead><tr><th class="hv-rownum" scope="col">Linha</th>' + cols.map((h) => {
+      const field = view.headerToField[h];
+      return `<th scope="col">${esc(h)}${field && field !== h ? `<br><small class="tsiino-field-tag">${esc(field)}</small>` : ''}</th>`;
+    }).join('') + (view.hasOrphans ? '<th scope="col">Campos ausentes</th>' : '') + '</tr></thead>';
+
+    const known = new Set(cols);
+    const body = shown.map((r) => {
+      const row = r._row_number;
+      const raw = r._raw || {};
+      const cells = cols.map((h) => {
+        const items = cellIssues(row, h);
+        const sev = items.length ? (items.some((i) => i.severity === 'error') ? 'error' : items.some((i) => i.severity === 'warning') ? 'warning' : 'info') : '';
+        return `<td class="${sev ? 'hv-cell-' + sev : ''}"><div class="hv-cell-value">${esc(raw[h])}</div>` +
+          (items.length ? `<div class="hv-cell-issues">${items.map(messageHtml).join('')}</div>` : '') + '</td>';
+      }).join('');
+      let orphan = '';
+      if (view.hasOrphans) {
+        const items = (view.byRow.get(row) || []).filter((i) => !known.has(view.fieldToHeader[i.column_name] || i.column_name) && (state.showInfo || i.severity !== 'info'));
+        orphan = `<td class="${items.some((i) => i.severity === 'error') ? 'hv-cell-error' : items.length ? 'hv-cell-warning' : ''}">` +
+          (items.length ? `<div class="hv-cell-issues">${items.map((i) => messageHtml({ ...i, message: `[${i.column_name}] ${i.message}` })).join('')}</div>` : '') + '</td>';
+      }
+      return `<tr id="hv-row-${esc(row)}" data-severity="${rowSeverity(row)}"><td class="hv-rownum">${esc(row)}</td>${cells}${orphan}</tr>`;
+    }).join('');
+
+    const empty = rows.length ? '' : `<tbody><tr><td colspan="${cols.length + 1}">Nenhuma linha para este filtro.</td></tr></tbody>`;
+    table.innerHTML = head + `<tbody>${body}</tbody>` + empty;
+
+    const pager = $('validator-pager');
+    if (pager) {
+      const more = rows.length - shown.length;
+      pager.innerHTML = `<span>Exibindo ${shown.length} de ${plural(rows.length, 'linha', 'linhas')}.</span>` +
+        (more > 0 ? ` <button type="button" class="hv-secondary" data-more>Mostrar mais ${Math.min(more, PAGE_SIZE)}</button>` : '');
+    }
+    const globalBox = $('validator-global-issues');
+    if (globalBox) {
+      const g = view.global.filter((i) => state.showInfo || i.severity !== 'info');
+      globalBox.hidden = !g.length;
+      globalBox.innerHTML = g.length ? `<strong>Ocorrências na planilha como um todo</strong><div class="hv-cell-issues">${g.map(messageHtml).join('')}</div>` : '';
+    }
+  }
+
+  function renderIssueList() {
+    const table = $('validator-issues');
+    if (!table) return;
+    const items = state.result.issues.filter((i) => (!state.code || i.code === state.code) && (state.showInfo || i.severity !== 'info'));
+    if (!items.length) { table.innerHTML = '<tbody><tr><td>Nenhuma ocorrência.</td></tr></tbody>'; return; }
+    table.innerHTML = '<thead><tr><th>Linha</th><th>Campo</th><th>Tipo</th><th>Código</th><th>Mensagem</th><th>Valor</th><th>Sugestão</th><th>Fonte</th></tr></thead><tbody>' +
+      items.map((i) => `<tr><td>${i.row_number != null ? `<a href="#hv-row-${esc(i.row_number)}" data-goto="${esc(i.row_number)}">${esc(i.row_number)}</a>` : '—'}</td>` +
+        `<td>${esc(i.column_name)}</td><td><span class="hv-pill ${esc(i.severity)}">${esc(SEV_LABEL[i.severity] || i.severity)}</span></td>` +
+        `<td>${esc(i.code)}</td><td>${esc(i.message)}</td><td>${esc(i.value)}</td><td>${esc(i.suggestion)}</td><td>${esc(i.source)}</td></tr>`).join('') + '</tbody>';
+  }
+
+  function gotoRow(row) {
+    // Garante que a linha esteja renderizada antes de rolar.
+    state.filter = 'all'; state.code = '';
+    const sel = $('validator-code-filter'); if (sel) sel.value = '';
+    const idx = state.result.table.findIndex((r) => String(r._row_number) === String(row));
+    state.page = Math.max(state.page, Math.ceil((idx + 1) / PAGE_SIZE));
+    renderSummary();
+    renderSheet();
+    const tr = $('hv-row-' + row);
+    if (tr) {
+      tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      tr.classList.add('tsiino-row-flash');
+      setTimeout(() => tr.classList.remove('tsiino-row-flash'), 1800);
+    }
+  }
+
+  function downloadIssuesCsv() {
+    if (!state.result) return;
+    const cols = ['row_number', 'column_name', 'severity', 'code', 'message', 'value', 'suggestion', 'source'];
+    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const lines = [cols.join(';')].concat(state.result.issues.map((i) => cols.map((c) => q(i[c])).join(';')));
+    const name = (state.result.summary.filename || 'planilha').replace(/\.[^.]+$/, '');
+    downloadBlob(new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }), `${name}_ocorrencias_tsiino.csv`);
+  }
+
+  // ---------------------------------------------------------------- mapa
+  function loadLeaflet() {
+    if (window.L) return Promise.resolve(window.L);
+    if (loadLeaflet.p) return loadLeaflet.p;
+    loadLeaflet.p = new Promise((resolve, reject) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(css);
+      const js = document.createElement('script');
+      js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      js.onload = () => resolve(window.L);
+      js.onerror = reject;
+      document.head.appendChild(js);
+    });
+    return loadLeaflet.p;
+  }
+
+  function mapFeatures() {
+    return state.result.table
+      .filter((r) => typeof r.lat === 'number' && typeof r.long === 'number')
+      .map((r) => ({ row: r._row_number, lat: r.lat, lon: r.long, sev: rowSeverity(r._row_number), r }));
+  }
+
+  async function openMap() {
+    if (!state.result) return;
+    const panel = $('validator-map-panel');
+    const box = $('validator-map');
+    if (!panel || !box) return;
+    panel.hidden = false;
+    const pts = mapFeatures();
+    if (!pts.length) { box.innerHTML = '<div class="hv-map-empty">Nenhuma linha com latitude e longitude válidas.</div>'; return; }
+    try {
+      const L = await loadLeaflet();
+      if (state.map) state.map.remove();
+      box.innerHTML = '';
+      box.classList.add('tsiino-leaflet');
+      const map = L.map(box, { scrollWheelZoom: false });
+      state.map = map;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap' }).addTo(map);
+      const colors = { error: '#B94262', warning: '#D47A00', info: '#626A38', clear: '#2E3B24' };
+      const markers = pts.map((p) => L.circleMarker([p.lat, p.lon], {
+        radius: 7, weight: 2, color: '#fff', fillColor: colors[p.sev] || colors.clear, fillOpacity: 0.9
+      }).bindPopup(`<strong>Linha ${esc(p.row)}</strong><br>${esc(p.r.collector)} ${esc(p.r.number)}<br><em>${esc(p.r.genus)} ${esc(p.r.sp1)}</em><br>${esc(p.r.minorarea)} – ${esc(p.r.majorarea)}<br>${esc(p.lat)}, ${esc(p.lon)}<br><a href="#hv-row-${esc(p.row)}" data-goto="${esc(p.row)}">Ver na planilha</a>`).addTo(map));
+      map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2), { maxZoom: 12 });
+      setTimeout(() => map.invalidateSize(), 150);
+    } catch (err) {
+      box.innerHTML = '<div class="hv-map-empty">Não foi possível carregar o mapa base. Pontos: ' +
+        pts.map((p) => `linha ${esc(p.row)} (${esc(p.lat)}, ${esc(p.lon)})`).join('; ') + '</div>';
+    }
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------------------------------------------------------------- eventos
+  function install() {
+    const form = $('herb-validator-form');
+    if (!form) return;
+    form.addEventListener('submit', onSubmit);
+    $('spreadsheet-file')?.addEventListener('change', () => {
+      const f = selectedFile();
+      closeMapper();
+      resetResults();
+      if (f) setStatus(`Arquivo selecionado: <strong>${esc(f.name)}</strong> (${(f.size / 1024 / 1024).toFixed(2)} MB). Clique em <strong>Validar planilha</strong>.`, '');
+    });
+    $('map-button')?.addEventListener('click', openMap);
+    $('map-close')?.addEventListener('click', () => { const p = $('validator-map-panel'); if (p) p.hidden = true; });
+    $('download-issues-csv')?.addEventListener('click', downloadIssuesCsv);
+    $('validator-code-filter')?.addEventListener('change', (e) => { state.code = e.target.value; state.page = 1; renderSheet(); renderIssueList(); });
+    $('validator-show-info')?.addEventListener('change', (e) => { state.showInfo = e.target.checked; renderSheet(); renderIssueList(); });
+    document.querySelectorAll('.hv-filter[data-filter]').forEach((b) => b.addEventListener('click', () => {
+      if (!state.result) return;
+      state.filter = b.dataset.filter; state.page = 1;
+      document.querySelectorAll('.hv-filter[data-filter]').forEach((x) => x.classList.toggle('is-active', x === b));
+      renderSheet();
+    }));
+    document.addEventListener('click', (e) => {
+      const more = e.target.closest('[data-more]');
+      if (more && state.result) { state.page += 1; renderSheet(); return; }
+      const go = e.target.closest('[data-goto]');
+      if (go && state.result) { e.preventDefault(); gotoRow(go.dataset.goto); return; }
+      if (!e.target.closest('.hv-mapper-v20-help') && !e.target.closest('.hv-mapper-v20-popup')) {
+        document.querySelectorAll('.hv-mapper-v20-popup').forEach((p) => p.remove());
+      }
+      onMapperEvent(e);
+    });
+    document.addEventListener('change', onMapperEvent);
+    ['dragstart', 'dragover', 'dragleave', 'drop'].forEach((t) => document.addEventListener(t, onDrag));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') document.querySelectorAll('.hv-mapper-v20-popup').forEach((p) => p.remove());
+      if (state.mapper && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+        if (state.mapper.undo.length) { state.mapper.mapping = JSON.parse(state.mapper.undo.pop()); renderMapper(); }
+      }
+    });
+    const tpl = $('download-template');
+    if (tpl) tpl.href = API + '/converter/template';
+    // Acorda o Space em segundo plano assim que a página abre (sem bloquear a interface).
+    fetch(API_ROOT + '/health', { cache: 'no-store' }).catch(() => null);
+  }
+
+  window.TsiinoValidator = { api: API, state, showResult, openMapper };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
+  else install();
 })();

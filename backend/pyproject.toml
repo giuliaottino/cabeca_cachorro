@@ -4,29 +4,29 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tsiino-herbarium-validator"
-version = "0.1.0"
-description = "FastAPI backend for herbarium spreadsheet validation"
+version = "2.0.0"
+description = "FastAPI backend for herbarium spreadsheet validation (INPA/BRAHMS, Flora e Funga do Brasil, IBGE)"
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.115",
   "uvicorn[standard]>=0.30",
   "python-multipart>=0.0.9",
   "pydantic>=2.8",
-  "pydantic-settings>=2.4",
-  "sqlalchemy>=2.0",
-  "psycopg[binary]>=3.2",
   "openpyxl>=3.1",
-  "pandas>=2.2",
-  "python-slugify>=8.0",
-  "pyshp>=2.3.1",
+  "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
+build = ["pyshp>=2.3.1"]  # scripts/build_ibge_sqlite.py
 dev = ["pytest>=8.0", "httpx>=0.27", "ruff>=0.6"]
 
 [tool.setuptools.packages.find]
 include = ["app*"]
-exclude = ["reference*", "scripts*", "downloads*"]
+exclude = ["reference*", "scripts*", "downloads*", "tests*"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
