@@ -27,6 +27,75 @@ resources:
 <link rel="stylesheet" href="../../assets/css/pages/validador.css">
 <link rel="stylesheet" href="../../assets/css/tsiino-base.css">
 <link rel="stylesheet" href="../../assets/css/pages/validador-resultados.css?v=20261113-r2">
+
+<style>
+/* Ajustes visuais restritos à área de resultados da validação. */
+#validator-results.tsr {
+  box-sizing: border-box;
+  width: min(100% - 3rem, 1440px);
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: clamp(1.25rem, 2.4vw, 2.25rem);
+  border-radius: 18px;
+}
+
+/* Menos efeito de cartões empilhados: conteúdo mais integrado e leve. */
+#validator-results .tsr-kpis,
+#validator-results .tsr-health,
+#validator-results .tsr-insights,
+#validator-results .tsr-grid {
+  gap: 0.75rem;
+}
+
+#validator-results .tsr-kpis > *,
+#validator-results .tsr-health > *,
+#validator-results .tsr-insights > *,
+#validator-results .tsr-grid > * {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+#validator-results .tsr-kpis > *,
+#validator-results .tsr-health > * {
+  padding: 0.85rem 1rem;
+}
+
+#validator-results .tsr-insights > *,
+#validator-results .tsr-grid > * {
+  padding: 1rem 1.1rem;
+}
+
+/* A planilha recebe a maior parte da área útil da seção. */
+#validator-results #tsr-pane-sheet {
+  min-width: 0;
+}
+
+#validator-results .tsr-sheet-wrap {
+  width: 100%;
+  min-width: 0;
+  height: min(78vh, 900px);
+  min-height: 620px;
+  overflow: auto;
+  border-radius: 12px;
+}
+
+#validator-results .tsr-sheet {
+  min-width: 100%;
+  width: max-content;
+}
+
+@media (max-width: 700px) {
+  #validator-results.tsr {
+    width: calc(100% - 1.25rem);
+    padding: 1rem;
+  }
+
+  #validator-results .tsr-sheet-wrap {
+    height: 72vh;
+    min-height: 460px;
+  }
+}
+</style>
 ```
 
 ```{=html}
@@ -55,7 +124,7 @@ resources:
   </div>
 </section>
 
-    
+
     <section class="hv-panel hv-upload-panel" id="enviar-planilha" aria-label="Envio da planilha">
       <div class="hv-section-title">
         <span></span>

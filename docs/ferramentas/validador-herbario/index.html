@@ -159,7 +159,76 @@ ul.task-list li input[type="checkbox"] {
 
 <link rel="stylesheet" href="../../assets/css/pages/validador.css">
 <link rel="stylesheet" href="../../assets/css/tsiino-base.css">
-<link rel="stylesheet" href="../../assets/css/pages/validador-resultados.css?v=20261113-r1">
+<link rel="stylesheet" href="../../assets/css/pages/validador-resultados.css?v=20261113-r2">
+
+<style>
+/* Ajustes visuais restritos à área de resultados da validação. */
+#validator-results.tsr {
+  box-sizing: border-box;
+  width: min(100% - 3rem, 1440px);
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: clamp(1.25rem, 2.4vw, 2.25rem);
+  border-radius: 18px;
+}
+
+/* Menos efeito de cartões empilhados: conteúdo mais integrado e leve. */
+#validator-results .tsr-kpis,
+#validator-results .tsr-health,
+#validator-results .tsr-insights,
+#validator-results .tsr-grid {
+  gap: 0.75rem;
+}
+
+#validator-results .tsr-kpis > *,
+#validator-results .tsr-health > *,
+#validator-results .tsr-insights > *,
+#validator-results .tsr-grid > * {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+#validator-results .tsr-kpis > *,
+#validator-results .tsr-health > * {
+  padding: 0.85rem 1rem;
+}
+
+#validator-results .tsr-insights > *,
+#validator-results .tsr-grid > * {
+  padding: 1rem 1.1rem;
+}
+
+/* A planilha recebe a maior parte da área útil da seção. */
+#validator-results #tsr-pane-sheet {
+  min-width: 0;
+}
+
+#validator-results .tsr-sheet-wrap {
+  width: 100%;
+  min-width: 0;
+  height: min(78vh, 900px);
+  min-height: 620px;
+  overflow: auto;
+  border-radius: 12px;
+}
+
+#validator-results .tsr-sheet {
+  min-width: 100%;
+  width: max-content;
+}
+
+@media (max-width: 700px) {
+  #validator-results.tsr {
+    width: calc(100% - 1.25rem);
+    padding: 1rem;
+  }
+
+  #validator-results .tsr-sheet-wrap {
+    height: 72vh;
+    min-height: 460px;
+  }
+}
+</style>
 <div class="hv-modern-page">
   <section class="hv-site-hero" aria-label="Abertura do validador de planilha de herbário">
     <div class="hv-site-hero-inner">
@@ -182,7 +251,7 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </section>
 
-    
+
     <section class="hv-panel hv-upload-panel" id="enviar-planilha" aria-label="Envio da planilha">
       <div class="hv-section-title">
         <span></span>
@@ -235,13 +304,16 @@ ul.task-list li input[type="checkbox"] {
           <p id="tsr-meta" class="tsr-meta"></p>
         </div>
         <div class="tsr-head-actions">
-          <a class="hv-primary tsr-btn" id="tsr-download-annotated" href="#">Baixar planilha anotada</a>
+          <a class="hv-primary tsr-btn" id="tsr-download-corrected" href="#" hidden="">Baixar planilha corrigida</a>
+          <a class="hv-secondary tsr-btn" id="tsr-download-annotated" href="#">Baixar planilha anotada</a>
           <button type="button" class="hv-secondary tsr-btn" id="download-issues-csv" disabled="">Ocorrências (.csv)</button>
         </div>
       </header>
 
       <div class="tsr-kpis" id="validator-summary"></div>
       <div class="tsr-health" id="tsr-health"></div>
+      <div id="tsr-corrections-note" class="tsr-note" hidden=""></div>
+      <div id="tsr-trailing" class="tsr-trailing" hidden="" role="region" aria-label="Coluna arrastada além dos dados"></div>
 
       <nav class="tsr-tabs" role="tablist" aria-label="Seções do resultado">
         <button type="button" role="tab" class="tsr-tab is-active" data-tab="overview" aria-selected="true" aria-controls="tsr-pane-overview">Visão geral</button>
@@ -303,10 +375,12 @@ ul.task-list li input[type="checkbox"] {
         <p class="tsr-caption">Ocorrências agrupadas por tipo, da mais grave para a mais frequente. Clique em uma linha para vê-la na planilha.</p>
         <div id="validator-issues" class="tsr-issue-groups"></div>
       </div>
+
+      <div id="tsr-fixbar" class="tsr-fixbar" hidden="" role="region" aria-label="Correções pendentes" aria-live="polite"></div>
     </section>
   </main>
 </div>
-<script src="../../assets/js/herb-validator.js?v=20261113-r1"></script>
+<script src="../../assets/js/herb-validator.js?v=20261113-r2"></script>
 
 
 
