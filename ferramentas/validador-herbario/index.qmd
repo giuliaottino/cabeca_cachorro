@@ -32,11 +32,15 @@ resources:
 /* Ajustes visuais restritos à área de resultados da validação. */
 #validator-results.tsr {
   box-sizing: border-box;
-  width: min(100% - 3rem, 1440px);
-  max-width: 1440px;
-  margin-inline: auto;
+  width: calc(100% - 4rem) !important;
+  max-width: 1440px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
   padding: clamp(1.25rem, 2.4vw, 2.25rem);
   border-radius: 18px;
+  position: relative;
+  left: auto !important;
+  right: auto !important;
 }
 
 /* Menos efeito de cartões empilhados: conteúdo mais integrado e leve. */
@@ -86,7 +90,9 @@ resources:
 
 @media (max-width: 700px) {
   #validator-results.tsr {
-    width: calc(100% - 1.25rem);
+    width: calc(100% - 1.25rem) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     padding: 1rem;
   }
 
