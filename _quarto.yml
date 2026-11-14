@@ -9,7 +9,13 @@ project:
     - ferramentas/validador-herbario/index.qmd
     - team/index.qmd
 
+  # Regenera o módulo 3D das expedições (expedicoes/3d/data.js) a partir de
+  # _input_data/expedicoes_3d.json, dos KMLs e das pastas de fotos.
+  pre-render: scripts/build_expedicoes_3d.py
+
   resources:
+    - expedicoes/3d/index.html
+    - expedicoes/3d/data.js
     - figures/**
     - js/**
     - css/**

@@ -1,0 +1,39 @@
+{
+  "_comentario": "Configuração da animação 3D das expedições. Cada trilha é o nome do arquivo em _input_data/kml_expedições (sem .kml). Pode ser só o nome, ou um objeto com name/name_en/mode. mode: 'rio', 'trilha' ou 'subida' (se omitido, é detectado: trajetos > 15 km viram 'rio' e desnível >= 250 m vira 'subida'). O módulo 3D é regenerado automaticamente a cada 'quarto render' (scripts/build_expedicoes_3d.py)",
+  "expeditions": [
+    {
+      "id": "tiquie-julho-2026",
+      "name": "Alto Rio Tiquié",
+      "name_en": "Upper Tiquié River",
+      "region": "Uaupés · Tiquié",
+      "date": "2026-07",
+      "photos": "tiquie-julho-2026",
+      "trails": [
+        { "kml": "porto-queiroz-ate-matapi", "name": "Porto Queiroz → Matapi" },
+        { "kml": "matapi-do-uaupes-ate-pirarara-poco", "name": "Matapi do Uaupés → Pirarara-poço" },
+        { "kml": "igarape-da-anta-margem-comunidade-pirata-poco", "name": "Igarapé da Anta · Pirarara-poço" },
+        { "kml": "pirara-poco-ate-sao-jose-2", "name": "Pirarara-poço → São José II" },
+        { "kml": "cachoeira-comprida-ate-sao-pedro", "name": "Cachoeira Comprida → São Pedro" },
+        { "kml": "sao-pedro-ate-parkia", "name": "São Pedro → Parkia" },
+        { "kml": "igarape-proximo-a-roca-do-seu-orlando", "name": "Igarapé da roça do seu Orlando" },
+        { "kml": "sao-pedro-ate-pari-cachoeira", "name": "São Pedro → Pari-Cachoeira" },
+        { "kml": "pari-cachoeira-ate-sao-sebastiao", "name": "Pari-Cachoeira → São Sebastião" },
+        { "kml": "pari-cachoeira-ate-matapi-do-uaupes", "name": "Pari-Cachoeira → Matapi do Uaupés" }
+      ]
+    },
+    {
+      "id": "curicuriari-maio-2026",
+      "name": "Serra da Bela Adormecida",
+      "name_en": "Sleeping Beauty Range",
+      "region": "Curicuriari",
+      "date": "2026-05",
+      "photos": "curicuriari-maio-2026",
+      "trails": [
+        { "kml": "bela-adormecida-rio-ate-o-acampamento-1", "name": "Rio → Acampamento 1", "name_en": "River → Camp 1" },
+        { "kml": "trilha-acampamento-1-ate-acampamento-2", "name": "Acampamento 1 → Acampamento 2", "name_en": "Camp 1 → Camp 2" },
+        { "kml": "trilha-paredao-da-arara", "name": "Paredão da Arara" },
+        { "kml": "trilha-mao-da-bela-adormecida", "name": "Mão da Bela Adormecida" }
+      ]
+    }
+  ]
+}

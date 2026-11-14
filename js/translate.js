@@ -464,7 +464,7 @@ window.TsiinoTranslations = {
       "Trajeto da expedição": "Expedition route",
       "Camadas": "Layers",
       "Registros de campo": "Field records",
-      "Fotografias e registros das expedições do projeto..": "Photographs and records from the project's expeditions.",
+      "Fotografias e registros das expedições do projeto.":"Photographs and records from the project's expeditions.",
       "Coleta do projeto Tsiino Hiiwiida": "Collection from the Tsiino Hiiwiida project",
       "Coleta botânica": "Botanical collection",
       "Coletor principal": "Primary collector",
@@ -552,7 +552,11 @@ window.TsiinoTranslations = {
       "expeditions.hero.logoAria": "Tsiino Hiiwiida logo",
       "expeditions.hero.logoAlt": "Tsiino Hiiwiida logo",
       "expeditions.hero.title": "Expeditions",
-      "expeditions.hero.description": ""
+      "expeditions.hero.description": "",
+      "expeditions.3d.title": "Expeditions in 3D",
+      "expeditions.3d.lead": "Follow the GPS routes of the expeditions over the terrain and satellite imagery, with the photos and records made along the way.",
+      "expeditions.3d.open": "Open in a new tab",
+      "expeditions.card.view3d": "View in 3D"
     }
   },
   "prefixes": {
@@ -740,6 +744,12 @@ window.TsiinoTranslations = {
       {
         "pattern": "^(.+) na Flora e Funga do Brasil$",
         "replacement": "$1 in Flora e Funga do Brasil",
+        "flags": "",
+        "terminal": true
+      },
+      {
+        "pattern": "^Coletas do projeto \\(n = ([\\d.,]+)\\)$",
+        "replacement": "Project collections (n = $1)",
         "flags": "",
         "terminal": true
       },

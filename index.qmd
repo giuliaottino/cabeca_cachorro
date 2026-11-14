@@ -15,7 +15,8 @@ execute:
   message: false
 resources:
   - figures/
-  - _input_data/
+  - _input_data/limites/
+  - _input_data/expedicoes_fotos/
 ---
 
 ```{r setup, include=FALSE}

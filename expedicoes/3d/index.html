@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expedições em 3D · Tsiino Hiiwiida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="data.js"></script>
+<style>
+  /* Tokens alinhados a assets/css/tsiino-base.css */
+  :root {
+    --tsi-bg-dark: #1c1f19;
+    --tsi-on-dark: #f4f3ef;
+    --tsi-on-dark-muted: rgba(244, 243, 239, .74);
+    --tsi-on-dark-faint: rgba(244, 243, 239, .5);
+    --tsi-line: rgba(244, 243, 239, .16);
+    --tsi-accent: #626a38;
+    --tsi-accent-strong: #4b5229;
+    --tsi-accent-light: #b4bc7a;
+    --tsi-accent-glow: #dfe5ae;
+    --tsi-font-sans: "Montserrat", Arial, sans-serif;
+    --tsi-font-serif: "Source Serif 4", Georgia, serif;
+    --tsi-font-mono: "Space Mono", ui-monospace, monospace;
+    --tsi-radius: 6px;
+    --tsi-radius-lg: 10px;
+    --gap: 24px;
+    --glass: rgba(28, 31, 25, .78);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--tsi-bg-dark); color: var(--tsi-on-dark); font-family: var(--tsi-font-sans); overflow: hidden; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; color: inherit; }
+  button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--tsi-accent-light); outline-offset: 2px; }
+  #map { position: fixed; inset: 0; }
+  .shade { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+    background:
+      linear-gradient(to bottom, rgba(20, 22, 18, .62) 0%, rgba(20, 22, 18, 0) 26%),
+      linear-gradient(to top, rgba(20, 22, 18, .62) 0%, rgba(20, 22, 18, 0) 24%),
+      radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(16, 18, 14, .45) 100%);
+  }
+
+  /* ---------- título (canto superior esquerdo, sem caixa) ---------- */
+  .title { position: fixed; z-index: 5; top: var(--gap); left: var(--gap); max-width: min(460px, calc(100% - 2 * var(--gap) - 150px)); text-shadow: 0 1px 12px rgba(0, 0, 0, .45); }
+  .mark { display: inline-flex; align-items: center; gap: 8px; font: 700 12px/1 var(--tsi-font-sans); color: var(--tsi-on-dark-muted); }
+  .mark img { width: 22px; height: 22px; display: block; }
+  h1 { margin: 14px 0 4px; font: 800 clamp(22px, 1.4rem + .8vw, 32px)/1.08 var(--tsi-font-sans); letter-spacing: -.015em; text-wrap: balance; }
+  .sub { color: var(--tsi-on-dark-muted); font: 400 15px/1.4 var(--tsi-font-serif); }
+  .now { margin-top: 18px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; transition: opacity .5s; }
+  .now-name { font: 600 15px/1.3 var(--tsi-font-sans); }
+  .chip { font: 600 10px/1 var(--tsi-font-sans); letter-spacing: .1em; text-transform: uppercase; color: var(--tsi-accent-glow); }
+
+  /* ---------- canto superior direito ---------- */
+  .top-right { position: fixed; z-index: 6; top: var(--gap); right: var(--gap); display: flex; gap: 8px; align-items: center; }
+  .pill { height: 34px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--tsi-line); background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font: 600 12px/1 var(--tsi-font-sans); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .pill:hover { border-color: rgba(244, 243, 239, .35); }
+  .lang { display: inline-flex; padding: 2px; gap: 0; }
+  .lang button { border: 0; background: none; color: var(--tsi-on-dark-faint); font: 600 11px/1 var(--tsi-font-sans); letter-spacing: .06em; padding: 0 9px; height: 28px; border-radius: 999px; cursor: pointer; }
+  .lang button[aria-pressed="true"] { background: var(--tsi-on-dark); color: var(--tsi-bg-dark); }
+  .menu { position: absolute; top: 42px; right: 0; min-width: 240px; padding: 6px; border-radius: var(--tsi-radius-lg); background: rgba(28, 31, 25, .95); border: 1px solid var(--tsi-line); box-shadow: 0 16px 40px rgba(0, 0, 0, .4); display: none; }
+  .menu.open { display: block; }
+  .menu button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 9px 10px; border-radius: var(--tsi-radius); cursor: pointer; font: 600 13px/1.3 var(--tsi-font-sans); }
+  .menu button small { display: block; font-weight: 400; color: var(--tsi-on-dark-faint); margin-top: 2px; }
+  .menu button:hover { background: rgba(244, 243, 239, .07); }
+  .menu button[aria-current="true"] { color: var(--tsi-accent-glow); }
+  .menu hr { border: 0; border-top: 1px solid var(--tsi-line); margin: 4px 6px; }
+
+  /* ---------- barra inferior: play + linha do tempo com perfil ---------- */
+  .dock { position: fixed; z-index: 5; left: 50%; bottom: var(--gap); transform: translateX(-50%); width: min(820px, calc(100% - 2 * var(--gap))); display: flex; align-items: center; gap: 14px; }
+  .play { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--tsi-on-dark); color: var(--tsi-bg-dark); display: grid; place-items: center; cursor: pointer; }
+  .play svg { width: 14px; height: 14px; }
+  .timeline { position: relative; flex: 1; height: 44px; cursor: pointer; touch-action: none; }
+  .timeline svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .tl-tip { position: absolute; bottom: 52px; transform: translateX(-50%); padding: 6px 9px; border-radius: var(--tsi-radius); background: rgba(28, 31, 25, .95); border: 1px solid var(--tsi-line); font: 600 11.5px/1.3 var(--tsi-font-sans); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .15s; }
+  .tl-tip small { display: block; font-weight: 400; color: var(--tsi-on-dark-faint); }
+  .timeline:hover .tl-tip { opacity: 1; }
+  .speed { flex: none; border: 0; background: none; font: 400 12px var(--tsi-font-mono); color: var(--tsi-on-dark-muted); cursor: pointer; padding: 6px; min-width: 34px; }
+  .recenter { position: fixed; z-index: 5; left: 50%; bottom: calc(var(--gap) + 58px); transform: translateX(-50%); display: none; }
+  .recenter.show { display: inline-flex; }
+
+  /* ---------- foto que viaja com o trajeto ---------- */
+  .traveler { pointer-events: none; }
+  .tcard { pointer-events: auto; position: relative; width: 196px; margin: 18px 0 0 18px; padding: 0; border: 0; background: none; cursor: zoom-in; display: block; transition: opacity .6s, transform .6s; }
+  .tcard.off { opacity: 0; transform: translateY(6px); pointer-events: none; }
+  .tcard::before { content: ""; position: absolute; left: -18px; top: -18px; width: 22px; height: 22px; border-left: 1px solid rgba(244, 243, 239, .7); border-top: 1px solid rgba(244, 243, 239, .7); border-radius: 2px 0 0 0; }
+  .tframe { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--tsi-radius); border: 1px solid rgba(244, 243, 239, .55); background: #2a2e25; box-shadow: 0 12px 28px rgba(0, 0, 0, .45); }
+  .tframe img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.1s ease; }
+  .tframe img.on { opacity: 1; }
+  .tmeta { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font: 400 10.5px/1.3 var(--tsi-font-mono); color: var(--tsi-on-dark-muted); text-shadow: 0 1px 4px rgba(0, 0, 0, .9); }
+  .tmeta span:first-child { font: italic 400 12.5px/1.3 var(--tsi-font-serif); color: var(--tsi-on-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .alt { position: absolute; left: 14px; top: -30px; font: 700 11px/1 var(--tsi-font-mono); padding: 4px 7px; border-radius: 999px; background: rgba(28, 31, 25, .8); color: var(--tsi-accent-glow); white-space: nowrap; opacity: 0; transition: opacity .4s; }
+  .alt.show { opacity: 1; }
+
+  /* fotos com coordenada: ficam presas no lugar */
+  .gpin { pointer-events: auto; border: 0; padding: 0; background: none; cursor: zoom-in; opacity: 0; transition: opacity .6s; }
+  .gpin.show { opacity: 1; }
+  .gpin .gframe { width: 92px; aspect-ratio: 4 / 3; border-radius: 4px; overflow: hidden; border: 1px solid rgba(244, 243, 239, .7); box-shadow: 0 8px 18px rgba(0, 0, 0, .45); transition: width .5s; }
+  .gpin .gframe img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gpin.mini .gframe { width: 14px; border-radius: 50%; aspect-ratio: 1; border-width: 2px; }
+
+  /* registros de campo (waypoints) */
+  .wp { display: flex; align-items: center; gap: 6px; pointer-events: none; opacity: 0; transition: opacity .6s; }
+  .wp.show { opacity: 1; }
+  .wp i { width: 8px; height: 8px; border-radius: 50%; background: var(--tsi-on-dark); box-shadow: 0 0 0 3px rgba(98, 106, 56, .65); flex: none; }
+  .wp span { font: 500 11.5px var(--tsi-font-sans); color: var(--tsi-on-dark); text-shadow: 0 1px 4px rgba(0, 0, 0, .95); white-space: nowrap; transition: opacity .6s; }
+  .wp.past span { opacity: 0; }
+  .wp.summit i { width: 0; height: 0; border-radius: 0; background: none; box-shadow: none; border: 6px solid transparent; border-bottom: 10px solid var(--tsi-on-dark); border-top: 0; }
+  .wp.summit span { font: 700 11px var(--tsi-font-mono); opacity: 1; }
+
+  /* ---------- lightbox ---------- */
+  .lightbox { position: fixed; inset: 0; z-index: 9; display: none; grid-template-rows: 1fr auto; padding: 56px 72px 28px; background: rgba(16, 18, 14, .95); }
+  .lightbox.open { display: grid; }
+  .lightbox img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+  .lb-cap { display: flex; justify-content: space-between; gap: 16px; margin-top: 14px; font: italic 400 16px/1.4 var(--tsi-font-serif); }
+  .lb-cap small { font: 400 11px var(--tsi-font-mono); font-style: normal; color: var(--tsi-on-dark-faint); white-space: nowrap; }
+  .lb-btn { position: absolute; border: 0; background: none; cursor: pointer; font-size: 28px; line-height: 1; padding: 10px; color: var(--tsi-on-dark-muted); }
+  .lb-btn:hover { color: var(--tsi-on-dark); }
+  .lb-close { top: 12px; right: 16px; font-size: 22px; }
+  .lb-prev { left: 14px; top: 50%; } .lb-next { right: 14px; top: 50%; }
+
+  /* ---------- abertura ---------- */
+  .intro { position: fixed; z-index: 8; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; background: radial-gradient(ellipse at center, rgba(28, 31, 25, .5), rgba(20, 22, 18, .94)); transition: opacity .9s; }
+  .intro.gone { opacity: 0; pointer-events: none; }
+  .intro .mark { font-size: 15px; color: var(--tsi-on-dark); gap: 10px; }
+  .intro .mark img { width: 38px; height: 38px; }
+  .intro h2 { font: 800 clamp(2.25rem, 1.4rem + 3.6vw, 4rem)/1.05 var(--tsi-font-sans); letter-spacing: -.02em; margin: 28px 0 14px; }
+  .intro p { max-width: 520px; margin: 0 auto 28px; color: var(--tsi-on-dark-muted); font: 400 17px/1.55 var(--tsi-font-serif); }
+  .intro .start { padding: 13px 26px; border-radius: var(--tsi-radius); border: 0; background: var(--tsi-accent); color: var(--tsi-on-dark); font: 600 15px var(--tsi-font-sans); cursor: pointer; }
+  .intro .start:hover { background: var(--tsi-accent-strong); }
+
+  .maplibregl-ctrl-attrib { font-size: 10px; }
+
+  @media (max-width: 767.98px) {
+    :root { --gap: 14px; }
+    .title { max-width: calc(100% - 2 * var(--gap)); top: calc(var(--gap) + 44px); }
+    .sub { font-size: 13.5px; }
+    .now { margin-top: 10px; }
+    .tcard { width: 132px; }
+    .tmeta { display: none; }
+    .lightbox { padding: 52px 12px 20px; }
+    .lb-prev, .lb-next { top: auto; bottom: 10px; }
+  }
+  /* ---------- embutido na aba Expedições (?embed=1) ---------- */
+  .fs { width: 34px; padding: 0; justify-content: center; display: none; }
+  .embed .fs { display: inline-flex; }
+  .embed .top-right .lang { display: none; } /* o idioma vem do site */
+  .embed { --gap: 16px; }
+  .embed h1 { font-size: clamp(18px, 1rem + .8vw, 26px); margin-top: 10px; }
+  .embed .intro h2 { font-size: clamp(1.75rem, 1.2rem + 2.4vw, 3rem); margin: 20px 0 10px; }
+  .embed .intro p { font-size: 15.5px; margin-bottom: 22px; }
+  .embed .tcard { width: 160px; }
+  :fullscreen.embed { --gap: 24px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="shade"></div>
+
+<header class="title">
+  <div class="mark"><img src="../../figures/brand/logo_tsiino_symbol.png" alt="" onerror="this.style.display='none'"><span>Tsiino Hiiwiida</span></div>
+  <h1 id="exp-name">—</h1>
+  <div class="sub" id="exp-meta"></div>
+  <div class="now" id="now"><span class="now-name" id="trail-name"></span><span class="chip" id="trail-chip"></span></div>
+</header>
+
+<div class="top-right">
+  <div style="position:relative">
+    <button class="pill" id="btn-menu" aria-haspopup="true" aria-expanded="false"><span data-t="expeditions"></span><span aria-hidden="true">▾</span></button>
+    <div class="menu" id="menu" role="menu"></div>
+  </div>
+  <div class="pill lang" data-lang-toggle></div>
+  <button class="pill fs" id="btn-fs"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 5V1h4M9 1h4v4M13 9v4H9M5 13H1V9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+</div>
+
+<button class="pill recenter" id="btn-recenter" data-t="recenter"></button>
+
+<nav class="dock" id="dock">
+  <button class="play" id="btn-play"></button>
+  <div class="timeline" id="timeline" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <svg id="tl-svg" viewBox="0 0 1000 44" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div class="tl-tip" id="tl-tip"></div>
+  </div>
+  <button class="speed" id="btn-speed">1×</button>
+</nav>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <img id="lb-img" alt="">
+  <div class="lb-cap"><span id="lb-cap"></span><small id="lb-count"></small></div>
+  <button class="lb-btn lb-close" id="lb-close">✕</button>
+  <button class="lb-btn lb-prev" id="lb-prev">‹</button>
+  <button class="lb-btn lb-next" id="lb-next">›</button>
+</div>
+
+<div class="intro" id="intro">
+  <div>
+    <div class="mark"><img src="../../figures/brand/logo_tsiino_symbol.png" alt="" onerror="this.style.display='none'"><span>Tsiino Hiiwiida</span></div>
+    <h2 data-t="introTitle"></h2>
+    <p id="intro-text"></p>
+    <button class="start" id="btn-start" data-t="start"></button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const EXPS = window.TSIINO_EXP.expeditions;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (id) => document.getElementById(id);
+  const EMBED = new URLSearchParams(location.search).get('embed') === '1';
+  if (EMBED) document.documentElement.classList.add('embed');
+
+  // ================= idioma (mesma chave e parâmetro do site) =================
+  const I18N = {
+    pt: {
+      introTitle: 'Nossos trajetos em 3D',
+      introText: (n, km) => `Acompanhe ${n} trajetos de campo — ${km} km por rios, trilhas e serras do Alto Rio Negro — com as fotos e os registros feitos pelo caminho.`,
+      start: 'Começar', expeditions: 'Expedições', all: 'Ver todas no mapa', recenter: 'Seguir o trajeto',
+      modes: { rio: 'pelo rio', trilha: 'a pé', subida: 'subida' },
+      meta: (region, date, km) => `${region} · ${date} · ${km} km`,
+      summit: 'Cume', play: 'Reproduzir', pause: 'Pausar', speed: 'Velocidade', photo: 'Foto',
+      timeline: 'Linha do tempo da expedição', openPhoto: 'Ampliar foto', close: 'Fechar', prev: 'Anterior', next: 'Próxima',
+      mapLabel: 'Mapa 3D das trilhas das expedições', fullscreen: 'Tela cheia'
+    },
+    en: {
+      introTitle: 'Our routes in 3D',
+      introText: (n, km) => `Follow ${n} field routes — ${km} km across rivers, trails and ranges of the Upper Rio Negro — with the photos and records made along the way.`,
+      start: 'Start', expeditions: 'Expeditions', all: 'See all on the map', recenter: 'Follow the route',
+      modes: { rio: 'by river', trilha: 'on foot', subida: 'ascent' },
+      meta: (region, date, km) => `${region} · ${date} · ${km} km`,
+      summit: 'Summit', play: 'Play', pause: 'Pause', speed: 'Speed', photo: 'Photo',
+      timeline: 'Expedition timeline', openPhoto: 'Enlarge photo', close: 'Close', prev: 'Previous', next: 'Next',
+      mapLabel: '3D map of the expedition routes', fullscreen: 'Full screen'
+    }
+  };
+  const LANG_KEY = 'tsiino-language';
+  let lang = (() => {
+    const q = new URLSearchParams(location.search).get('lang');
+    if (q === 'pt' || q === 'en') return q;
+    try { const s = localStorage.getItem(LANG_KEY); if (s === 'pt' || s === 'en') return s; } catch (e) {}
+    return 'pt';
+  })();
+  const T = () => I18N[lang];
+  const locale = () => (lang === 'en' ? 'en' : 'pt-BR');
+  const fmtKm = (m) => Math.round(m / 1000).toLocaleString(locale());
+  const expName = (e) => (lang === 'en' && e.name_en) || e.name;
+  const trailName = (t) => (lang === 'en' && t.name_en) || t.name;
+  function fmtDate(s) {
+    const m = /^(\d{4})-(\d{2})/.exec(s || '');
+    if (!m) return s || '';
+    const txt = new Intl.DateTimeFormat(locale(), { month: 'long', year: 'numeric' }).format(new Date(+m[1], +m[2] - 1, 1));
+    return txt.charAt(0).toUpperCase() + txt.slice(1);
+  }
+
+  // ================= geometria =================
+  const R = 6371008.8, rad = Math.PI / 180;
+  function bearing(a, b) {
+    const y = Math.sin((b[0] - a[0]) * rad) * Math.cos(b[1] * rad);
+    const x = Math.cos(a[1] * rad) * Math.sin(b[1] * rad) - Math.sin(a[1] * rad) * Math.cos(b[1] * rad) * Math.cos((b[0] - a[0]) * rad);
+    return (Math.atan2(y, x) / rad + 360) % 360;
+  }
+  function distM(a, b) {
+    const dla = (b[1] - a[1]) * rad, dlo = (b[0] - a[0]) * rad;
+    const h = Math.sin(dla / 2) ** 2 + Math.cos(a[1] * rad) * Math.cos(b[1] * rad) * Math.sin(dlo / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  function offset(p, brg, m) {
+    const d = m / R, b = brg * rad, la = p[1] * rad, lo = p[0] * rad;
+    const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
+    const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2));
+    return [lo2 / rad, la2 / rad];
+  }
+  function idxAt(t, d) {
+    let lo = 0, hi = t.dist.length - 1;
+    while (lo < hi) { const m = (lo + hi + 1) >> 1; if (t.dist[m] <= d) lo = m; else hi = m - 1; }
+    return lo;
+  }
+  function pointAt(t, d) {
+    d = Math.max(0, Math.min(t.length_m, d));
+    const i = idxAt(t, d), j = Math.min(i + 1, t.coords.length - 1);
+    const f = (d - t.dist[i]) / ((t.dist[j] - t.dist[i]) || 1);
+    const a = t.coords[i], b = t.coords[j], za = t.z[i], zb = t.z[j];
+    return { lngLat: [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f], i, z: za == null ? null : za + ((zb ?? za) - za) * f };
+  }
+  function nearestDist(t, p) {
+    let best = Infinity, bd = 0;
+    t.coords.forEach((c, i) => { const d = distM(c, p); if (d < best) { best = d; bd = t.dist[i]; } });
+    return { along: bd, off: best };
+  }
+  function boundsOf(trails) { const b = new maplibregl.LngLatBounds(); trails.forEach(t => t.coords.forEach(c => b.extend(c))); return b; }
+  function centroid(cs) { let x = 0, y = 0; cs.forEach(c => { x += c[0]; y += c[1]; }); return [x / cs.length, y / cs.length]; }
+  const lerpP = (a, b, f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+  const angleLerp = (a, b, f) => { const d = ((b - a + 540) % 360) - 180; return (a + d * f + 360) % 360; };
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // ================= mapa =================
+  const EXAG = { base: 2.0, subida: 1.3 };
+  const all = EXPS.flatMap(e => e.trails);
+  const DEM_URL = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: {
+      version: 8,
+      sources: {
+        sat: { type: 'raster', tileSize: 256, maxzoom: 18, tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], attribution: 'Imagem © Esri, Maxar, Earthstar Geographics' },
+        dem: { type: 'raster-dem', encoding: 'terrarium', tileSize: 256, maxzoom: 14, tiles: [DEM_URL], attribution: 'Relevo: AWS Terrain Tiles' },
+        hs: { type: 'raster-dem', encoding: 'terrarium', tileSize: 256, maxzoom: 14, tiles: [DEM_URL] }
+      },
+      layers: [
+        { id: 'bg', type: 'background', paint: { 'background-color': '#1c1f19' } },
+        { id: 'sat', type: 'raster', source: 'sat', paint: { 'raster-saturation': -0.22, 'raster-contrast': 0.06, 'raster-brightness-max': 0.9 } },
+        { id: 'hill', type: 'hillshade', source: 'hs', paint: { 'hillshade-exaggeration': 0.3, 'hillshade-shadow-color': '#10120e', 'hillshade-highlight-color': '#f4f3ef', 'hillshade-illumination-direction': 300 } }
+      ],
+      terrain: { source: 'dem', exaggeration: EXAG.base }
+    },
+    bounds: boundsOf(all), fitBoundsOptions: { padding: 80 },
+    pitch: 40, maxPitch: 78, attributionControl: { compact: true },
+    // Embutido na página: a rolagem continua rolando a página; zoom com Ctrl/⌘ ou dois dedos.
+    cooperativeGestures: EMBED,
+    locale: lang === 'en' ? {} : {
+      'CooperativeGesturesHandler.WindowsHelpText': 'Use Ctrl + rolagem para aproximar o mapa',
+      'CooperativeGesturesHandler.MacHelpText': 'Use ⌘ + rolagem para aproximar o mapa',
+      'CooperativeGesturesHandler.MobileHelpText': 'Use dois dedos para mover o mapa'
+    }
+  });
+  map.setPadding({ top: 70, bottom: 110, left: 0, right: 0 });
+
+  let exagNow = EXAG.base, exagAnim = 0;
+  function tweenExaggeration(target, ms = 1400) {
+    if (Math.abs(target - exagNow) < 0.01) return;
+    const from = exagNow, t0 = performance.now(), id = ++exagAnim;
+    (function step(now) {
+      if (id !== exagAnim) return;
+      const f = Math.min(1, (now - t0) / ms), e = f < .5 ? 2 * f * f : 1 - (-2 * f + 2) ** 2 / 2;
+      exagNow = from + (target - from) * e;
+      map.setTerrain({ source: 'dem', exaggeration: exagNow });
+      if (f < 1) requestAnimationFrame(step);
+    })(performance.now());
+  }
+  function groundElev(p) { const v = map.queryTerrainElevation(p); return v == null ? null : v / (exagNow || 1); }
+
+  // ================= estado =================
+  const S = { exp: 0, trail: 0, d: 0, playing: !reduceMotion, speed: 1, follow: true, run: 0, cam: null, shown: new Set(), lastExp: -1 };
+  const SPEEDS = [0.5, 1, 2, 4];
+  const fc = (f) => ({ type: 'FeatureCollection', features: f });
+  const lineF = (c) => ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: c } });
+  const ptF = (c) => ({ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: c } });
+
+  function trailDuration(t) {
+    const base = Math.max(9, Math.min(26, 6 + 3.2 * Math.sqrt(t.length_m / 1000)));
+    return t.mode === 'subida' ? base * 1.5 : base;
+  }
+
+  // ================= câmeras =================
+  function followCam(t) {
+    if (t.mode === 'rio') return { kind: 'follow', zoom: t.length_m > 100000 ? 12.1 : 12.6, pitch: 62, look: 2200 };
+    return { kind: 'follow', zoom: 14.5, pitch: 62, look: 280 };
+  }
+  // Subida: de lado e afastada, rumo quase fixo, no lado de terreno mais baixo.
+  function climbCam(t) {
+    const top = t.coords[t.summit ? t.summit.i : t.coords.length - 1];
+    const axis = bearing(t.coords[0], top), mid = centroid(t.coords);
+    let best = null;
+    for (const side of [70, -70]) {
+      const view = (axis + side + 360) % 360;
+      const ok = [2000, 3500, 5000].map(m => groundElev(offset(mid, view + 180, m))).filter(v => v != null);
+      const score = ok.length ? Math.max(...ok) : 0;
+      if (!best || score < best.score) best = { view, score };
+    }
+    const fit = map.cameraForBounds(boundsOf([t]), { padding: 60, bearing: best.view });
+    return { kind: 'climb', view: best.view, zoom: clamp((fit ? fit.zoom : 13.5) - 0.55, 11.6, 13.9), pitch: 55, mid };
+  }
+  const camFor = (t) => (t.mode === 'subida' ? climbCam(t) : followCam(t));
+  function cameraFrame(t, c, p, smooth) {
+    if (c.kind === 'climb') {
+      const f = S.d / t.length_m;
+      return { center: lerpP(c.mid, p.lngLat, 0.4), bearing: (c.view + (f - 0.5) * 16 + 360) % 360, pitch: c.pitch, zoom: c.zoom };
+    }
+    const back = pointAt(t, S.d - c.look * 0.4).lngLat, fwd = pointAt(t, S.d + c.look).lngLat;
+    S.cam.bearing = smooth ? angleLerp(S.cam.bearing, bearing(back, fwd), Math.min(1, 0.025 * S.speed)) : bearing(back, fwd);
+    let zoom = c.zoom;
+    if (t.mode !== 'rio') { // folga do relevo atrás da câmera
+      const here = groundElev(p.lngLat);
+      const behind = [600, 1100, 1700].map(m => groundElev(offset(p.lngLat, S.cam.bearing + 180, m))).filter(v => v != null);
+      if (here != null && behind.length) zoom = c.zoom - clamp((Math.max(...behind) - here - 30) / 140, 0, 1.8);
+    }
+    S.cam.zoom = smooth && S.cam.zoom != null ? S.cam.zoom + (zoom - S.cam.zoom) * 0.04 : zoom;
+    return { center: p.lngLat, bearing: S.cam.bearing, pitch: c.pitch, zoom: S.cam.zoom };
+  }
+  function detectClimbsFromTerrain(exp) { // só para KMLs sem altitude
+    exp.trails.forEach(t => {
+      if (t.mode !== 'trilha' || t._checked || t.z.some(v => v != null)) return;
+      const step = Math.max(1, Math.floor(t.coords.length / 40)), zs = [];
+      let bi = 0, bz = -1e9;
+      for (let i = 0; i < t.coords.length; i += step) { const z = groundElev(t.coords[i]); if (z != null) { zs.push(z); if (z > bz) { bz = z; bi = i; } } }
+      if (zs.length < 8) return;
+      t._checked = true;
+      if (bz - Math.min(...zs) >= 250) { t.mode = 'subida'; t.summit = { i: bi, z: Math.round(bz) }; addSummit(EXPS.indexOf(exp), exp.trails.indexOf(t)); }
+    });
+  }
+
+  // ================= camadas =================
+  function addLayers() {
+    map.addSource('all', { type: 'geojson', data: fc(all.map(t => lineF(t.coords))) });
+    ['done', 'active', 'head'].forEach(id => map.addSource(id, { type: 'geojson', data: fc([]) }));
+    const lw = (a, b) => ['interpolate', ['linear'], ['zoom'], 8, a, 15, b];
+    map.addLayer({ id: 'all-line', type: 'line', source: 'all', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#f4f3ef', 'line-width': lw(1, 2), 'line-opacity': .4, 'line-dasharray': [2, 2] } });
+    for (const src of ['done', 'active']) {
+      map.addLayer({ id: src + '-glow', type: 'line', source: src, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#dfe5ae', 'line-width': lw(6, 16), 'line-blur': 8, 'line-opacity': src === 'active' ? .5 : .2 } });
+      map.addLayer({ id: src + '-line', type: 'line', source: src, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': src === 'active' ? '#f4f3ef' : '#b4bc7a', 'line-width': lw(2, 4.5) } });
+    }
+    map.addLayer({ id: 'head-glow', type: 'circle', source: 'head', paint: { 'circle-radius': 20, 'circle-color': '#dfe5ae', 'circle-opacity': .3, 'circle-blur': 1, 'circle-pitch-alignment': 'map' } });
+    map.addLayer({ id: 'head', type: 'circle', source: 'head', paint: { 'circle-radius': 6, 'circle-color': '#f4f3ef', 'circle-stroke-color': '#626a38', 'circle-stroke-width': 3, 'circle-pitch-alignment': 'map' } });
+    try {
+      map.setSky({ 'sky-color': '#9fb1a5', 'horizon-color': '#e2e4d8', 'fog-color': '#cdd2c4', 'sky-horizon-blend': 0.6, 'horizon-fog-blend': 0.75, 'fog-ground-blend': 0.35, 'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 10, 1, 12, 0] });
+    } catch (e) { console.warn('Céu/névoa indisponível', e); }
+  }
+
+  // ================= registros de campo =================
+  // O MapLibre controla a opacidade do elemento do marcador (oclusão pelo relevo);
+  // a visibilidade fica sempre num elemento interno.
+  function htmlMarker(inner, lngLat, anchor = 'left', off = [-5, 0]) {
+    const wrap = document.createElement('div');
+    wrap.appendChild(inner);
+    return new maplibregl.Marker({ element: wrap, anchor, offset: off }).setLngLat(lngLat).addTo(map);
+  }
+  const marks = [];
+  function addMark(ei, ti, kind, lngLat, labelFn) {
+    const el = document.createElement('div');
+    el.className = 'wp' + (kind === 'summit' ? ' summit' : '');
+    el.innerHTML = '<i></i><span></span>';
+    htmlMarker(el, lngLat);
+    const m = { ei, ti, kind, lngLat, el, labelFn, key: `${ei}-${ti}-${marks.length}` };
+    el.querySelector('span').textContent = labelFn();
+    marks.push(m);
+  }
+  function addSummit(ei, ti) {
+    const t = EXPS[ei].trails[ti];
+    addMark(ei, ti, 'summit', t.coords[t.summit.i], () => `${T().summit} · ${t.summit.z.toLocaleString(locale())} m`);
+  }
+  function buildMarks() {
+    EXPS.forEach((e, ei) => e.trails.forEach((t, ti) => {
+      t.waypoints.forEach(w => addMark(ei, ti, 'wp', [w.lon, w.lat], () => w.name));
+      if (t.mode === 'subida' && t.summit) addSummit(ei, ti);
+    }));
+  }
+  // Trajeto atual: nomes aparecem quando a linha passa. Anteriores: só o ponto.
+  function syncMarks() {
+    marks.forEach(m => {
+      const before = m.ei === S.exp && m.ti < S.trail;
+      if (!(m.ei === S.exp && m.ti === S.trail)) {
+        m.el.classList.toggle('show', before);
+        m.el.classList.toggle('past', before && m.kind !== 'summit');
+        S.shown.delete(m.key);
+      }
+    });
+  }
+  function checkMarks(lngLat, t) {
+    const r = t.mode === 'rio' ? 600 : 90;
+    marks.forEach(m => {
+      if (m.ei !== S.exp || m.ti !== S.trail || S.shown.has(m.key)) return;
+      if (distM(lngLat, m.lngLat) < r) { S.shown.add(m.key); m.el.classList.add('show'); m.el.classList.remove('past'); }
+    });
+  }
+
+  // ================= fotos =================
+  // Sem coordenada: viajam junto, num cartão preso ao ponto que percorre o trajeto.
+  // Com coordenada (legendas.csv): ficam presas no lugar e viram um ponto depois.
+  const P = { list: [], idx: -1, timer: null, imgs: new Map(), pins: [] };
+  const travelerRoot = document.createElement('div');
+  travelerRoot.className = 'traveler';
+  travelerRoot.innerHTML = '<span class="alt" id="alt"></span><button class="tcard off" id="tcard"><div class="tframe" id="tframe"></div><div class="tmeta"><span id="tcap"></span><span id="tcount"></span></div></button>';
+  document.body.appendChild(travelerRoot); // passa para o marcador no load
+  let travelerMarker = null;
+  const photoSrc = (p) => encodeURI(p.src);
+  const capOf = (p, e) => (lang === 'en' ? p.en || p.pt : p.pt || p.en) || expName(e);
+  function rotationFor() {
+    const e = EXPS[S.exp], tid = (e.trails[S.trail] || {}).id;
+    const free = e.photos.map((_, i) => i).filter(i => e.photos[i].lat == null);
+    const own = free.filter(i => e.photos[i].trail === tid);
+    return own.length ? own : free.filter(i => !e.photos[i].trail);
+  }
+  function showTravelerPhoto(i) {
+    const e = EXPS[S.exp], p = e.photos[i];
+    if (!p) { $('tcard').classList.add('off'); return; }
+    P.idx = i;
+    let im = P.imgs.get(i);
+    if (!im) { im = document.createElement('img'); im.decoding = 'async'; im.alt = ''; im.src = photoSrc(p); $('tframe').appendChild(im); P.imgs.set(i, im); }
+    const next = e.photos[P.list[(P.list.indexOf(i) + 1) % P.list.length]];
+    if (next) { const pre = new Image(); pre.src = photoSrc(next); }
+    P.imgs.forEach((x, k) => x.classList.toggle('on', k === i));
+    $('tcap').textContent = capOf(p, e);
+    $('tcount').textContent = `${i + 1}/${e.photos.length}`;
+    $('tcard').setAttribute('aria-label', `${T().openPhoto}: ${capOf(p, e)}`);
+    $('tcard').classList.remove('off');
+  }
+  function resetPhotos() {
+    const e = EXPS[S.exp];
+    clearInterval(P.timer);
+    P.imgs.forEach(im => im.remove()); P.imgs.clear(); P.idx = -1;
+    P.pins.forEach(x => x.marker.remove()); P.pins = [];
+    $('tcard').classList.add('off');
+    e.photos.forEach((p, i) => {
+      if (p.lat == null) return;
+      const btn = document.createElement('button');
+      btn.className = 'gpin';
+      btn.innerHTML = `<div class="gframe"><img loading="lazy" alt="" src="${photoSrc(p)}"></div>`;
+      btn.onclick = () => openLightbox(i);
+      const near = e.trails.reduce((best, t, k) => { const n = nearestDist(t, [p.lon, p.lat]); return n.off < best.off ? { off: n.off, ti: k, along: n.along } : best; }, { off: Infinity, ti: 0, along: 0 });
+      P.pins.push({ el: btn, ti: near.ti, along: near.along, marker: htmlMarker(btn, [p.lon, p.lat], 'bottom', [0, -6]) });
+    });
+    P.timer = setInterval(() => {
+      if (!S.playing || !P.list.length || $('lightbox').classList.contains('open')) return;
+      showTravelerPhoto(P.list[(P.list.indexOf(P.idx) + 1) % P.list.length]);
+    }, 7000);
+  }
+  function syncPhotosForTrail() {
+    P.list = rotationFor();
+    if (!P.list.length) { $('tcard').classList.add('off'); return; }
+    if (!P.list.includes(P.idx)) showTravelerPhoto(P.list[0]);
+  }
+  function updatePins() {
+    P.pins.forEach(pin => {
+      const reached = pin.ti < S.trail || (pin.ti === S.trail && S.d >= pin.along - 50);
+      const passed = pin.ti < S.trail || (pin.ti === S.trail && S.d > pin.along + 600);
+      pin.el.classList.toggle('show', reached);
+      pin.el.classList.toggle('mini', passed);
+    });
+  }
+
+  // lightbox
+  let lbIdx = 0, lbWasPlaying = false;
+  function openLightbox(i) {
+    lbIdx = i; renderLightbox();
+    if (!$('lightbox').classList.contains('open')) { lbWasPlaying = S.playing; setPlaying(false); }
+    $('lightbox').classList.add('open'); $('lb-close').focus();
+  }
+  function closeLightbox() { $('lightbox').classList.remove('open'); if (lbWasPlaying) setPlaying(true); }
+  function renderLightbox() {
+    const e = EXPS[S.exp], p = e.photos[lbIdx];
+    if (!p) return;
+    $('lb-img').src = photoSrc(p); $('lb-img').alt = capOf(p, e);
+    $('lb-cap').textContent = capOf(p, e) + (p.credit ? ` — ${p.credit}` : '');
+    $('lb-count').textContent = `${T().photo} ${lbIdx + 1}/${e.photos.length}`;
+  }
+  $('tcard').onclick = () => { if (P.idx >= 0) openLightbox(P.idx); };
+  $('lb-close').onclick = closeLightbox;
+  $('lb-prev').onclick = () => { const n = EXPS[S.exp].photos.length; lbIdx = (lbIdx - 1 + n) % n; renderLightbox(); };
+  $('lb-next').onclick = () => { const n = EXPS[S.exp].photos.length; lbIdx = (lbIdx + 1) % n; renderLightbox(); };
+
+  // ================= linha do tempo = perfil de altitude da expedição =================
+  // Largura de cada trajeto proporcional ao tempo de animação (não à distância),
+  // para que trilhas curtas não sumam ao lado de 190 km de rio.
+  const TL = { segs: [] };
+  function buildTimeline() {
+    const e = EXPS[S.exp], gap = 6;
+    const durs = e.trails.map(trailDuration), W = 1000 - gap * (e.trails.length - 1);
+    const sum = durs.reduce((a, b) => a + b, 0);
+    const zs = e.trails.flatMap(t => t.z.filter(v => v != null));
+    const zlo = zs.length ? Math.min(...zs) : 0, zspan = Math.max(zs.length ? Math.max(...zs) - zlo : 0, 80);
+    let x = 0, areas = '', summits = '';
+    TL.segs = e.trails.map((t, i) => {
+      const w = durs[i] / sum * W, seg = { x0: x, w, t };
+      const n = Math.max(4, Math.round(w / 4));
+      let path = `M${x.toFixed(1)},44`;
+      for (let k = 0; k <= n; k++) {
+        const p = pointAt(t, t.length_m * k / n);
+        const y = p.z == null ? 36 : 40 - ((p.z - zlo) / zspan) * 30;
+        path += `L${(x + w * k / n).toFixed(1)},${y.toFixed(1)}`;
+      }
+      areas += path + `L${(x + w).toFixed(1)},44Z`;
+      if (t.mode === 'subida' && t.summit) {
+        const sx = x + w * (t.dist[t.summit.i] / t.length_m);
+        summits += `<path d="M${(sx - 5).toFixed(1)},4 L${(sx + 5).toFixed(1)},4 L${sx.toFixed(1)},-3Z" fill="#f4f3ef"/>`;
+      }
+      x += w + gap;
+      return seg;
+    });
+    $('tl-svg').innerHTML =
+      `<defs><clipPath id="tl-clip"><rect id="tl-prog" x="0" y="-10" width="0" height="60"/></clipPath></defs>` +
+      `<path d="${areas}" fill="rgba(244,243,239,.18)"/>` +
+      `<path d="${areas}" fill="#b4bc7a" clip-path="url(#tl-clip)"/>` +
+      summits +
+      `<line id="tl-cursor" x1="0" x2="0" y1="0" y2="44" stroke="#f4f3ef" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+    updateTimeline();
+  }
+  function updateTimeline() {
+    let x = 0;
+    if (S.trail >= TL.segs.length) x = 1000;
+    else if (TL.segs[S.trail]) { const s = TL.segs[S.trail]; x = s.x0 + s.w * (S.d / s.t.length_m); }
+    const prog = $('tl-prog'), cur = $('tl-cursor');
+    if (!prog) return;
+    prog.setAttribute('width', x);
+    cur.setAttribute('x1', x); cur.setAttribute('x2', x);
+    $('timeline').setAttribute('aria-valuenow', Math.round(x / 10));
+  }
+  function segAt(clientX) {
+    const r = $('timeline').getBoundingClientRect(), x = clamp((clientX - r.left) / r.width, 0, 1) * 1000;
+    let i = TL.segs.findIndex(s => x <= s.x0 + s.w);
+    if (i < 0) i = TL.segs.length - 1;
+    const s = TL.segs[i];
+    return { i, d: clamp((x - s.x0) / s.w, 0, 1) * s.t.length_m, px: clientX - r.left };
+  }
+  $('timeline').addEventListener('pointermove', (ev) => {
+    if (!TL.segs.length) return;
+    const h = segAt(ev.clientX), t = TL.segs[h.i].t;
+    $('tl-tip').innerHTML = '<span></span><small></small>';
+    $('tl-tip').firstChild.textContent = trailName(t);
+    $('tl-tip').lastChild.textContent = `${T().modes[t.mode]} · ${(t.length_m / 1000).toLocaleString(locale(), { maximumFractionDigits: 1 })} km`;
+    $('tl-tip').style.left = h.px + 'px';
+  });
+  $('timeline').addEventListener('click', (ev) => { if (TL.segs.length) { const h = segAt(ev.clientX); seek(h.i, h.d); } });
+  $('timeline').addEventListener('keydown', (ev) => {
+    if (ev.key === 'ArrowRight') { ev.preventDefault(); seek(Math.min(S.trail + 1, TL.segs.length - 1), 0); }
+    if (ev.key === 'ArrowLeft') { ev.preventDefault(); seek(Math.max(S.trail - (S.d < 200 ? 1 : 0), 0), 0); }
+  });
+
+  // ================= textos =================
+  function renderHeader() {
+    const e = EXPS[S.exp];
+    $('exp-name').textContent = expName(e);
+    $('exp-meta').textContent = T().meta(e.region, fmtDate(e.date), fmtKm(e.trails.reduce((s, t) => s + t.length_m, 0)));
+  }
+  let trailTextTimer = null;
+  function renderTrail() {
+    const e = EXPS[S.exp], t = e.trails[Math.min(S.trail, e.trails.length - 1)];
+    $('now').style.opacity = 0;
+    clearTimeout(trailTextTimer);
+    trailTextTimer = setTimeout(() => {
+      $('trail-name').textContent = trailName(t);
+      $('trail-chip').textContent = T().modes[t.mode];
+      $('now').style.opacity = 1;
+    }, 250);
+  }
+  function renderMenu() {
+    const m = $('menu');
+    m.innerHTML = '';
+    EXPS.forEach((e, i) => {
+      const b = document.createElement('button');
+      b.setAttribute('role', 'menuitem');
+      b.setAttribute('aria-current', String(i === S.exp && S.lastExp >= 0));
+      b.innerHTML = '<span></span><small></small>';
+      b.firstChild.textContent = expName(e);
+      b.lastChild.textContent = `${e.region} · ${fmtDate(e.date)}`;
+      b.onclick = () => { toggleMenu(false); $('intro').classList.add('gone'); setPlaying(true); startExpedition(i, 0); };
+      m.appendChild(b);
+    });
+    m.appendChild(document.createElement('hr'));
+    const ov = document.createElement('button');
+    ov.setAttribute('role', 'menuitem');
+    ov.textContent = T().all;
+    ov.onclick = () => { toggleMenu(false); overviewAll(); };
+    m.appendChild(ov);
+  }
+  function toggleMenu(open) {
+    $('menu').classList.toggle('open', open);
+    $('btn-menu').setAttribute('aria-expanded', String(open));
+  }
+  $('btn-menu').onclick = (ev) => { ev.stopPropagation(); toggleMenu(!$('menu').classList.contains('open')); };
+  document.addEventListener('click', (ev) => { if (!ev.target.closest('#menu')) toggleMenu(false); });
+
+  function renderStatic() {
+    document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
+    document.querySelectorAll('[data-t]').forEach(n => { const v = T()[n.dataset.t]; if (typeof v === 'string') n.textContent = v; });
+    $('intro-text').textContent = T().introText(all.length, fmtKm(all.reduce((s, t) => s + t.length_m, 0)));
+    $('map').setAttribute('aria-label', T().mapLabel);
+    $('timeline').setAttribute('aria-label', T().timeline);
+    $('btn-speed').title = T().speed;
+    $('lb-close').setAttribute('aria-label', T().close);
+    $('lb-prev').setAttribute('aria-label', T().prev);
+    $('lb-next').setAttribute('aria-label', T().next);
+    $('btn-fs').setAttribute('aria-label', T().fullscreen); $('btn-fs').title = T().fullscreen;
+    document.querySelectorAll('[data-lang-toggle]').forEach(box => {
+      box.innerHTML = '';
+      ['pt', 'en'].forEach(l => {
+        const b = document.createElement('button');
+        b.textContent = l.toUpperCase();
+        b.setAttribute('aria-pressed', String(l === lang));
+        b.onclick = () => setLang(l);
+        box.appendChild(b);
+      });
+    });
+    setPlaying(S.playing);
+  }
+  function setLang(l) {
+    lang = l;
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+    renderStatic(); renderHeader(); renderTrail(); renderMenu();
+    marks.forEach(m => { m.el.querySelector('span').textContent = m.labelFn(); });
+    if (P.idx >= 0) showTravelerPhoto(P.idx);
+    if ($('lightbox').classList.contains('open')) renderLightbox();
+  }
+
+  // ================= animação =================
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  async function waitPlaying(run) { while (!S.playing && run === S.run) await sleep(120); }
+  function flyTo(opts, run) {
+    return new Promise(res => {
+      if (run !== S.run) return res();
+      map.stop();
+      if (reduceMotion) { map.jumpTo(opts); return res(); }
+      map.once('moveend', () => res());
+      map.flyTo({ ...opts, duration: (opts.duration || 3000) / S.speed, essential: true });
+    });
+  }
+  function setDone() { map.getSource('done').setData(fc(EXPS[S.exp].trails.slice(0, S.trail).map(t => lineF(t.coords)))); }
+  function overviewAll() {
+    setFollow(false);
+    const cam = map.cameraForBounds(boundsOf(all), { padding: 60 });
+    map.flyTo({ center: cam.center, zoom: cam.zoom, pitch: 45, bearing: 0, duration: 3500, essential: true });
+  }
+  function seek(ti, d) { setFollow(true); startExpedition(S.exp, ti, d, true); }
+
+  async function startExpedition(ei, ti, d0 = 0, quick = false) {
+    const run = ++S.run;
+    const changed = ei !== S.lastExp;
+    S.exp = ei; S.trail = ti; S.d = d0;
+    if (changed) { S.lastExp = ei; renderHeader(); renderMenu(); buildTimeline(); resetPhotos(); }
+    setDone(); syncMarks(); renderTrail(); updateTimeline(); updatePins();
+    map.getSource('active').setData(fc([]));
+    if (!quick) tweenExaggeration(EXAG.base);
+
+    if (ti === 0 && d0 === 0 && !quick) {
+      const cam = map.cameraForBounds(boundsOf(EXPS[ei].trails), { padding: 60 });
+      await flyTo({ center: cam.center, zoom: Math.min(cam.zoom, 12), pitch: 50, bearing: -15, duration: 4200 }, run);
+      await waitPlaying(run);
+      await sleep(700);
+      if (run !== S.run) return;
+      detectClimbsFromTerrain(EXPS[ei]);
+      buildTimeline();
+    }
+    for (let i = ti; i < EXPS[ei].trails.length && run === S.run; i++) {
+      S.trail = i; S.d = i === ti ? d0 : 0;
+      setDone(); syncMarks(); renderTrail(); syncPhotosForTrail();
+      await playTrail(run, quick && i === ti);
+    }
+    if (run !== S.run) return;
+    S.trail = EXPS[ei].trails.length; setDone(); syncMarks(); updateTimeline();
+    map.getSource('active').setData(fc([]));
+    tweenExaggeration(EXAG.base);
+    const cam = map.cameraForBounds(boundsOf(EXPS[ei].trails), { padding: 60 });
+    await flyTo({ center: cam.center, zoom: Math.min(cam.zoom, 12.5), pitch: 52, bearing: 20, duration: 4500 }, run);
+    await waitPlaying(run);
+    await sleep(2500 / S.speed);
+    if (run === S.run) startExpedition((ei + 1) % EXPS.length, 0);
+  }
+
+  async function playTrail(run, quick) {
+    const t = EXPS[S.exp].trails[S.trail];
+    tweenExaggeration(t.mode === 'subida' ? EXAG.subida : EXAG.base);
+    await waitPlaying(run);
+    if (t.mode === 'subida' && !quick) { // aproxima para o relevo carregar antes de escolher o lado
+      await flyTo({ center: centroid(t.coords), zoom: 12.6, pitch: 45, duration: 2600 }, run);
+      await sleep(400);
+    }
+    if (run !== S.run) return;
+    const c = camFor(t);
+    S.cam = { bearing: 0, zoom: null };
+    travelerMarker.setLngLat(pointAt(t, S.d).lngLat);
+    if (S.follow) await flyTo({ ...cameraFrame(t, c, pointAt(t, S.d), false), duration: quick ? 900 : 3200 }, run);
+    const dur = trailDuration(t) * 1000;
+    let last = performance.now();
+    await new Promise(resolve => {
+      function frame(now) {
+        if (run !== S.run) return resolve();
+        const dt = Math.min(now - last, 60); last = now;
+        if (S.playing) S.d = Math.min(t.length_m, S.d + (dt * S.speed / dur) * t.length_m);
+        const p = pointAt(t, S.d);
+        map.getSource('active').setData(fc([lineF(t.coords.slice(0, p.i + 1).concat([p.lngLat]))]));
+        map.getSource('head').setData(fc([ptF(p.lngLat)]));
+        travelerMarker.setLngLat(p.lngLat);
+        const alt = $('alt');
+        alt.classList.toggle('show', t.mode === 'subida' && p.z != null);
+        if (p.z != null) alt.textContent = `${Math.round(p.z).toLocaleString(locale())} m`;
+        if (S.follow && S.playing) map.jumpTo(cameraFrame(t, c, p, true));
+        checkMarks(p.lngLat, t);
+        updatePins();
+        updateTimeline();
+        if (S.d >= t.length_m) return resolve();
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+    if (run === S.run) await sleep(600 / S.speed);
+  }
+
+  // ================= controles =================
+  const ICON_PAUSE = '<svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/></svg>';
+  const ICON_PLAY = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.2v11.6c0 .5.6.8 1 .5l8.6-5.8a.6.6 0 0 0 0-1L4 .7c-.4-.3-1 0-1 .5z" fill="currentColor"/></svg>';
+  function setPlaying(v) {
+    S.playing = v;
+    $('btn-play').innerHTML = v ? ICON_PAUSE : ICON_PLAY;
+    $('btn-play').setAttribute('aria-label', v ? T().pause : T().play);
+  }
+  function setFollow(v) { S.follow = v; $('btn-recenter').classList.toggle('show', !v); }
+  $('btn-play').onclick = () => setPlaying(!S.playing);
+  $('btn-speed').onclick = () => { S.speed = SPEEDS[(SPEEDS.indexOf(S.speed) + 1) % SPEEDS.length]; $('btn-speed').textContent = S.speed.toLocaleString(locale()) + '×'; };
+  $('btn-recenter').onclick = () => setFollow(true);
+  $('btn-fs').onclick = () => {
+    const d = document;
+    if (d.fullscreenElement) d.exitFullscreen();
+    else if (d.documentElement.requestFullscreen) d.documentElement.requestFullscreen();
+    else window.open(location.pathname, '_blank');
+  };
+
+  // Mensagens da aba Expedições quando embutido: idioma, visibilidade e "Ver em 3D".
+  let mapReady = false, pendingGoto = null;
+  function gotoExpedition(id) {
+    const ei = EXPS.findIndex(e => e.id === id);
+    if (ei < 0) return;
+    if (!mapReady) { pendingGoto = id; return; }
+    $('intro').classList.add('gone'); setFollow(true); setPlaying(true); startExpedition(ei, 0);
+  }
+  window.addEventListener('message', (ev) => {
+    if (ev.source !== window.parent || !ev.data || typeof ev.data !== 'object') return;
+    const m = ev.data;
+    if (m.type === 'tsiino-lang' && (m.lang === 'pt' || m.lang === 'en') && m.lang !== lang) setLang(m.lang);
+    if (m.type === 'tsiino-goto') gotoExpedition(m.exp);
+    if (m.type === 'tsiino-visible') {
+      if (!m.visible && S.playing) { S.autoPaused = true; setPlaying(false); }
+      else if (m.visible && S.autoPaused) { S.autoPaused = false; setPlaying(true); }
+    }
+  });
+  map.on('dragstart', (ev) => { if (ev.originalEvent) setFollow(false); });
+  document.addEventListener('keydown', (ev) => {
+    if ($('lightbox').classList.contains('open')) {
+      if (ev.key === 'Escape') closeLightbox();
+      if (ev.key === 'ArrowRight') $('lb-next').click();
+      if (ev.key === 'ArrowLeft') $('lb-prev').click();
+      return;
+    }
+    if (ev.key === 'Escape') toggleMenu(false);
+    if (ev.code === 'Space' && ev.target === document.body) { ev.preventDefault(); setPlaying(!S.playing); }
+  });
+
+  renderStatic();
+  map.on('load', () => {
+    addLayers();
+    buildMarks();
+    travelerMarker = htmlMarker(travelerRoot, map.getCenter().toArray(), 'top-left', [0, 0]);
+    S.exp = 0;
+    renderHeader(); renderMenu(); buildTimeline(); renderTrail();
+    mapReady = true;
+    if (pendingGoto) gotoExpedition(pendingGoto);
+    $('btn-start').onclick = () => { $('intro').classList.add('gone'); setPlaying(true); startExpedition(0, 0); };
+    // Link direto: ?exp=<id>&trail=<n ou kml>
+    const q = new URLSearchParams(location.search);
+    const ei = EXPS.findIndex(e => e.id === q.get('exp'));
+    if (ei >= 0) {
+      const tq = q.get('trail');
+      let ti = tq == null ? 0 : EXPS[ei].trails.findIndex(t => t.id === tq);
+      if (ti < 0) ti = clamp((parseInt(tq, 10) || 1) - 1, 0, EXPS[ei].trails.length - 1);
+      $('intro').classList.add('gone');
+      startExpedition(ei, ti);
+    }
+  });
+})();
+</script>
+</body>
+</html>

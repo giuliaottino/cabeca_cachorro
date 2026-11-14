@@ -13,13 +13,7 @@ execute:
   warning: false
   message: false
 resources:
-  - ../figures/
-  - ../figures/brand/
-  - ../figures/video/
-  - ../_input_data/
   - ../_input_data/expedicoes_fotos/
-  - ../_input_data/kml_expedições/
-  - ../_input_data/limites/
 ---
 
 ```{r setup, include=FALSE}
@@ -77,7 +71,7 @@ clean_photo_folder <- function(x) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script defer src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
 <link rel="stylesheet" href="../assets/css/pages/expedicoes.css">
 <link rel="stylesheet" href="../assets/css/tsiino-base.css">
@@ -114,8 +108,11 @@ clean_photo_folder <- function(x) {
       });
     }
 
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     function startCarousel(carousel){
-      if(!carousel || carousel.dataset.single === 'true') return;
+      if(!carousel || carousel.dataset.single === 'true' || reduceMotion) return;
       stopCarousel(carousel);
       carousel._tsiinoTimer = window.setInterval(() => {
         const current = Number(carousel.dataset.index || '0');
@@ -228,8 +225,6 @@ clean_photo_folder <- function(x) {
     <div class="hero-kicker" data-i18n="expeditions.hero.kicker">Expedições · Alto Rio Negro</div>
     <h1 data-i18n="expeditions.hero.title">Expedições</h1>
     <p class="hero-subtitle" data-i18n="expeditions.hero.subtitle">Trilhas, coletas, fotos e registros de campo</p>
-    <p class="hero-description" data-i18n="expeditions.hero.description"></p>
-
   </div>
 </section>
 ```
@@ -277,22 +272,8 @@ kml_dir <- find_existing_dir(c(
   file.path("_input_data", "kml_expedicoes")
 ))
 
-# O código aceita tanto uma pasta de coletas quanto o arquivo validado que
-# aparece diretamente em _input_data.
-project_dirs <- c(
-  file.path("_input_data", "expedições"),
-  file.path("_input_data", "expedicoes"),
-  file.path("_input_data", "coletas_expedições"),
-  file.path("_input_data", "coletas_expedicoes"),
-  file.path("_input_data", "expedicoes_coletas")
-)
-
-project_direct_files <- c(
-  file.path("_input_data", "dwc_expedicoes_tsiino_validado.xlsx"),
-  file.path("_input_data", "dwc_expedicoes_tsiino.xlsx"),
-  file.path("_input_data", "coletas_expedicoes.xlsx"),
-  file.path("_input_data", "coletas_expedições.xlsx")
-)
+# Planilha Darwin Core validada com as coletas do projeto.
+project_direct_files <- file.path("_input_data", "dwc_expedicoes_tsiino_validado.xlsx")
 
 # =========================================================================
 # 2) HELPERS PARA PLANILHAS E DWC
@@ -729,9 +710,19 @@ read_one_kml <- function(path) {
 
     if (nrow(x) == 0) return(NULL)
 
+    # Simplifica o traçado do GPS (~10 m): visualmente idêntico no mapa e
+    # bem menor no HTML. A extensão é calculada antes, em read_one_kml().
+    len_m <- sum(as.numeric(sf::st_length(x)), na.rm = TRUE)
+    x <- tryCatch({
+      y <- sf::st_transform(x, 32719)
+      y <- sf::st_simplify(y, dTolerance = 10, preserveTopology = TRUE)
+      sf::st_transform(y, 4326)
+    }, error = function(e) x)
+
     sf::st_sf(
       kml_name = tools::file_path_sans_ext(basename(path)),
       kml_file = basename(path),
+      length_m = len_m / nrow(x),
       geometry = sf::st_geometry(x)
     )
   })
@@ -780,7 +771,7 @@ trail_color <- setNames(trail_colors, trail_names)
 # 4) PONTOS DE COLETA
 # =========================================================================
 
-project_files <- collect_input_files(project_dirs, project_direct_files)
+project_files <- collect_input_files(character(), project_direct_files)
 
 project_points <- read_collection_files(
   project_files,
@@ -844,12 +835,7 @@ make_collection_popup <- function(data) {
       popup_row("Expedição", x$expedition),
       popup_row("Habitat", x$habitat),
       popup_row("Características", x$remarks),
-      popup_row("Instituição", x$institution),
-      popup_row("Catálogo", x$catalog_number),
       "</table>",
-      "<div class='popup-source'>", safe_html(x$source_label),
-      if (nz(x$source_file)) paste0(" · ", safe_html(x$source_file)) else "",
-      "</div>",
       "</div>"
     )
   }, character(1))
@@ -885,34 +871,6 @@ if (!is.na(limite_path) && file.exists(limite_path)) {
   }, error = function(e) NULL)
 }
 
-input_dir_abs <- find_up("_input_data")
-
-if (is.null(municipio_sf) && requireNamespace("geobr", quietly = TRUE) && !is.na(input_dir_abs)) {
-  limite_dir_abs <- file.path(input_dir_abs, "limites")
-  dir.create(limite_dir_abs, recursive = TRUE, showWarnings = FALSE)
-  limite_path_new <- file.path(limite_dir_abs, "sao_gabriel_da_cachoeira.geojson")
-
-  municipio_sf <- tryCatch({
-    x <- geobr::read_municipality(
-      code_muni = 1303809,
-      year = 2020,
-      simplified = TRUE,
-      showProgress = FALSE
-    )
-
-    x <- sf::st_transform(x, 4326)
-    x <- sf::st_make_valid(x)
-
-    sf::st_write(
-      x,
-      limite_path_new,
-      delete_dsn = TRUE,
-      quiet = TRUE
-    )
-
-    x
-  }, error = function(e) NULL)
-}
 
 if (!is.null(municipio_sf)) {
   municipio_sf <- sf::st_transform(municipio_sf, 4326)
@@ -927,11 +885,7 @@ if (!is.null(municipio_sf)) {
 # 6) MAPA
 # =========================================================================
 
-logo_src <- if (exists("logo_map_uri") && nzchar(logo_map_uri)) {
-  logo_map_uri
-} else {
-  "../figures/brand/logo_tsiino_symbol.png"
-}
+logo_src <- "../figures/brand/logo_tsiino_symbol.png"
 
 map <- leaflet(
   width = "100%",
@@ -1013,9 +967,8 @@ if (!is.null(trails_sf) && nrow(trails_sf) > 0) {
   for (trail_nm in trail_names) {
     x <- trails_sf[trails_sf$kml_name == trail_nm, , drop = FALSE]
 
-    length_km <- tryCatch({
-      sum(as.numeric(sf::st_length(x)), na.rm = TRUE) / 1000
-    }, error = function(e) NA_real_)
+    length_km <- sum(x$length_m, na.rm = TRUE) / 1000
+    if (!is.finite(length_km) || length_km <= 0) length_km <- NA_real_
 
     route_popup <- paste0(
       "<div class='popup-card'>",
@@ -1380,13 +1333,76 @@ map
 ```{=html}
 </section>
 
+<section id="expedicoes-3d" class="content-card exp3d-section">
+  <div class="section-title">
+    <h2 data-i18n="expeditions.3d.title">Expedições em 3D</h2>
+  </div>
+  <p class="lead" data-i18n="expeditions.3d.lead">
+    Percorra os trajetos de GPS das expedições sobre o relevo e a imagem de satélite, com as fotos e os registros feitos pelo caminho.
+  </p>
+  <div class="exp3d-frame">
+    <iframe
+      id="exp3d-iframe"
+      src="3d/index.html?embed=1"
+      title="Expedições em 3D"
+      data-i18n-title="expeditions.3d.title"
+      loading="lazy"
+      allow="fullscreen"
+      allowfullscreen
+    ></iframe>
+  </div>
+  <p class="exp3d-actions">
+    <a href="3d/index.html" target="_blank" rel="noopener"><span data-i18n="expeditions.3d.open">Abrir em nova aba</span> <span aria-hidden="true">↗</span></a>
+  </p>
+</section>
+
+<script>
+/* Ponte entre a aba e o módulo 3D (expedicoes/3d/index.html?embed=1):
+   idioma do site, pausa fora da tela e botões "Ver em 3D" dos cards. */
+(function () {
+  var frame = document.getElementById('exp3d-iframe');
+  if (!frame) return;
+  var base = frame.getAttribute('src');
+  var ready = false;
+
+  function post(msg) {
+    if (ready && frame.contentWindow) frame.contentWindow.postMessage(msg, '*');
+  }
+  function currentLang() {
+    return document.documentElement.getAttribute('data-tsiino-language') === 'en' ? 'en' : 'pt';
+  }
+  function sendLang() { post({ type: 'tsiino-lang', lang: currentLang() }); }
+
+  frame.addEventListener('load', function () { ready = true; sendLang(); });
+  new MutationObserver(sendLang).observe(document.documentElement, {
+    attributes: true, attributeFilter: ['data-tsiino-language']
+  });
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { post({ type: 'tsiino-visible', visible: e.isIntersecting }); });
+    }, { threshold: 0.2 }).observe(frame);
+  }
+
+  document.addEventListener('click', function (ev) {
+    var link = ev.target.closest && ev.target.closest('[data-exp3d]');
+    if (!link) return;
+    ev.preventDefault();
+    var id = link.getAttribute('data-exp3d');
+    document.getElementById('expedicoes-3d').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (ready) post({ type: 'tsiino-goto', exp: id });
+    else frame.src = base + '&exp=' + encodeURIComponent(id);
+  });
+})();
+</script>
+
 <div class="bg-window"></div>
 
 <section id="lista-expedicoes" class="expeditions-shell">
   <div class="expeditions-heading">
     <div class="eyebrow" data-i18n="expeditions.list.eyebrow">Registros de campo</div>
     <h2 data-i18n="expeditions.list.title">Expedições</h2>
-    <p data-i18n="expeditions.list.description">Fotografias e registros das expedições do projeto..</p>
+    <p data-i18n="expeditions.list.description">Fotografias e registros das expedições do projeto.</p>
   </div>
 ```
 
@@ -1457,6 +1473,17 @@ read_expedition_metadata <- function(path) {
 
 expedicoes <- read_expedition_metadata(exp_meta_path)
 
+# Expedições que têm módulo 3D (_input_data/expedicoes_3d.json) ganham o
+# botão "Ver em 3D" no card. O id do JSON deve ser igual ao slug do nome
+# da expedição no CSV (ex.: "Tiquié Julho 2026" -> "tiquie-julho-2026").
+exp3d_ids <- local({
+  p <- find_up(file.path("_input_data", "expedicoes_3d.json"))
+  if (is.na(p) || !requireNamespace("jsonlite", quietly = TRUE)) return(character())
+  cfg <- tryCatch(jsonlite::fromJSON(p, simplifyVector = FALSE), error = function(e) NULL)
+  if (is.null(cfg)) return(character())
+  vapply(cfg$expeditions, function(e) as.character(e$id), character(1))
+})
+
 # Fallback: se o CSV ainda não existir, cada subpasta de expedicoes_fotos
 # vira uma expedição para que a galeria continue funcionando.
 if (nrow(expedicoes) == 0 && !is.na(photo_root_abs) && dir.exists(photo_root_abs)) {
@@ -1525,7 +1552,7 @@ make_meta <- function(label, value, key = NULL) {
   }
 }
 
-make_gallery <- function(photos, title, section_id) {
+make_gallery <- function(photos, title, section_id, eager_first = FALSE) {
   if (length(photos) == 0) {
     return(
       tags$div(
@@ -1541,7 +1568,7 @@ make_gallery <- function(photos, title, section_id) {
       tags$img(
         src = photos[j],
         alt = paste(title, "foto", j),
-        loading = if (j == 1) "eager" else "lazy",
+        loading = if (j == 1 && eager_first) "eager" else "lazy",
         decoding = "async"
       ),
       tags$figcaption(
@@ -1618,7 +1645,16 @@ make_exp_card <- function(i) {
       make_meta("Equipe", x$equipe, "common.team")
     ),
     if (nz(summary_txt)) tags$p(class = "expedition-summary", summary_txt),
-    make_gallery(photos, title, x$section_id)
+    if (x$expedicao_id %in% exp3d_ids) {
+      tags$a(
+        class = "exp3d-link",
+        href = "#expedicoes-3d",
+        `data-exp3d` = x$expedicao_id,
+        tags$span(`data-i18n` = "expeditions.card.view3d", "Ver em 3D"),
+        tags$span(`aria-hidden` = "true", " →")
+      )
+    },
+    make_gallery(photos, title, x$section_id, eager_first = (i == 1))
   )
 }
 

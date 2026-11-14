@@ -15,7 +15,6 @@ execute:
 resources:
   - ../figures/
   - ../figures/brand/
-  - ../_input_data/
   - ../_input_data/tsiino_team_images/
   - ../_input_data/icons/
 ---

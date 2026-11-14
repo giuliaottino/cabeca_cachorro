@@ -139,10 +139,7 @@
   #quarto-header .navbar i,
   #quarto-header .navbar .bi,
   #quarto-header .quarto-navbar-tools a,
-  #quarto-header .quarto-navbar-tools button,
-  #quarto-header .aa-DetachedSearchButton,
-  #quarto-header .aa-DetachedSearchButtonIcon,
-  #quarto-header .quarto-color-scheme-toggle{
+  #quarto-header .quarto-navbar-tools button{
     color: #fff !important;
     fill: #fff !important;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.58));
@@ -303,8 +300,7 @@
     margin: 0 0 1rem 0;
   }
 
-  .lead,
-  .map-lead{
+  .lead{
     font-family: 'DM Sans', 'Montserrat', Arial, sans-serif !important;
     font-size: clamp(1rem, 1.45vw, 1.18rem) !important;
     line-height: 1.55 !important;
@@ -1208,3 +1204,41 @@
     }
   }
 
+
+
+/* =========================================================================
+   Expedições em 3D (iframe de expedicoes/3d/index.html?embed=1)
+   ========================================================================= */
+.exp3d-frame {
+  position: relative;
+  width: 100%;
+  height: min(78vh, 720px);
+  min-height: 420px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1c1f19;
+}
+.exp3d-frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.exp3d-actions {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  text-align: right;
+}
+.exp3d-link {
+  display: inline-block;
+  margin: 0 0 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #626a38;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+.exp3d-link:hover { color: #4b5229; }
+@media (max-width: 767.98px) {
+  .exp3d-frame { height: 72svh; min-height: 380px; }
+}

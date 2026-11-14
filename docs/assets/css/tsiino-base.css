@@ -1193,3 +1193,104 @@ html body .page-hero-team .hero-actions {
     color: #fff !important;
   }
 }
+
+
+/* -------------------------------------------------------------------------
+   9. Camada global de acessibilidade e interação (todas as páginas)
+      Foco visível, âncoras sob a navbar fixa, movimento reduzido,
+      tipografia de títulos e mídia científica.
+   ------------------------------------------------------------------------- */
+
+/* Foco por teclado: anel único na cor da marca (o legado removia outline) */
+html body :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--tsi-accent) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px var(--tsi-bg) !important;
+  border-radius: 2px;
+}
+/* Sobre fotos e faixas escuras o anel precisa ser claro */
+html body :is(.hero-strip, .page-hero, .conservation-hero, .hv-site-hero, .tsiino-site-footer, #quarto-header)
+  :is(a, button, summary, [tabindex]):focus-visible {
+  outline-color: var(--tsi-on-dark) !important;
+  box-shadow: none !important;
+}
+
+/* Âncoras (#secao) não ficam escondidas atrás da navbar fixa */
+html body :is(section, [id]):target,
+html body main :is(h1, h2, h3)[id],
+html body main section[id] {
+  scroll-margin-top: 88px;
+}
+
+/* Títulos: quebra equilibrada; parágrafos sem palavra órfã */
+html body main :is(h1, h2, h3) {
+  text-wrap: balance;
+}
+html body main p {
+  text-wrap: pretty;
+}
+
+/* Números (KPIs, contagens, tabelas) com algarismos alinhados */
+html body :is(table, .kpi, [class*="kpi"], [class*="stat"], [class*="metric"], [class*="count"]) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Seleção de texto na cor da marca */
+::selection {
+  background: rgba(98, 106, 56, 0.22);
+  color: inherit;
+}
+
+/* Mídia científica: legendas consistentes (tamanhos das imagens ficam
+   com o CSS de cada página, que usa object-fit/alturas próprias) */
+html body main figure figcaption,
+html body main .figure-caption {
+  margin-top: var(--tsi-space-2);
+  color: var(--tsi-muted);
+  font-size: var(--tsi-fs-sm);
+  line-height: var(--tsi-lh-snug);
+}
+
+/* Mapas: moldura fina e controles legíveis */
+html body .leaflet-container {
+  font-family: var(--tsi-font-sans);
+}
+html body .leaflet-bar a {
+  color: var(--tsi-ink);
+}
+html body .leaflet-control-attribution {
+  font-size: 11px;
+}
+
+/* Movimento reduzido: desliga rolagem suave, revelações e transições */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  html body *,
+  html body *::before,
+  html body *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html body :is(.reveal, [class*="reveal"], [data-aos]) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Impressão: sem navbar, rodapé ou fundos escuros */
+@media print {
+  #quarto-header,
+  .tsiino-site-footer,
+  .navbar,
+  .leaflet-control-container {
+    display: none !important;
+  }
+  html body main a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: var(--tsi-muted);
+  }
+}
