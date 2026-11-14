@@ -36,7 +36,7 @@
     page: 1,
     query: '',
     onlyIssueCols: false,
-    tab: 'overview',
+    tab: 'sheet',
     mapper: null,        // { preview, mapping, undo: [] }
     map: null,
     mapFilter: { error: true, warning: true, clear: true },
@@ -640,7 +640,7 @@
     renderSheet();
     renderIssueList();
     configureDownloads(result);
-    switchTab('overview');
+    switchTab('sheet');
     const s = result.summary;
     const verdict = s.error_count
       ? `${plural(s.error_count, 'erro', 'erros')} em ${plural(s.rows_with_errors, 'linha', 'linhas')} precisam de correção antes do depósito.`

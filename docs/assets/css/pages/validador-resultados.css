@@ -884,3 +884,218 @@ html body #herb-validator-form .is-disabled { opacity: .45; pointer-events: none
 @media (prefers-reduced-motion: reduce) {
   html body #validator-results * { transition: none !important; animation: none !important; }
 }
+
+/* =====================================================================
+   Layout da página (reforma 2026-11)
+   Uma única coluna centrada para abertura, introdução, envio e
+   resultados. Substitui as larguras e margens divergentes do CSS legado
+   (herb-validator.css), que deixavam o módulo colado à esquerda.
+   ===================================================================== */
+html body .hv-modern-page {
+  --hv-col: min(1180px, calc(100% - 2 * clamp(1.25rem, 5vw, 4rem)));
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 0 var(--tsi-space-9) !important;
+  font-family: var(--tsi-font-sans);
+  color: var(--tsi-text);
+}
+
+/* ---------- abertura ---------- */
+html body .hv-modern-page .hv-site-hero {
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  padding-bottom: clamp(3rem, 7vh, 5rem) !important;
+}
+
+html body .hv-modern-page .hv-site-hero .hv-site-hero-inner {
+  width: var(--hv-col) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  text-align: left !important;
+  align-items: flex-start !important;
+}
+
+html body .hv-modern-page .hv-site-hero .hv-site-title,
+html body .hv-modern-page .hv-site-hero .hv-site-title span {
+  max-width: 20ch !important;
+  margin: 0 !important;
+  text-align: left !important;
+  font-family: var(--tsi-font-sans) !important;
+  font-size: var(--tsi-fs-display) !important;
+  font-weight: 800 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.03em !important;
+}
+
+html body .hv-modern-page .hv-site-hero .hv-site-deck {
+  max-width: 34rem !important;
+  margin: var(--tsi-space-4) 0 0 !important;
+  text-align: left !important;
+  font-size: var(--tsi-fs-md) !important;
+  line-height: var(--tsi-lh-body) !important;
+}
+
+/* ---------- coluna principal ---------- */
+html body .hv-modern-page .hv-modern-main {
+  width: var(--hv-col) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+html body .hv-modern-page .hv-modern-main > section {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box;
+}
+
+/* Introdução: texto direto na página, sem caixa cinza. */
+html body .hv-modern-page .hv-clean-overview {
+  background: none !important;
+  border-radius: 0 !important;
+  padding: var(--tsi-space-8) 0 var(--tsi-space-6) !important;
+}
+
+html body .hv-modern-page .tsiino-validator-intro-card__content {
+  max-width: 44rem;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html body .hv-modern-page .hv-clean-overview h2 {
+  margin: 0 0 var(--tsi-space-4) !important;
+  font-family: var(--tsi-font-sans) !important;
+  font-weight: 700 !important;
+  letter-spacing: var(--tsi-tracking-tight) !important;
+}
+
+html body .hv-modern-page .hv-clean-overview p {
+  margin: 0 0 var(--tsi-space-3) !important;
+  font-size: var(--tsi-fs-base) !important;
+  line-height: var(--tsi-lh-body) !important;
+  color: var(--tsi-muted) !important;
+}
+
+/* Envio: separado da introdução só por um fio. */
+html body .hv-modern-page .hv-upload-panel {
+  padding-top: var(--tsi-space-7) !important;
+  padding-bottom: 0 !important;
+}
+
+html body .hv-modern-page .hv-section-title h2 {
+  margin: 0 0 var(--tsi-space-5) !important;
+  font-family: var(--tsi-font-sans) !important;
+  font-weight: 700 !important;
+}
+
+html body .hv-modern-page .hv-form-grid {
+  gap: var(--tsi-space-4) var(--tsi-space-5) !important;
+}
+
+html body .hv-modern-page .hv-form label > span {
+  font-size: var(--tsi-fs-sm) !important;
+  font-weight: 600 !important;
+  color: var(--tsi-ink) !important;
+}
+
+html body .hv-modern-page .hv-panel :is(input[type="text"], input[type="file"], select) {
+  min-height: 44px;
+  padding: 0.55rem 0.8rem !important;
+  font-size: var(--tsi-fs-sm) !important;
+}
+
+html body .hv-modern-page .hv-panel input[type="file"] {
+  cursor: pointer;
+  color: var(--tsi-muted);
+}
+
+html body .hv-modern-page .hv-panel input[type="file"]::file-selector-button {
+  margin-right: var(--tsi-space-3);
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--tsi-line-strong);
+  border-radius: var(--tsi-radius);
+  background: var(--tsi-bg-subtle);
+  color: var(--tsi-ink);
+  font: 600 var(--tsi-fs-sm) var(--tsi-font-sans);
+  cursor: pointer;
+}
+
+html body .hv-modern-page .hv-panel input[type="file"]::file-selector-button:hover {
+  background: var(--tsi-accent-soft);
+}
+
+html body .hv-modern-page .hv-checks {
+  gap: var(--tsi-space-2) var(--tsi-space-5) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  color: var(--tsi-text) !important;
+}
+
+html body .hv-modern-page .hv-checks input { accent-color: var(--tsi-accent); }
+
+html body .hv-modern-page .hv-actions {
+  gap: var(--tsi-space-3) !important;
+  margin-top: var(--tsi-space-5) !important;
+}
+
+html body .hv-modern-page :is(.hv-primary, .hv-secondary) {
+  min-height: 44px;
+  padding: 0 1.15rem !important;
+  font-size: var(--tsi-fs-sm) !important;
+}
+
+html body .hv-modern-page .hv-secondary.is-disabled,
+html body .hv-modern-page .hv-secondary:disabled {
+  border-color: var(--tsi-line) !important;
+  color: var(--tsi-faint) !important;
+}
+
+html body .hv-modern-page .hv-status {
+  margin-top: var(--tsi-space-5) !important;
+  padding: var(--tsi-space-3) var(--tsi-space-4) !important;
+  font-size: var(--tsi-fs-sm) !important;
+  color: var(--tsi-muted) !important;
+}
+
+/* ---------- resultados: mesma coluna, sem caixa própria ---------- */
+html body .hv-modern-page #validator-results.tsr {
+  width: 100% !important;
+  max-width: none !important;
+  margin: var(--tsi-space-8) 0 0 !important;
+  padding: var(--tsi-space-7) 0 0 !important;
+  border-radius: 0 !important;
+}
+
+html body #validator-results .tsr-sheet-wrap {
+  width: 100%;
+  min-width: 0;
+  max-height: min(78vh, 900px);
+  overflow: auto;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius);
+}
+
+html body #validator-results .tsr-sheet {
+  min-width: 100%;
+  width: max-content;
+}
+
+html body #validator-results #tsr-pane-sheet { min-width: 0; }
+
+@media (max-width: 700px) {
+  html body .hv-modern-page .hv-form-grid { grid-template-columns: 1fr !important; }
+  html body #validator-results .tsr-sheet-wrap { max-height: 72vh; }
+}
+
+/* Veredito: frase de resultado, não manchete. */
+html body .hv-modern-page #validator-results .tsr-verdict {
+  max-width: 34ch;
+  font-size: clamp(1.5rem, 1.1rem + 1.3vw, 2.1rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}

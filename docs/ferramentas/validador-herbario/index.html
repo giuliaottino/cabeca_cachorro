@@ -157,84 +157,13 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/css/pages/validador.css">
 <link rel="stylesheet" href="../../assets/css/tsiino-base.css">
-<link rel="stylesheet" href="../../assets/css/pages/validador-resultados.css?v=20261113-r2">
+<link rel="stylesheet" href="../../assets/css/pages/validador-resultados.css?v=20261114-r3">
 
-<style>
-/* Ajustes visuais restritos à área de resultados da validação. */
-#validator-results.tsr {
-  box-sizing: border-box;
-  width: calc(100% - 4rem) !important;
-  max-width: 1440px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding: clamp(1.25rem, 2.4vw, 2.25rem);
-  border-radius: 18px;
-  position: relative;
-  left: auto !important;
-  right: auto !important;
-}
-
-/* Menos efeito de cartões empilhados: conteúdo mais integrado e leve. */
-#validator-results .tsr-kpis,
-#validator-results .tsr-health,
-#validator-results .tsr-insights,
-#validator-results .tsr-grid {
-  gap: 0.75rem;
-}
-
-#validator-results .tsr-kpis > *,
-#validator-results .tsr-health > *,
-#validator-results .tsr-insights > *,
-#validator-results .tsr-grid > * {
-  border-radius: 10px;
-  box-shadow: none;
-}
-
-#validator-results .tsr-kpis > *,
-#validator-results .tsr-health > * {
-  padding: 0.85rem 1rem;
-}
-
-#validator-results .tsr-insights > *,
-#validator-results .tsr-grid > * {
-  padding: 1rem 1.1rem;
-}
-
-/* A planilha recebe a maior parte da área útil da seção. */
-#validator-results #tsr-pane-sheet {
-  min-width: 0;
-}
-
-#validator-results .tsr-sheet-wrap {
-  width: 100%;
-  min-width: 0;
-  height: min(78vh, 900px);
-  min-height: 620px;
-  overflow: auto;
-  border-radius: 12px;
-}
-
-#validator-results .tsr-sheet {
-  min-width: 100%;
-  width: max-content;
-}
-
-@media (max-width: 700px) {
-  #validator-results.tsr {
-    width: calc(100% - 1.25rem) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding: 1rem;
-  }
-
-  #validator-results .tsr-sheet-wrap {
-    height: 72vh;
-    min-height: 460px;
-  }
-}
-</style>
 <div class="hv-modern-page">
   <section class="hv-site-hero" aria-label="Abertura do validador de planilha de herbário">
     <div class="hv-site-hero-inner">
@@ -322,13 +251,13 @@ ul.task-list li input[type="checkbox"] {
       <div id="tsr-trailing" class="tsr-trailing" hidden="" role="region" aria-label="Coluna arrastada além dos dados"></div>
 
       <nav class="tsr-tabs" role="tablist" aria-label="Seções do resultado">
-        <button type="button" role="tab" class="tsr-tab is-active" data-tab="overview" aria-selected="true" aria-controls="tsr-pane-overview">Visão geral</button>
+        <button type="button" role="tab" class="tsr-tab is-active" data-tab="sheet" aria-selected="true" aria-controls="tsr-pane-sheet">Planilha anotada</button>
         <button type="button" role="tab" class="tsr-tab" data-tab="map" aria-selected="false" aria-controls="tsr-pane-map">Mapa <span class="tsr-tab-count" id="tsr-count-map"></span></button>
-        <button type="button" role="tab" class="tsr-tab" data-tab="sheet" aria-selected="false" aria-controls="tsr-pane-sheet">Planilha anotada</button>
+        <button type="button" role="tab" class="tsr-tab" data-tab="overview" aria-selected="false" aria-controls="tsr-pane-overview">Painel</button>
         <button type="button" role="tab" class="tsr-tab" data-tab="issues" aria-selected="false" aria-controls="tsr-pane-issues">Ocorrências <span class="tsr-tab-count" id="tsr-count-issues"></span></button>
       </nav>
 
-      <div class="tsr-pane" id="tsr-pane-overview" role="tabpanel" data-pane="overview">
+      <div class="tsr-pane" id="tsr-pane-overview" role="tabpanel" data-pane="overview" hidden="">
         <div id="validator-global-issues" class="tsr-global" hidden=""></div>
         <div id="tsr-insights" class="tsr-insights"></div>
         <div id="tsr-dashboard" class="tsr-grid"></div>
@@ -351,7 +280,7 @@ ul.task-list li input[type="checkbox"] {
         </section>
       </div>
 
-      <div class="tsr-pane" id="tsr-pane-sheet" role="tabpanel" data-pane="sheet" hidden="">
+      <div class="tsr-pane" id="tsr-pane-sheet" role="tabpanel" data-pane="sheet">
         <div class="tsr-toolbar" aria-label="Filtros da planilha anotada">
           <div class="tsr-seg" role="group" aria-label="Filtrar linhas">
             <button type="button" class="hv-filter tsr-seg-btn is-active" data-filter="all">Todas</button>
@@ -386,7 +315,7 @@ ul.task-list li input[type="checkbox"] {
     </section>
   </main>
 </div>
-<script src="../../assets/js/herb-validator.js?v=20261113-r2"></script>
+<script src="../../assets/js/herb-validator.js?v=20261114-r3"></script>
 
 
 
