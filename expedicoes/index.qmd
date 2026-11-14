@@ -67,189 +67,8 @@ clean_photo_folder <- function(x) {
 }
 ```
 
-```{=html}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script defer src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
-
-<link rel="stylesheet" href="../assets/css/pages/expedicoes.css">
-<link rel="stylesheet" href="../assets/css/tsiino-base.css">
-
-<script>
-(function(){
-  function initExpeditionCarousels(){
-    const cards = Array.from(document.querySelectorAll('.expedition-card'));
-
-    function stopCarousel(carousel){
-      if(carousel && carousel._tsiinoTimer){
-        window.clearInterval(carousel._tsiinoTimer);
-        carousel._tsiinoTimer = null;
-      }
-    }
-
-    function goTo(carousel, index){
-      if(!carousel) return;
-      const slides = Array.from(carousel.querySelectorAll('.exp-slide'));
-      if(!slides.length) return;
-
-      const n = slides.length;
-      const idx = ((index % n) + n) % n;
-      carousel.dataset.index = String(idx);
-
-      const track = carousel.querySelector('.exp-carousel-track');
-      if(track){
-        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
-      }
-
-      carousel.querySelectorAll('.exp-carousel-dot').forEach((dot, i) => {
-        dot.classList.toggle('is-current', i === idx);
-        dot.setAttribute('aria-current', i === idx ? 'true' : 'false');
-      });
-    }
-
-    const reduceMotion = window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function startCarousel(carousel){
-      if(!carousel || carousel.dataset.single === 'true' || reduceMotion) return;
-      stopCarousel(carousel);
-      carousel._tsiinoTimer = window.setInterval(() => {
-        const current = Number(carousel.dataset.index || '0');
-        goTo(carousel, current + 1);
-      }, 4200);
-    }
-
-    document.querySelectorAll('.exp-carousel').forEach(carousel => {
-      goTo(carousel, 0);
-
-      const prev = carousel.querySelector('.exp-carousel-prev');
-      const next = carousel.querySelector('.exp-carousel-next');
-
-      if(prev){
-        prev.addEventListener('click', () => {
-          goTo(carousel, Number(carousel.dataset.index || '0') - 1);
-          if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
-        });
-      }
-
-      if(next){
-        next.addEventListener('click', () => {
-          goTo(carousel, Number(carousel.dataset.index || '0') + 1);
-          if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
-        });
-      }
-
-      carousel.querySelectorAll('.exp-carousel-dot').forEach((dot, i) => {
-        dot.addEventListener('click', () => {
-          goTo(carousel, i);
-          if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
-        });
-      });
-
-      carousel.addEventListener('mouseenter', () => stopCarousel(carousel));
-      carousel.addEventListener('mouseleave', () => {
-        if(carousel.closest('.expedition-card')?.classList.contains('is-active')) startCarousel(carousel);
-      });
-    });
-
-    if('IntersectionObserver' in window){
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          const card = entry.target;
-          const carousel = card.querySelector('.exp-carousel');
-
-          if(entry.isIntersecting){
-            cards.forEach(other => {
-              if(other !== card){
-                other.classList.remove('is-active');
-                stopCarousel(other.querySelector('.exp-carousel'));
-              }
-            });
-
-            card.classList.add('is-active');
-            startCarousel(carousel);
-          } else {
-            card.classList.remove('is-active');
-            stopCarousel(carousel);
-          }
-        });
-      }, {
-        root: null,
-        rootMargin: '-34% 0px -34% 0px',
-        threshold: 0
-      });
-
-      cards.forEach(card => observer.observe(card));
-    } else {
-      const first = cards[0];
-      if(first){
-        first.classList.add('is-active');
-        startCarousel(first.querySelector('.exp-carousel'));
-      }
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', initExpeditionCarousels);
-})();
-</script>
-```
-
-```{=html}
-<section class="page-hero page-hero-expeditions" aria-label="Abertura da página de expedições" data-i18n-aria="expeditions.hero.aria">
-  <video
-    class="hero-video"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="metadata"
-    aria-hidden="true"
-  >
-    <source src="../figures/video/exp_hero.mp4" type="video/mp4">
-  </video>
-
-  <div class="page-hero-overlay"></div>
-  <div class="page-hero-pattern"></div>
-
-  <div class="page-hero-logo" aria-label="Logo Tsiino Hiiwiida" data-i18n-aria="expeditions.hero.logoAria">
-    <img
-      src="../figures/logo_tsiino.png"
-      alt="Logo Tsiino Hiiwiida"
-      data-i18n-alt="expeditions.hero.logoAlt"
-      onerror="this.style.display='none';"
-    >
-  </div>
-
-  <div class="page-hero-content">
-    <div class="hero-kicker" data-i18n="expeditions.hero.kicker">Expedições · Alto Rio Negro</div>
-    <h1 data-i18n="expeditions.hero.title">Expedições</h1>
-    <p class="hero-subtitle" data-i18n="expeditions.hero.subtitle">Trilhas, coletas, fotos e registros de campo</p>
-  </div>
-</section>
-```
-
-```{=html}
-<section id="mapa-expedicoes" class="content-card">
-  <div class="section-title">
-    <h2 data-i18n="expeditions.map.title">Mapa das expedições</h2>
-  </div>
-
-  <p class="lead" data-i18n-html="expeditions.map.lead">
-    O mapa reúne alguns trajetos das expedições e pontos de coleta do projeto Tsiino Hiiwiida.
-  </p>
-```
-
-```{r mapa-expedicoes}
-library(leaflet)
-library(htmlwidgets)
-library(dplyr)
-library(htmltools)
+```{r trilhas, include=FALSE}
 library(sf)
-
-# =========================================================================
-# 1) CAMINHOS DE INPUT
-# =========================================================================
 
 find_existing_dir <- function(candidates) {
   for (rel in candidates) {
@@ -271,9 +90,6 @@ kml_dir <- find_existing_dir(c(
   file.path("_input_data", "kml_expedições"),
   file.path("_input_data", "kml_expedicoes")
 ))
-
-# Planilha Darwin Core validada com as coletas do projeto.
-project_direct_files <- file.path("_input_data", "dwc_expedicoes_tsiino_validado.xlsx")
 
 # =========================================================================
 # 2) HELPERS PARA PLANILHAS E DWC
@@ -711,8 +527,7 @@ read_one_kml <- function(path) {
     if (nrow(x) == 0) return(NULL)
 
     # Simplifica o traçado do GPS (~10 m): visualmente idêntico no mapa e
-    # bem menor no HTML. A extensão é calculada antes, em read_one_kml().
-    len_m <- sum(as.numeric(sf::st_length(x)), na.rm = TRUE)
+    # bem menor no HTML. A extensão vem do módulo 3D (trail_len_m).
     x <- tryCatch({
       y <- sf::st_transform(x, 32719)
       y <- sf::st_simplify(y, dTolerance = 10, preserveTopology = TRUE)
@@ -722,7 +537,6 @@ read_one_kml <- function(path) {
     sf::st_sf(
       kml_name = tools::file_path_sans_ext(basename(path)),
       kml_file = basename(path),
-      length_m = len_m / nrow(x),
       geometry = sf::st_geometry(x)
     )
   })
@@ -766,6 +580,486 @@ trail_colors <- if (length(trail_names) > 0) {
 }
 
 trail_color <- setNames(trail_colors, trail_names)
+
+# =========================================================================
+# EXPEDIÇÕES COM MÓDULO 3D (_input_data/expedicoes_3d.json)
+# O id do JSON é o slug do nome da expedição no CSV
+# (ex.: "Tiquié Julho 2026" -> "tiquie-julho-2026").
+# =========================================================================
+
+exp3d_cfg <- local({
+  p <- find_up(file.path("_input_data", "expedicoes_3d.json"))
+  if (is.na(p) || !requireNamespace("jsonlite", quietly = TRUE)) return(list())
+  cfg <- tryCatch(jsonlite::fromJSON(p, simplifyVector = FALSE), error = function(e) NULL)
+  if (is.null(cfg)) list() else cfg$expeditions
+})
+
+exp3d_ids <- vapply(exp3d_cfg, function(e) as.character(e$id), character(1))
+
+# trajeto (nome do KML) -> id da expedição
+trail_exp <- unlist(lapply(exp3d_cfg, function(e) {
+  kmls <- vapply(e$trails, function(t) if (is.list(t)) as.character(t$kml) else as.character(t), character(1))
+  setNames(rep(as.character(e$id), length(kmls)), kmls)
+}))
+if (is.null(trail_exp)) trail_exp <- character()
+
+# Extensão de cada trajeto: a mesma medida exibida no módulo 3D, calculada
+# por scripts/build_expedicoes_3d.py sobre o traçado filtrado (Douglas-Peucker,
+# 12 m em rio e 3 m em trilha). O traço bruto do GPS soma o ruído de cada
+# ponto e superestima a distância, por isso não é usado aqui.
+trail_len_m <- local({
+  p <- find_up(file.path("expedicoes", "3d", "data.js"))
+  if (is.na(p) || !requireNamespace("jsonlite", quietly = TRUE)) return(numeric())
+  txt <- paste(readLines(p, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  txt <- sub("^[^{]*", "", txt)
+  txt <- sub(";\\s*$", "", txt)
+  d <- tryCatch(jsonlite::fromJSON(txt, simplifyVector = FALSE), error = function(e) NULL)
+  if (is.null(d)) return(numeric())
+  tr <- unlist(lapply(d$expeditions, function(e) e$trails), recursive = FALSE)
+  setNames(
+    vapply(tr, function(t) as.numeric(t$length_m), numeric(1)),
+    vapply(tr, function(t) as.character(t$id), character(1))
+  )
+})
+
+# Extensão e número de trajetos de GPS por expedição.
+exp_routes <- lapply(exp3d_ids, function(id) {
+  kmls <- intersect(names(trail_exp)[trail_exp == id], names(trail_len_m))
+  if (length(kmls) == 0) return(list(n = 0L, km = NA_real_))
+  list(n = length(kmls), km = sum(trail_len_m[kmls]) / 1000)
+})
+names(exp_routes) <- exp3d_ids
+```
+
+```{=html}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script defer src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+<link rel="stylesheet" href="../assets/css/pages/expedicoes.css">
+<link rel="stylesheet" href="../assets/css/tsiino-base.css">
+
+<script>
+/* Visualizador do álbum: abre a foto clicada e navega dentro da mesma expedição. */
+(function(){
+  function init(){
+    const dlg = document.getElementById('photo-viewer');
+    if(!dlg || typeof dlg.showModal !== 'function') return;
+    const img = dlg.querySelector('img');
+    const cap = dlg.querySelector('.pv-caption');
+    const count = dlg.querySelector('.pv-count');
+    let set = [], idx = 0, opener = null;
+
+    function show(i){
+      idx = (i + set.length) % set.length;
+      const b = set[idx];
+      img.src = b.dataset.full;
+      img.alt = b.querySelector('img').alt;
+      cap.textContent = b.dataset.caption || '';
+      count.textContent = (idx + 1) + ' / ' + set.length;
+    }
+
+    document.addEventListener('click', function(ev){
+      const b = ev.target.closest && ev.target.closest('.field-photo');
+      if(!b) return;
+      set = Array.from(b.closest('.field-strip').querySelectorAll('.field-photo'));
+      opener = b;
+      show(set.indexOf(b));
+      dlg.showModal();
+    });
+    dlg.querySelector('.pv-prev').addEventListener('click', function(){ show(idx - 1); });
+    dlg.querySelector('.pv-next').addEventListener('click', function(){ show(idx + 1); });
+    dlg.querySelector('.pv-close').addEventListener('click', function(){ dlg.close(); });
+    dlg.addEventListener('click', function(ev){ if(ev.target === dlg) dlg.close(); });
+    dlg.addEventListener('keydown', function(ev){
+      if(ev.key === 'ArrowLeft') show(idx - 1);
+      if(ev.key === 'ArrowRight') show(idx + 1);
+    });
+    dlg.addEventListener('close', function(){
+      img.removeAttribute('src');
+      if(opener) opener.focus();
+    });
+  }
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+```
+
+```{=html}
+<section class="page-hero page-hero-expeditions" aria-label="Abertura da página de expedições" data-i18n-aria="expeditions.hero.aria">
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    aria-hidden="true"
+  >
+    <source src="../figures/video/exp_hero.mp4" type="video/mp4">
+  </video>
+
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-pattern"></div>
+
+  <div class="page-hero-logo" aria-label="Logo Tsiino Hiiwiida" data-i18n-aria="expeditions.hero.logoAria">
+    <img
+      src="../figures/logo_tsiino.png"
+      alt="Logo Tsiino Hiiwiida"
+      data-i18n-alt="expeditions.hero.logoAlt"
+      onerror="this.style.display='none';"
+    >
+  </div>
+
+  <div class="page-hero-content">
+    <div class="hero-kicker" data-i18n="expeditions.hero.kicker">Expedições · Alto Rio Negro</div>
+    <h1 data-i18n="expeditions.hero.title">Expedições</h1>
+    <p class="hero-subtitle" data-i18n="expeditions.hero.subtitle">Trilhas, coletas, fotos e registros de campo</p>
+  </div>
+</section>
+```
+
+```{=html}
+<section id="expedicoes-3d" class="exp-section exp3d-section">
+  <header class="exp-section-head">
+    <h2 data-i18n="expeditions.3d.title">Expedições em 3D</h2>
+    <p class="lead" data-i18n="expeditions.3d.lead">Percorra os trajetos de GPS das expedições sobre o relevo e a imagem de satélite, com as fotos e os registros feitos pelo caminho.</p>
+  </header>
+  <div class="exp3d-frame">
+    <iframe
+      id="exp3d-iframe"
+      src="3d/index.html?embed=1"
+      title="Expedições em 3D"
+      data-i18n-title="expeditions.3d.title"
+      loading="lazy"
+      allow="fullscreen"
+      allowfullscreen
+    ></iframe>
+  </div>
+  <p class="exp3d-actions">
+    <a href="3d/index.html" target="_blank" rel="noopener"><span data-i18n="expeditions.3d.open">Abrir em nova aba</span> <span aria-hidden="true">↗</span></a>
+  </p>
+</section>
+
+<script>
+/* Ponte entre a aba e o módulo 3D (expedicoes/3d/index.html?embed=1):
+   idioma do site, pausa fora da tela e botões "Ver em 3D" dos cards. */
+(function () {
+  var frame = document.getElementById('exp3d-iframe');
+  if (!frame) return;
+  var base = frame.getAttribute('src');
+  var ready = false;
+
+  function post(msg) {
+    if (ready && frame.contentWindow) frame.contentWindow.postMessage(msg, '*');
+  }
+  function currentLang() {
+    return document.documentElement.getAttribute('data-tsiino-language') === 'en' ? 'en' : 'pt';
+  }
+  function sendLang() { post({ type: 'tsiino-lang', lang: currentLang() }); }
+
+  frame.addEventListener('load', function () { ready = true; sendLang(); });
+  new MutationObserver(sendLang).observe(document.documentElement, {
+    attributes: true, attributeFilter: ['data-tsiino-language']
+  });
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { post({ type: 'tsiino-visible', visible: e.isIntersecting }); });
+    }, { threshold: 0.2 }).observe(frame);
+  }
+
+  document.addEventListener('click', function (ev) {
+    var link = ev.target.closest && ev.target.closest('[data-exp3d]');
+    if (!link) return;
+    ev.preventDefault();
+    var id = link.getAttribute('data-exp3d');
+    document.getElementById('expedicoes-3d').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (ready) post({ type: 'tsiino-goto', exp: id });
+    else frame.src = base + '&exp=' + encodeURIComponent(id);
+  });
+})();
+</script>
+
+<section id="lista-expedicoes" class="exp-section">
+  <header class="exp-section-head">
+    <h2 data-i18n="expeditions.list.title">Álbum de campo</h2>
+    <p class="lead" data-i18n="expeditions.list.description">Da expedição mais recente às primeiras, com as fotos feitas pela equipe em campo.</p>
+  </header>
+```
+
+```{r expedition-sections}
+library(htmltools)
+
+# =========================================================================
+# METADADOS DAS EXPEDIÇÕES — mantêm a lógica antiga das fotos/cards.
+# Este arquivo NÃO alimenta mais os pontos do mapa.
+# =========================================================================
+
+exp_meta_path <- find_up(file.path("_input_data", "expedicoes_tsiino.csv"))
+photo_root_abs <- find_up(file.path("_input_data", "expedicoes_fotos"))
+photo_root_html_rel <- file.path("..", "_input_data", "expedicoes_fotos")
+
+read_expedition_metadata <- function(path) {
+  if (is.na(path) || !file.exists(path)) return(data.frame())
+
+  raw <- tryCatch(read_delimited_auto(path), error = function(e) NULL)
+  if (is.null(raw) || nrow(raw) == 0) return(data.frame())
+
+  get_meta <- function(candidates) get_col_chr(raw, candidates)
+
+  out <- data.frame(
+    expedicao = first_nonempty(
+      get_meta(c("expedicao", "expedição", "expedition", "nome", "name"))
+    ),
+    input_id = first_nonempty(
+      get_meta(c("expedicao_id", "expedição_id", "id", "slug", "codigo", "código"))
+    ),
+    localidade = first_nonempty(
+      get_meta(c("localidade", "local", "site", "ponto", "locality"))
+    ),
+    data_exp = first_nonempty(
+      get_meta(c("data", "date", "periodo", "período"))
+    ),
+    comunidade = first_nonempty(
+      get_meta(c("comunidade", "community", "aldeia"))
+    ),
+    municipio = first_nonempty(
+      get_meta(c("municipio", "município", "city", "cidade"))
+    ),
+    equipe = first_nonempty(
+      get_meta(c("equipe", "team", "pesquisadores", "coletores", "collectors"))
+    ),
+    observacoes = first_nonempty(
+      get_meta(c("observacoes", "observações", "obs", "notes", "comentarios", "comentários"))
+    ),
+    resumo = first_nonempty(
+      get_meta(c("resumo", "descricao", "descrição", "description"))
+    ),
+    pasta_fotos = clean_photo_folder(first_nonempty(
+      get_meta(c("pasta_fotos", "fotos", "folder", "photo_folder", "pasta", "imagens"))
+    )),
+    stringsAsFactors = FALSE
+  )
+
+  out$expedicao[!nz(out$expedicao)] <- paste0("Expedição ", which(!nz(out$expedicao)))
+
+  ids <- out$input_id
+  ids[!nz(ids)] <- out$expedicao[!nz(ids)]
+  out$expedicao_id <- slugify(ids)
+  out$section_id <- paste0("exp-", out$expedicao_id)
+
+  out$pasta_fotos[!nz(out$pasta_fotos)] <- out$expedicao_id[!nz(out$pasta_fotos)]
+  out
+}
+
+expedicoes <- read_expedition_metadata(exp_meta_path)
+
+# Fallback: se o CSV ainda não existir, cada subpasta de expedicoes_fotos
+# vira uma expedição para que a galeria continue funcionando.
+if (nrow(expedicoes) == 0 && !is.na(photo_root_abs) && dir.exists(photo_root_abs)) {
+  folders <- list.dirs(photo_root_abs, recursive = FALSE, full.names = FALSE)
+  folders <- folders[nz(folders)]
+
+  if (length(folders) > 0) {
+    titles <- gsub("[-_]", " ", folders)
+    titles <- tools::toTitleCase(titles)
+
+    expedicoes <- data.frame(
+      expedicao = titles,
+      input_id = folders,
+      localidade = NA_character_,
+      data_exp = NA_character_,
+      comunidade = NA_character_,
+      municipio = NA_character_,
+      equipe = NA_character_,
+      observacoes = NA_character_,
+      resumo = NA_character_,
+      pasta_fotos = folders,
+      expedicao_id = slugify(folders),
+      stringsAsFactors = FALSE
+    )
+    expedicoes$section_id <- paste0("exp-", expedicoes$expedicao_id)
+  }
+}
+
+get_photos <- function(folder) {
+  folder <- clean_photo_folder(folder)[1]
+
+  if (is.na(photo_root_abs) || is.na(folder) || !nzchar(folder)) {
+    return(character())
+  }
+
+  d <- file.path(photo_root_abs, folder)
+  if (!dir.exists(d)) return(character())
+
+  f <- list.files(
+    d,
+    pattern = "\\.(jpg|jpeg|png|webp)$",
+    full.names = FALSE,
+    ignore.case = TRUE
+  )
+
+  f <- f[!grepl("^\\.", f)]
+  if (length(f) == 0) return(character())
+
+  f <- sort(f)
+  gsub("\\\\", "/", file.path(photo_root_html_rel, folder, f))
+}
+
+read_captions <- function(folder) {
+  folder <- clean_photo_folder(folder)[1]
+  if (is.na(photo_root_abs) || is.na(folder)) return(character())
+  f <- file.path(photo_root_abs, folder, "legendas.csv")
+  if (!file.exists(f)) return(character())
+  x <- tryCatch(read_delimited_auto(f), error = function(e) NULL)
+  if (is.null(x) || nrow(x) == 0) return(character())
+  file <- get_col_chr(x, c("arquivo", "file"))
+  txt <- get_col_chr(x, c("legenda_pt", "legenda", "caption"))
+  cred <- get_col_chr(x, c("credito", "crédito", "credit"))
+  cap <- trimws(paste(ifelse(nz(txt), txt, ""), ifelse(nz(cred), cred, "")))
+  setNames(cap, file)[nz(file) & nzchar(cap)]
+}
+
+month_pt <- c("janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho",
+              "agosto", "setembro", "outubro", "novembro", "dezembro")
+
+make_date <- function(x) {
+  x <- trimws(as.character(x))
+  m <- regmatches(x, regexec("^(\\d{4})-(\\d{1,2})", x))[[1]]
+  if (length(m) == 3) {
+    return(tags$p(
+      class = "field-date",
+      tags$time(
+        datetime = sprintf("%s-%02d", m[2], as.integer(m[3])),
+        tags$span(month_pt[as.integer(m[3])]), " ", tags$span(m[2])
+      )
+    ))
+  }
+  if (nz(x)) tags$p(class = "field-date", x)
+}
+
+make_facts <- function(id) {
+  r <- exp_routes[[id]]
+  if (is.null(r) || r$n == 0 || is.na(r$km)) return(NULL)
+  km <- formatC(round(r$km), big.mark = " ", format = "d")
+  word <- if (r$n == 1) "trajeto" else "trajetos"
+  tags$p(class = "field-facts", sprintf("%s km em %d %s de GPS", km, r$n, word))
+}
+
+make_strip <- function(photos, title, captions, eager_first = FALSE) {
+  if (length(photos) == 0) {
+    return(tags$p(
+      class = "field-empty",
+      `data-i18n` = "expeditions.card.noPhoto",
+      "As fotos desta expedição ainda não foram publicadas."
+    ))
+  }
+
+  shots <- lapply(seq_along(photos), function(j) {
+    cap <- unname(captions[basename(photos[j])])
+    cap <- if (length(cap) && nz(cap)) cap else ""
+    tags$figure(
+      class = "field-shot",
+      tags$button(
+        class = "field-photo",
+        type = "button",
+        `data-full` = photos[j],
+        `data-caption` = cap,
+        `aria-label` = paste("Ampliar foto", j),
+        tags$img(
+          src = photos[j],
+          alt = if (nzchar(cap)) cap else paste(title, "foto", j),
+          loading = if (j == 1 && eager_first) "eager" else "lazy",
+          decoding = "async"
+        )
+      ),
+      if (nzchar(cap)) tags$figcaption(cap)
+    )
+  })
+
+  tags$div(
+    class = "field-strip",
+    role = "region",
+    tabindex = "0",
+    `aria-label` = paste0("Fotos: ", title),
+    do.call(tagList, shots)
+  )
+}
+
+make_entry <- function(i) {
+  x <- expedicoes[i, , drop = FALSE]
+  title <- if (nz(x$localidade)) trimws(x$localidade) else x$expedicao
+  where <- if (nz(x$resumo)) x$resumo else x$comunidade
+  photos <- get_photos(x$pasta_fotos)
+
+  tags$article(
+    class = "field-entry",
+    id = x$section_id,
+    tags$header(
+      class = "field-head",
+      make_date(x$data_exp),
+      tags$h3(title),
+      if (nz(where)) tags$p(class = "field-where", where),
+      make_facts(x$expedicao_id),
+      if (x$expedicao_id %in% exp3d_ids) {
+        tags$a(
+          class = "exp3d-link",
+          href = "#expedicoes-3d",
+          `data-exp3d` = x$expedicao_id,
+          `data-i18n` = "expeditions.card.view3d",
+          "Ver o percurso em 3D"
+        )
+      }
+    ),
+    make_strip(photos, title, read_captions(x$pasta_fotos), eager_first = (i == 1))
+  )
+}
+
+if (nrow(expedicoes) > 0) {
+  tags$div(class = "field-log", lapply(seq_len(nrow(expedicoes)), make_entry))
+} else {
+  tags$p(
+    class = "field-empty",
+    `data-i18n` = "expeditions.list.empty",
+    "Nenhuma expedição foi cadastrada em _input_data/expedicoes_tsiino.csv e nenhuma subpasta foi encontrada em _input_data/expedicoes_fotos/."
+  )
+}
+```
+
+```{=html}
+</section>
+
+<dialog id="photo-viewer" class="photo-viewer" aria-label="Visualizador de fotos">
+  <figure>
+    <img alt="">
+    <figcaption><span class="pv-caption"></span><span class="pv-count"></span></figcaption>
+  </figure>
+  <button type="button" class="pv-btn pv-close" aria-label="Fechar">✕</button>
+  <button type="button" class="pv-btn pv-prev" aria-label="Foto anterior">‹</button>
+  <button type="button" class="pv-btn pv-next" aria-label="Próxima foto">›</button>
+</dialog>
+
+<section id="mapa-expedicoes" class="exp-section">
+  <header class="exp-section-head">
+    <h2 data-i18n="expeditions.map.title">Onde coletamos</h2>
+  </header>
+```
+
+```{r mapa-expedicoes}
+library(leaflet)
+library(htmlwidgets)
+library(dplyr)
+library(htmltools)
+library(sf)
+
+# =========================================================================
+# 1) CAMINHOS DE INPUT
+# =========================================================================
+
+# Planilha Darwin Core validada com as coletas do projeto.
+project_direct_files <- file.path("_input_data", "dwc_expedicoes_tsiino_validado.xlsx")
 
 # =========================================================================
 # 4) PONTOS DE COLETA
@@ -871,7 +1165,6 @@ if (!is.na(limite_path) && file.exists(limite_path)) {
   }, error = function(e) NULL)
 }
 
-
 if (!is.null(municipio_sf)) {
   municipio_sf <- sf::st_transform(municipio_sf, 4326)
   municipio_bbox <- sf::st_bbox(municipio_sf)
@@ -885,8 +1178,6 @@ if (!is.null(municipio_sf)) {
 # 6) MAPA
 # =========================================================================
 
-logo_src <- "../figures/brand/logo_tsiino_symbol.png"
-
 map <- leaflet(
   width = "100%",
   height = 780,
@@ -899,28 +1190,7 @@ map <- leaflet(
   addProviderTiles(providers$Esri.WorldImagery, group = "Satélite") %>%
   addProviderTiles(providers$OpenStreetMap, group = "OSM") %>%
   addProviderTiles(providers$Esri.WorldStreetMap, group = "ESRI Street") %>%
-  addProviderTiles(providers$OpenTopoMap, group = "OpenTopo") %>%
-  addControl(
-    html = paste0(
-      "<div class='map-logo'>",
-      "<img src='", logo_src, "' alt='Logo Tsiino Hiiwiida'>",
-      "</div>"
-    ),
-    position = "topright",
-    className = "map-logo-control"
-  ) %>%
-  addControl(
-    html = paste0(
-      "<div style='text-align:left;line-height:1.18;padding:6px 8px;",
-      "background:rgba(250,246,238,0.93);border-radius:8px;",
-      "box-shadow:0 1px 5px rgba(0,0,0,0.20);'>",
-      "<div style='font-size:15px;font-weight:800;color:#203B23;'>Tsiino Hiiwiida</div>",
-      "<div style='font-size:10px;font-weight:700;color:#A94F35;'>Trilhas e coletas · Cabeça do Cachorro</div>",
-      "</div>"
-    ),
-    position = "topleft",
-    className = "custom-title"
-  )
+  addProviderTiles(providers$OpenTopoMap, group = "OpenTopo")
 
 # Limite municipal
 if (!is.null(municipio_sf)) {
@@ -967,8 +1237,7 @@ if (!is.null(trails_sf) && nrow(trails_sf) > 0) {
   for (trail_nm in trail_names) {
     x <- trails_sf[trails_sf$kml_name == trail_nm, , drop = FALSE]
 
-    length_km <- sum(x$length_m, na.rm = TRUE) / 1000
-    if (!is.finite(length_km) || length_km <= 0) length_km <- NA_real_
+    length_km <- if (trail_nm %in% names(trail_len_m)) trail_len_m[[trail_nm]] / 1000 else NA_real_
 
     route_popup <- paste0(
       "<div class='popup-card'>",
@@ -978,6 +1247,10 @@ if (!is.null(trails_sf) && nrow(trails_sf) > 0) {
       popup_row("KML", unique(x$kml_file)[1]),
       if (!is.na(length_km)) popup_row("Extensão", paste0(format(round(length_km, 1), decimal.mark = ","), " km")) else "",
       "</table>",
+      if (!is.na(trail_exp[trail_nm])) paste0(
+        "<a class='popup-3d' href='#expedicoes-3d' data-exp3d='",
+        safe_html(trail_exp[[trail_nm]]), "'>Ver este percurso em 3D</a>"
+      ) else "",
       "</div>"
     )
 
@@ -1106,7 +1379,6 @@ map <- map %>%
     position = "bottomright",
     className = "map-legend-control"
   )
-
 
 # Heatmap suave por escala + modo ponto/contagem + números das coletas em
 # escala próxima + controle de tela cheia. O mapa continua funcionando se
@@ -1327,380 +1599,20 @@ map <- htmlwidgets::onRender(
   data = list(heat = heat_payload)
 )
 
-map
-```
+fmt_n <- function(x) formatC(x, big.mark = "\u202F", format = "d")
+n_points <- nrow(collection_points)
+n_families <- if (n_points > 0) length(unique(collection_points$family[nz(collection_points$family)])) else 0L
 
-```{=html}
-</section>
-
-<section id="expedicoes-3d" class="content-card exp3d-section">
-  <div class="section-title">
-    <h2 data-i18n="expeditions.3d.title">Expedições em 3D</h2>
-  </div>
-  <p class="lead" data-i18n="expeditions.3d.lead">
-    Percorra os trajetos de GPS das expedições sobre o relevo e a imagem de satélite, com as fotos e os registros feitos pelo caminho.
-  </p>
-  <div class="exp3d-frame">
-    <iframe
-      id="exp3d-iframe"
-      src="3d/index.html?embed=1"
-      title="Expedições em 3D"
-      data-i18n-title="expeditions.3d.title"
-      loading="lazy"
-      allow="fullscreen"
-      allowfullscreen
-    ></iframe>
-  </div>
-  <p class="exp3d-actions">
-    <a href="3d/index.html" target="_blank" rel="noopener"><span data-i18n="expeditions.3d.open">Abrir em nova aba</span> <span aria-hidden="true">↗</span></a>
-  </p>
-</section>
-
-<script>
-/* Ponte entre a aba e o módulo 3D (expedicoes/3d/index.html?embed=1):
-   idioma do site, pausa fora da tela e botões "Ver em 3D" dos cards. */
-(function () {
-  var frame = document.getElementById('exp3d-iframe');
-  if (!frame) return;
-  var base = frame.getAttribute('src');
-  var ready = false;
-
-  function post(msg) {
-    if (ready && frame.contentWindow) frame.contentWindow.postMessage(msg, '*');
-  }
-  function currentLang() {
-    return document.documentElement.getAttribute('data-tsiino-language') === 'en' ? 'en' : 'pt';
-  }
-  function sendLang() { post({ type: 'tsiino-lang', lang: currentLang() }); }
-
-  frame.addEventListener('load', function () { ready = true; sendLang(); });
-  new MutationObserver(sendLang).observe(document.documentElement, {
-    attributes: true, attributeFilter: ['data-tsiino-language']
-  });
-
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { post({ type: 'tsiino-visible', visible: e.isIntersecting }); });
-    }, { threshold: 0.2 }).observe(frame);
-  }
-
-  document.addEventListener('click', function (ev) {
-    var link = ev.target.closest && ev.target.closest('[data-exp3d]');
-    if (!link) return;
-    ev.preventDefault();
-    var id = link.getAttribute('data-exp3d');
-    document.getElementById('expedicoes-3d').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (ready) post({ type: 'tsiino-goto', exp: id });
-    else frame.src = base + '&exp=' + encodeURIComponent(id);
-  });
-})();
-</script>
-
-<div class="bg-window"></div>
-
-<section id="lista-expedicoes" class="expeditions-shell">
-  <div class="expeditions-heading">
-    <div class="eyebrow" data-i18n="expeditions.list.eyebrow">Registros de campo</div>
-    <h2 data-i18n="expeditions.list.title">Expedições</h2>
-    <p data-i18n="expeditions.list.description">Fotografias e registros das expedições do projeto.</p>
-  </div>
-```
-
-```{r expedition-sections}
-library(htmltools)
-
-# =========================================================================
-# METADADOS DAS EXPEDIÇÕES — mantêm a lógica antiga das fotos/cards.
-# Este arquivo NÃO alimenta mais os pontos do mapa.
-# =========================================================================
-
-exp_meta_path <- find_up(file.path("_input_data", "expedicoes_tsiino.csv"))
-photo_root_abs <- find_up(file.path("_input_data", "expedicoes_fotos"))
-photo_root_html_rel <- file.path("..", "_input_data", "expedicoes_fotos")
-
-read_expedition_metadata <- function(path) {
-  if (is.na(path) || !file.exists(path)) return(data.frame())
-
-  raw <- tryCatch(read_delimited_auto(path), error = function(e) NULL)
-  if (is.null(raw) || nrow(raw) == 0) return(data.frame())
-
-  get_meta <- function(candidates) get_col_chr(raw, candidates)
-
-  out <- data.frame(
-    expedicao = first_nonempty(
-      get_meta(c("expedicao", "expedição", "expedition", "nome", "name"))
-    ),
-    input_id = first_nonempty(
-      get_meta(c("expedicao_id", "expedição_id", "id", "slug", "codigo", "código"))
-    ),
-    localidade = first_nonempty(
-      get_meta(c("localidade", "local", "site", "ponto", "locality"))
-    ),
-    data_exp = first_nonempty(
-      get_meta(c("data", "date", "periodo", "período"))
-    ),
-    comunidade = first_nonempty(
-      get_meta(c("comunidade", "community", "aldeia"))
-    ),
-    municipio = first_nonempty(
-      get_meta(c("municipio", "município", "city", "cidade"))
-    ),
-    equipe = first_nonempty(
-      get_meta(c("equipe", "team", "pesquisadores", "coletores", "collectors"))
-    ),
-    observacoes = first_nonempty(
-      get_meta(c("observacoes", "observações", "obs", "notes", "comentarios", "comentários"))
-    ),
-    resumo = first_nonempty(
-      get_meta(c("resumo", "descricao", "descrição", "description"))
-    ),
-    pasta_fotos = clean_photo_folder(first_nonempty(
-      get_meta(c("pasta_fotos", "fotos", "folder", "photo_folder", "pasta", "imagens"))
-    )),
-    stringsAsFactors = FALSE
-  )
-
-  out$expedicao[!nz(out$expedicao)] <- paste0("Expedição ", which(!nz(out$expedicao)))
-
-  ids <- out$input_id
-  ids[!nz(ids)] <- out$expedicao[!nz(ids)]
-  out$expedicao_id <- slugify(ids)
-  out$section_id <- paste0("exp-", out$expedicao_id)
-
-  out$pasta_fotos[!nz(out$pasta_fotos)] <- out$expedicao_id[!nz(out$pasta_fotos)]
-  out
-}
-
-expedicoes <- read_expedition_metadata(exp_meta_path)
-
-# Expedições que têm módulo 3D (_input_data/expedicoes_3d.json) ganham o
-# botão "Ver em 3D" no card. O id do JSON deve ser igual ao slug do nome
-# da expedição no CSV (ex.: "Tiquié Julho 2026" -> "tiquie-julho-2026").
-exp3d_ids <- local({
-  p <- find_up(file.path("_input_data", "expedicoes_3d.json"))
-  if (is.na(p) || !requireNamespace("jsonlite", quietly = TRUE)) return(character())
-  cfg <- tryCatch(jsonlite::fromJSON(p, simplifyVector = FALSE), error = function(e) NULL)
-  if (is.null(cfg)) return(character())
-  vapply(cfg$expeditions, function(e) as.character(e$id), character(1))
-})
-
-# Fallback: se o CSV ainda não existir, cada subpasta de expedicoes_fotos
-# vira uma expedição para que a galeria continue funcionando.
-if (nrow(expedicoes) == 0 && !is.na(photo_root_abs) && dir.exists(photo_root_abs)) {
-  folders <- list.dirs(photo_root_abs, recursive = FALSE, full.names = FALSE)
-  folders <- folders[nz(folders)]
-
-  if (length(folders) > 0) {
-    titles <- gsub("[-_]", " ", folders)
-    titles <- tools::toTitleCase(titles)
-
-    expedicoes <- data.frame(
-      expedicao = titles,
-      input_id = folders,
-      localidade = NA_character_,
-      data_exp = NA_character_,
-      comunidade = NA_character_,
-      municipio = NA_character_,
-      equipe = NA_character_,
-      observacoes = NA_character_,
-      resumo = NA_character_,
-      pasta_fotos = folders,
-      expedicao_id = slugify(folders),
-      stringsAsFactors = FALSE
+htmltools::tagList(
+  tags$p(
+    class = "lead",
+    sprintf(
+      "Cada ponto é uma coleta do projeto com coordenadas: %s registros de %s famílias. Clique em um trajeto para vê-lo em 3D.",
+      fmt_n(n_points), fmt_n(n_families)
     )
-    expedicoes$section_id <- paste0("exp-", expedicoes$expedicao_id)
-  }
-}
-
-get_photos <- function(folder) {
-  folder <- clean_photo_folder(folder)[1]
-
-  if (is.na(photo_root_abs) || is.na(folder) || !nzchar(folder)) {
-    return(character())
-  }
-
-  d <- file.path(photo_root_abs, folder)
-  if (!dir.exists(d)) return(character())
-
-  f <- list.files(
-    d,
-    pattern = "\\.(jpg|jpeg|png|webp)$",
-    full.names = FALSE,
-    ignore.case = TRUE
-  )
-
-  f <- f[!grepl("^\\.", f)]
-  if (length(f) == 0) return(character())
-
-  f <- sort(f)
-  gsub("\\\\", "/", file.path(photo_root_html_rel, folder, f))
-}
-
-make_meta <- function(label, value, key = NULL) {
-  value <- as.character(value)[1]
-  if (!nz(value)) return(NULL)
-
-  if (!is.null(key) && nzchar(key)) {
-    tags$span(
-      class = "meta-pill",
-      tags$span(`data-i18n` = key, label),
-      ": ",
-      value
-    )
-  } else {
-    tags$span(class = "meta-pill", paste0(label, ": ", value))
-  }
-}
-
-make_gallery <- function(photos, title, section_id, eager_first = FALSE) {
-  if (length(photos) == 0) {
-    return(
-      tags$div(
-        class = "empty-gallery",
-        tags$span(`data-i18n` = "expeditions.card.noPhoto", "Nenhuma foto encontrada para esta expedição.")
-      )
-    )
-  }
-
-  slides <- lapply(seq_along(photos), function(j) {
-    tags$figure(
-      class = "exp-slide",
-      tags$img(
-        src = photos[j],
-        alt = paste(title, "foto", j),
-        loading = if (j == 1 && eager_first) "eager" else "lazy",
-        decoding = "async"
-      ),
-      tags$figcaption(
-        tagList(
-          tags$span(`data-i18n` = "common.photo", "Foto"),
-          " ", j, " · ", title
-        )
-      )
-    )
-  })
-
-  dots <- lapply(seq_along(photos), function(j) {
-    tags$button(
-      class = paste("exp-carousel-dot", if (j == 1) "is-current" else ""),
-      type = "button",
-      `aria-label` = paste("Ir para foto", j),
-      `aria-current` = if (j == 1) "true" else "false"
-    )
-  })
-
-  tags$div(
-    class = "exp-carousel",
-    id = paste0("carousel-", section_id),
-    `data-index` = "0",
-    `data-single` = if (length(photos) == 1) "true" else "false",
-    tags$div(class = "exp-carousel-track", do.call(tagList, slides)),
-    tags$button(
-      class = "exp-carousel-nav exp-carousel-prev",
-      type = "button",
-      `aria-label` = "Foto anterior",
-      "‹"
-    ),
-    tags$button(
-      class = "exp-carousel-nav exp-carousel-next",
-      type = "button",
-      `aria-label` = "Próxima foto",
-      "›"
-    ),
-    tags$div(class = "exp-carousel-dots", do.call(tagList, dots))
-  )
-}
-
-make_exp_card <- function(i) {
-  x <- expedicoes[i, , drop = FALSE]
-  photos <- get_photos(x$pasta_fotos)
-
-  title <- ifelse(
-    nz(x$expedicao),
-    x$expedicao,
-    paste0("Expedição ", i)
-  )
-
-  summary_txt <- ifelse(
-    nz(x$resumo),
-    x$resumo,
-    x$observacoes
-  )
-
-  tags$section(
-    class = "expedition-card",
-    id = x$section_id,
-    tags$div(
-      class = "expedition-eyebrow",
-      `data-i18n` = "expeditions.card.eyebrow",
-      "Expedição"
-    ),
-    tags$h3(title),
-    tags$div(
-      class = "expedition-meta",
-      make_meta("Data", x$data_exp, "common.date"),
-      make_meta("Localidade", x$localidade, "common.locality"),
-      make_meta("Comunidade", x$comunidade, "common.community"),
-      make_meta("Município", x$municipio, "common.municipality"),
-      make_meta("Equipe", x$equipe, "common.team")
-    ),
-    if (nz(summary_txt)) tags$p(class = "expedition-summary", summary_txt),
-    if (x$expedicao_id %in% exp3d_ids) {
-      tags$a(
-        class = "exp3d-link",
-        href = "#expedicoes-3d",
-        `data-exp3d` = x$expedicao_id,
-        tags$span(`data-i18n` = "expeditions.card.view3d", "Ver em 3D"),
-        tags$span(`aria-hidden` = "true", " →")
-      )
-    },
-    make_gallery(photos, title, x$section_id, eager_first = (i == 1))
-  )
-}
-
-make_page_break <- function(position_index) {
-  n <- ((position_index - 1) %% 5) + 1
-  filename <- if (n == 1) "page_break.jpg" else paste0("page_break_", n, ".jpg")
-
-  tags$figure(
-    class = "expedition-break",
-    `aria-hidden` = "true",
-    tags$img(
-      src = file.path("..", "figures", filename),
-      alt = "",
-      loading = "lazy",
-      decoding = "async",
-      onerror = "this.closest('.expedition-break').style.display='none';"
-    )
-  )
-}
-
-if (nrow(expedicoes) > 0) {
-  items <- list()
-
-  for (i in seq_len(nrow(expedicoes))) {
-    items[[length(items) + 1]] <- make_exp_card(i)
-
-    if (i < nrow(expedicoes)) {
-      items[[length(items) + 1]] <- make_page_break(i)
-    }
-  }
-
-  tagList(
-    tags$div(
-      class = "expedition-grid",
-      do.call(tagList, items)
-    )
-  )
-} else {
-  tags$div(
-    class = "expedition-card",
-    tags$p(
-      `data-i18n` = "expeditions.list.empty",
-      "Nenhuma expedição foi cadastrada em _input_data/expedicoes_tsiino.csv e nenhuma subpasta foi encontrada em _input_data/expedicoes_fotos/."
-    )
-  )
-}
+  ),
+  map
+)
 ```
 
 ```{=html}

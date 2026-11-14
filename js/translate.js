@@ -257,8 +257,8 @@ window.TsiinoTranslations = {
       "expeditions.map.legend": "Legend",
       "expeditions.map.sgc": "São Gabriel da Cachoeira",
       "expeditions.map.registeredExpeditions": "Registered expeditions",
-      "expeditions.list.title": "Expeditions",
-      "expeditions.card.noPhoto": "No photo found for this expedition.",
+      "expeditions.list.title": "Field album",
+      "expeditions.card.noPhoto": "Photos from this expedition have not been published yet.",
       "expeditions.card.expectedFolder": "Expected folder:",
       "expeditions.card.eyebrow": "Expedition",
       "expeditions.list.empty": "No expedition has been registered in _input_data/expedicoes_tsiino.csv and no subfolder was found in _input_data/expedicoes_fotos/.",
@@ -464,6 +464,21 @@ window.TsiinoTranslations = {
       "Trajeto da expedição": "Expedition route",
       "Camadas": "Layers",
       "Registros de campo": "Field records",
+      "janeiro": "January",
+      "fevereiro": "February",
+      "março": "March",
+      "abril": "April",
+      "maio": "May",
+      "junho": "June",
+      "julho": "July",
+      "agosto": "August",
+      "setembro": "September",
+      "outubro": "October",
+      "novembro": "November",
+      "dezembro": "December",
+      "Fechar": "Close",
+      "Visualizador de fotos": "Photo viewer",
+      "Ver este percurso em 3D": "See this route in 3D",
       "Fotografias e registros das expedições do projeto.":"Photographs and records from the project's expeditions.",
       "Coleta do projeto Tsiino Hiiwiida": "Collection from the Tsiino Hiiwiida project",
       "Coleta botânica": "Botanical collection",
@@ -544,10 +559,10 @@ window.TsiinoTranslations = {
       "expeditions.hero.subtitle": "Trails, collections, photos and field records",
       "expeditions.hero.mapButton": "View map",
       "expeditions.hero.listButton": "View expeditions",
-      "expeditions.map.title": "Expedition map",
+      "expeditions.map.title": "Where we collected",
       "expeditions.map.lead": "The map shows selected expedition routes and collection sites from the Tsiino Hiiwiida project.",
       "expeditions.list.eyebrow": "Field records",
-      "expeditions.list.description": "Photographs and records from the project's expeditions.",
+      "expeditions.list.description": "From the most recent expedition back to the first, with photos taken by the team in the field.",
       "expeditions.hero.aria": "Opening section of the expeditions page",
       "expeditions.hero.logoAria": "Tsiino Hiiwiida logo",
       "expeditions.hero.logoAlt": "Tsiino Hiiwiida logo",
@@ -556,7 +571,7 @@ window.TsiinoTranslations = {
       "expeditions.3d.title": "Expeditions in 3D",
       "expeditions.3d.lead": "Follow the GPS routes of the expeditions over the terrain and satellite imagery, with the photos and records made along the way.",
       "expeditions.3d.open": "Open in a new tab",
-      "expeditions.card.view3d": "View in 3D"
+      "expeditions.card.view3d": "See the route in 3D"
     }
   },
   "prefixes": {
@@ -571,7 +586,8 @@ window.TsiinoTranslations = {
       "Arquivo validado não encontrado para ": "Validated file not found for ",
       ", mas não pôde ser lido. Erro: ": ", but could not be read. Error: ",
       "Pasta esperada: ": "Expected folder: ",
-      "Foto ": "Photo "
+      "Foto ": "Photo ",
+      "Fotos: ": "Photos: "
     }
   },
   "phrases": {
@@ -744,6 +760,30 @@ window.TsiinoTranslations = {
       {
         "pattern": "^(.+) na Flora e Funga do Brasil$",
         "replacement": "$1 in Flora e Funga do Brasil",
+        "flags": "",
+        "terminal": true
+      },
+      {
+        "pattern": "^Cada ponto é uma coleta do projeto com coordenadas: ([0-9\u202F]+) registros de ([0-9\u202F]+) famílias[.] Clique em um trajeto para vê-lo em 3D[.]$",
+        "replacement": "Each point is a project collection with coordinates: $1 records from $2 families. Click a route to see it in 3D.",
+        "flags": "",
+        "terminal": true
+      },
+      {
+        "pattern": "^([0-9\u202F]+) km em 1 trajeto de GPS$",
+        "replacement": "$1 km over 1 GPS route",
+        "flags": "",
+        "terminal": true
+      },
+      {
+        "pattern": "^([0-9\u202F]+) km em ([0-9]+) trajetos de GPS$",
+        "replacement": "$1 km over $2 GPS routes",
+        "flags": "",
+        "terminal": true
+      },
+      {
+        "pattern": "^Ampliar foto ([0-9]+)$",
+        "replacement": "Enlarge photo $1",
         "flags": "",
         "terminal": true
       },
